@@ -10,6 +10,12 @@ and [this how-to](https://www.drissamri.be/blog/java/enable-https-in-spring-boot
 
 Building the code is trivial using maven. Or open the `pom.xml` as a project in your IDE.
 
+To create a runnable jar, open a console, go to the root of the project directory and type:
+
+```
+mvn package
+```
+
 ## Configuring
 
 ### 1. Get a SSL certificate.
@@ -99,7 +105,11 @@ In this case, there is one client, with settings to use the Gluu Server on honeg
 ## Running
 
 ### 1. Using maven
-TODO
+In the root directory of the project, type:
+
+```
+mvn spring-boot:run
+```
 
 ### 2. In IntelliJ IDEA
 IntelliJ IDEA supports Spring Boot apps out of the box. Navigate to `be.ugent.idlab.tcbl.OAuth2LoginApplication`, right-click on
