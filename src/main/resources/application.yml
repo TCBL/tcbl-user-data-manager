@@ -1,0 +1,47 @@
+server:
+  port: 8443
+  ssl:
+    key-store: /home/ghaesen/projects/TCBL/test_project/OpenIDConnectTest/cert/keystore.p12
+    key-store-password: secret
+    key-store-type: PKCS12
+    key-alias: tomcat
+
+logging:
+  level:
+    root: info
+    org.springframework.web: debug
+    org.springframework.security: debug
+
+spring:
+  thymeleaf:
+    cache: false
+
+security:
+  oauth2:
+    client:
+      tcbl-manager-dev:
+        client-id: "@!4F1B.EBA3.75E2.F47A!0001!EF35.6902!0008!1B4C.7A50.7F55.50D7"
+        client-secret: averysecrativesecret
+        client-authentication-method: post
+        authorized-grant-type: authorization_code
+        redirect-uri: "https://ravel.elis.ugent.be:8443/oauth2/authorize/code/tcbl_manager_dev"
+        scopes: openid, user_name
+        authorization-uri: "https://honegger.elis.ugent.be/oxauth/seam/resource/restv1/oxauth/authorize"
+        token-uri: "https://honegger.elis.ugent.be/oxauth/seam/resource/restv1/oxauth/token"
+        user-info-uri: "https://honegger.elis.ugent.be/oxauth/seam/resource/restv1/oxauth/userinfo"
+        user-info-converter: "org.springframework.security.oauth2.client.user.converter.UserInfoConverter"
+        client-name: TCBL_manager_dev
+        client-alias: tcbl-manager-dev
+      tcbl-test:
+        client-id: "@!E692.B7C7.C462.7A1D!0001!E03D.8C4F!0008!7826.7E79.0C74.E1B6"
+        client-secret: averysecrativesecret
+        client-authentication-method: header
+        authorized-grant-type: authorization_code
+        redirect-uri: "https://ravel.elis.ugent.be:8443/oauth2/authorize/code/tcbl_test"
+        scopes: openid, user_name
+        authorization-uri: "https://tcblsso2.ilabt.imec.be/oxauth/seam/resource/restv1/oxauth/authorize"
+        token-uri: "https://tcblsso2.ilabt.imec.be/oxauth/seam/resource/restv1/oxauth/token"
+        user-info-uri: "https://tcblsso2.ilabt.imec.be/oxauth/seam/resource/restv1/oxauth/userinfo"
+        user-info-converter: "org.springframework.security.oauth2.client.user.converter.UserInfoConverter"
+        client-name: TCBL_manager_test
+        client-alias: tcbl-manager-test
