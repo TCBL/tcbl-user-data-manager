@@ -1,3 +1,8 @@
+####
+#
+# This is a sample configuration. Copy this and place next to the application jar file to override.
+#
+####
 server:
   port: 8443
   ssl:
