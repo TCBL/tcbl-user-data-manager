@@ -31,7 +31,9 @@ import reactor.core.publisher.Mono;
 import java.util.Map;
 
 /**
- * @author Joe Grandja
+ * <p>Copyright 2017 IDLab (Ghent University - imec)</p>
+ *
+ * @author Gerald Haesendonck
  */
 @Controller
 public class MainController {
