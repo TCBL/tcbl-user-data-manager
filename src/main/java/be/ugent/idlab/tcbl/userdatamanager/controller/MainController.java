@@ -16,6 +16,8 @@
  */
 package be.ugent.idlab.tcbl.userdatamanager.controller;
 
+import be.ugent.idlab.tcbl.userdatamanager.model.TCBLUser;
+import be.ugent.idlab.tcbl.userdatamanager.model.TCBLUserRepository;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
@@ -39,6 +41,12 @@ import java.util.Map;
 public class MainController {
 	private WebClient webClient = WebClient.create();
 
+	private final TCBLUserRepository tcblUserRepository;
+
+	public MainController(TCBLUserRepository tcblUserRepository) {
+		this.tcblUserRepository = tcblUserRepository;
+	}
+
 
 	@RequestMapping("/")
 	public String index(Model model, @AuthenticationPrincipal OAuth2User user, OAuth2AuthenticationToken authentication) {
@@ -56,7 +64,14 @@ public class MainController {
 				.retrieve()
 				.bodyToMono(Map.class)
 				.block();
+		String userName = userAttributes.get("user_name").toString();
+		TCBLUser tcblUser = tcblUserRepository.find(userName);
+		if (tcblUser == null) {
+			tcblUser = new TCBLUser();
+			tcblUser.setUserName(userName);
+		}
 		model.addAttribute("userAttributes", userAttributes);
+//		model.addAttribute("tcblUSer", tcblUser);
 		return "userinfo";
 	}
 
