@@ -1,4 +1,4 @@
-package be.ugent.idlab.tcbl;
+package be.ugent.idlab.tcbl.userdatamanager;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
