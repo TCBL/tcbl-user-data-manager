@@ -71,7 +71,7 @@ public class MainController {
 			tcblUser.setUserName(userName);
 		}
 		model.addAttribute("userAttributes", userAttributes);
-//		model.addAttribute("tcblUSer", tcblUser);
+		model.addAttribute("tcblUser", tcblUser);
 		return "userinfo";
 	}
 
