@@ -47,12 +47,21 @@ public class MainController {
 		this.tcblUserRepository = tcblUserRepository;
 	}
 
-
 	@RequestMapping("/")
-	public String index(Model model, @AuthenticationPrincipal OAuth2User user, OAuth2AuthenticationToken authentication) {
+	public String root() {
+		return "redirect:index";
+	}
+
+	@RequestMapping("/index")
+	public String index() {
+		return "index";
+	}
+
+	@RequestMapping("/user/index")
+	public String userIndex(Model model, @AuthenticationPrincipal OAuth2User user, OAuth2AuthenticationToken authentication) {
 		model.addAttribute("userName", user.getName());
 		model.addAttribute("clientName", authentication.getClientRegistration().getClientName());
-		return "index";
+		return "user/index";
 	}
 
 	@RequestMapping("/userinfo")
