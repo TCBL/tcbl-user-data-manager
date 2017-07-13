@@ -17,7 +17,7 @@
             <input type="submit" value="Logout" />
         </form>
     </div>
-</div-->
+</div>
 <!-- *** -->
 
 <h1>TCBL User  Manager</h1>
@@ -27,9 +27,14 @@
     via the OAuth 2.0 Client <span style="font-weight:bold" th:text="${clientName}"></span> -->
 </div>
 <div>&nbsp;</div>
-<div>
+
+<!--div>
     <a href="/userinfo" th:href="@{/userinfo}">Display User Info</a>
+</div-->
+<div>
+    <a href="/optekenen" th:href="@{/optekenen}">Optekenen</a>
 </div>
+
 <div>
     <a href="/user/index" th:href="@{/user/index}">Manage your info</a>
 </div>

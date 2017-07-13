@@ -53,14 +53,19 @@ public class MainController {
 	}
 
 	@RequestMapping("/index")
-	public String index() {
+	public String index(@AuthenticationPrincipal OAuth2User user, OAuth2AuthenticationToken authentication) {
 		return "index";
+	}
+
+	@RequestMapping("/optekenen")
+	public String optekenen() {
+		return "redirect:/oauth2/authorization/code/tcbl-manager";
 	}
 
 	@RequestMapping("/user/index")
 	public String userIndex(Model model, @AuthenticationPrincipal OAuth2User user, OAuth2AuthenticationToken authentication) {
-		model.addAttribute("userName", user.getName());
-		model.addAttribute("clientName", authentication.getClientRegistration().getClientName());
+		model.addAttribute("userName", user.getAttributes().get("given_name"));
+		//model.addAttribute("clientName", authentication.getClientRegistration().getClientName());
 		return "user/index";
 	}
 
