@@ -34,7 +34,7 @@ import java.util.stream.Collectors;
 public class ClientRegistrationAutoConfiguration {
 	private static final String CLIENT_ID_PROPERTY = "client-id";
 	//private static final String CLIENTS_DEFAULTS_RESOURCE = "META-INF/oauth2-clients-defaults.yml";
-	static final String CLIENT_PROPERTY_PREFIX = "security.oauth2.client";
+	public static final String CLIENT_PROPERTY_PREFIX = "security.oauth2.client";
 
 	@Configuration
 	@Conditional(ClientPropertiesAvailableCondition.class)
@@ -80,7 +80,7 @@ public class ClientRegistrationAutoConfiguration {
 		}*/
 	}
 
-	static Set<String> resolveClientPropertyKeys(Environment environment) {
+	public static Set<String> resolveClientPropertyKeys(Environment environment) {
 		Binder binder = Binder.get(environment);
 		BindResult<Map<String, Object>> result = binder.bind(
 				CLIENT_PROPERTY_PREFIX, Bindable.mapOf(String.class, Object.class));
