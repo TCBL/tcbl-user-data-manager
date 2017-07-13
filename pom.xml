@@ -12,8 +12,10 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <spring.boot.version>2.0.0.M2</spring.boot.version>
-        <spring.security.version>5.0.0.M2</spring.security.version>  <!-- The latest release does not offer OpenID Connect, so we need this Milestone version-->
-        <scim.client.version>3.0.2</scim.client.version>             <!-- Must be the same as the Gluu server version -->
+        <spring.security.version>5.0.0.M2
+        </spring.security.version>  <!-- The latest release does not offer OpenID Connect, so we need this Milestone version-->
+        <scim.client.version>3.0.2
+        </scim.client.version>             <!-- Must be the same as the Gluu server version -->
         <java.version>1.8</java.version>
     </properties>
 
@@ -122,6 +124,16 @@
             <groupId>gluu.scim.client</groupId>
             <artifactId>SCIM-Client</artifactId>
             <version>${scim.client.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-log4j12</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>log4j</groupId>
+                    <artifactId>log4j</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
 </project>
