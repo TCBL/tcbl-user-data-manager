@@ -12,7 +12,8 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <spring.boot.version>2.0.0.M2</spring.boot.version>
-        <spring.security.version>5.0.0.M2</spring.security.version>
+        <spring.security.version>5.0.0.M2</spring.security.version>  <!-- The latest release does not offer OpenID Connect, so we need this Milestone version-->
+        <scim.client.version>3.0.2</scim.client.version>             <!-- Must be the same as the Gluu server version -->
         <java.version>1.8</java.version>
     </properties>
 
@@ -31,6 +32,8 @@
                     <target>${java.version}</target>
                 </configuration>
             </plugin>
+
+            <!-- provides handy commands, e.g. to start the app from the command line using maven -->
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
@@ -40,6 +43,7 @@
     </build>
 
     <repositories>
+        <!-- Needed to use Spring Milestone releases -->
         <repository>
             <id>spring-milestones</id>
             <name>Spring Milestones</name>
@@ -48,17 +52,18 @@
                 <enabled>false</enabled>
             </snapshots>
         </repository>
+
+        <!-- Gluu software repo -->
         <repository>
-            <id>spring-snapshots</id>
-            <name>Spring Snapshots</name>
-            <url>https://repo.spring.io/libs-snapshot</url>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
+            <id>gluu</id>
+            <name>Gluu repository</name>
+            <url>http://ox.gluu.org/maven</url>
         </repository>
     </repositories>
 
     <dependencies>
+
+        <!-- Spring Boot, to minimalise and ease configuration -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
@@ -67,13 +72,15 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-webflux</artifactId>
         </dependency>
-        
+
+        <!-- This is neede because we hacked the Nimbus OAuth2 code -->
         <dependency>
             <groupId>com.nimbusds</groupId>
             <artifactId>oauth2-oidc-sdk</artifactId>
             <version>5.28</version>
         </dependency>
 
+        <!-- Spring Security offers a security framework so we don't need to write too much code -->
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-oauth2-core</artifactId>
@@ -95,7 +102,8 @@
             <version>${spring.security.version}</version>
             <scope>compile</scope>
         </dependency>
-        
+
+        <!-- Template engine (for rendering html pages) that integrates with Spring -->
         <dependency>
             <groupId>org.thymeleaf</groupId>
             <artifactId>thymeleaf-spring5</artifactId>
@@ -107,6 +115,13 @@
             <artifactId>thymeleaf-extras-springsecurity4</artifactId>
             <version>3.0.2.RELEASE</version>
             <scope>compile</scope>
+        </dependency>
+
+        <!-- Gluu SCIM client, for managing users and groups on the Gluu Server -->
+        <dependency>
+            <groupId>gluu.scim.client</groupId>
+            <artifactId>SCIM-Client</artifactId>
+            <version>${scim.client.version}</version>
         </dependency>
     </dependencies>
 </project>
