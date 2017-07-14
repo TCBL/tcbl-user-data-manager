@@ -1,7 +1,8 @@
-# OpenID Connect via Spring to log in on the Gluu Server.
+# TCBL User Data Manager.
 
-This is a sample Spring Boot application that uses the Gluu Server to log in and display user info.
-This will be our TCBL User Data Management application!
+This application allows to manage user data as stored in a Gluu Server.
+It is a Java Spring Boot application that uses OpenID Connect 1.0 to authorize and SCIM 2.0 to manage the data.
+This README describes how to build and configure it.
 
 The code and documentation are based on [this sample](https://github.com/spring-projects/spring-security/tree/master/samples/boot/oauth2login)
 and [this how-to](https://www.drissamri.be/blog/java/enable-https-in-spring-boot/).
@@ -18,16 +19,18 @@ mvn package
 
 ## Configuring
 
-### 1. Get a SSL certificate.
-Two options here: a self-signed certificate or a certificate from a Certificate Authority.
+### 1. Enable SHTTP for the application
+
+In order to use OpenID Connect, the application needs to be able to receive https requests.
+Two options here: using a self-signed certificate or a certificate from a Certificate Authority.
 
 #### a. Self-signed
 
 Use `keytool` (shipped with a JDK or JRE) to generate a certificate and store it in a keystore.
-You can choose the alias (`tomcat`) and the name of the keystore (`keystore.p12`) as you whish, but remember them for later.
+You can choose the alias (`tudm`) and the name of the keystore (`tudm.p12`) as you whish, but remember them for later.
 
 ```
-keytool -genkey -alias tomcat -storetype PKCS12 -keyalg RSA -keysize 2048 -keystore keystore.p12 -validity 3650
+keytool -genkey -alias tudm -storetype PKCS12 -keyalg RSA -keysize 2048 -keystore tudm.jks -validity 3650
 ```
 
 You don't *have* to provide much details in order for it to work. Just remember the password, you will need it later on.
@@ -52,26 +55,116 @@ Enter keystore password:
 ```
 
 #### b. From a CA
-TODO
 
-### 2. Configure the application
+If you already have a certificate (chain), find the .crt file. Then import it into the keystore:
 
-Open `OpenIDConnectTest/src/main/resources/application.yml`. Example:
+```
+/usr/lib/jvm/java-8-openjdk-amd64/bin/keytool -importcert -file the_certificate.crt -alias tudm -keystore tudm.jks
+
+```
+
+This results in the following configuration snippet (example):
 
 ```yaml
 server:
   port: 8443
   ssl:
-    key-store: /home/ghaesen/projects/TCBL/test_project/OpenIDConnectTest/cert/keystore.p12
+    key-store: /home/ghaesen/projects/TCBL/config/tudm.jks
     key-store-password: secret
     key-store-type: PKCS12
-    key-alias: tomcat
+    key-alias: tudm
+```
+
+*The complete configuration can be viewed in "4. Configure the application"*
+
+### 2. Register the client on the server
+
+**Before registering, make sure there is a scope `inum` with a claim `inum` created on the server!**
+
+This is a manual registration because Spring Security Oauth2 doesn't support dynamic registration for OpenID Connect yet.
+Here are the settings (example, adjust to correct hosts):
+
+* Client Name: TCBL_manager
+* Application Type: Web
+* Pre-Authorization: True (this skips the authorization step, since it makes no sence for this application)
+* Persist Client Authorizations: False
+* Logo URI: https://tcblsso.ilabt.iminds.be:8443/resources/logos/login-with-TCBL.png (though it won't be shown)
+* Subject Type: pairwise
+* Authentication method for the Token Endpoint: client_secret_post
+* Redirect Login URIs: https://ravel.elis.ugent.be:8443/oauth2/authorize/code/tcbl_manager (or wherever the app lives)
+* Scopes: openid, inum
+* Response Types: code
+* Grant Types: authorization_code
+
+For the client, this results in the following configuration snippet (example):
+
+```yaml
+security:
+  oauth2:
+    client:
+      tcbl-manager:
+        client-id: "@!4F1B.EBA3.75E2.F47A!0001!EF35.6902!0008!1B4C.7A50.7F55.50D7"
+        client-secret: averysecrativesecret
+        client-authentication-method: post
+        authorized-grant-type: authorization_code
+        redirect-uri: "https://ravel.elis.ugent.be:8443/oauth2/authorize/code/tcbl_manager"
+        scopes: openid, inum
+        authorization-uri: "https://honegger.elis.ugent.be/oxauth/seam/resource/restv1/oxauth/authorize"
+        token-uri: "https://honegger.elis.ugent.be/oxauth/seam/resource/restv1/oxauth/token"
+        user-info-uri: "https://honegger.elis.ugent.be/oxauth/seam/resource/restv1/oxauth/userinfo"
+        user-info-converter: org.springframework.security.oauth2.client.user.converter.UserInfoConverter
+        client-name: TCBL_manager
+        client-alias: tcbl-manager
+```
+
+### 3. SCIM configuration
+
+Follow the instructions of [1. Preparations](https://git.datasciencelab.ugent.be/TCBL/internal-server-docs/wikis/scim-2-0-setup#1-preparations) of
+chapter **Setting up a SCIM 2.0 client** from the Scim 2.0 wiki page. In this page, the client is this application.
+
+Skip **2 Setting up the client application**.
+
+Now you should have a client ID, a jks file (containing the certificate from the host running the Gluu Server) and the password of the jks file.
+The client key id can be left empty since there is only one key in the store.
+
+This results in the following configuration snippet (example):
+
+```yaml
+security:
+  scim:
+    domain: "https://honegger.elis.ugent.be/identity/seam/resource/restv1"
+    meta-data-url: "https://honegger.elis.ugent.be/.well-known/uma-configuration"
+    aat-client-id: "@!4F1B.EBA3.75E2.F47A!0001!EF35.6902!0008!224B.6C55"
+    aat-client-jks-path: /home/ghaesen/projects/TCBL/config/scim-rp-honegger.jks
+    aat-client-jks-password: secret
+    aat-client-key-id:
+```
+
+### 4. Configure the application
+
+Putting it all together, the client congfiguration ashould look like in `tcbl-user-data-manager/src/main/resources/application.yml`. Example:
+
+```yaml
+####
+#
+# This is a sample configuration. Copy this and place next to the application jar file to override.
+#
+####
+
+server:
+  port: 8443
+  ssl:
+    key-store: /home/ghaesen/projects/TCBL/config/tudm.jks
+    key-store-password: secret
+    key-store-type: PKCS12
+    key-alias: tudm
 
 logging:
   level:
     root: info
-    org.springframework.web: debug
-    org.springframework.security: debug
+    be.ugent.idlab: debug
+    org.springframework.web: warn
+    org.springframework.security: warn
 
 spring:
   thymeleaf:
@@ -80,27 +173,30 @@ spring:
 security:
   oauth2:
     client:
-      tcbl-manager-dev:
+      # config for client on honegger
+      tcbl-manager:
         client-id: "@!4F1B.EBA3.75E2.F47A!0001!EF35.6902!0008!1B4C.7A50.7F55.50D7"
         client-secret: averysecrativesecret
         client-authentication-method: post
         authorized-grant-type: authorization_code
-        redirect-uri: "https://ravel.elis.ugent.be:8443/oauth2/authorize/code/tcbl_manager_dev"
-        scopes: openid, user_name
+        redirect-uri: "https://ravel.elis.ugent.be:8443/oauth2/authorize/code/tcbl_manager"
+        scopes: openid, inum
         authorization-uri: "https://honegger.elis.ugent.be/oxauth/seam/resource/restv1/oxauth/authorize"
         token-uri: "https://honegger.elis.ugent.be/oxauth/seam/resource/restv1/oxauth/token"
         user-info-uri: "https://honegger.elis.ugent.be/oxauth/seam/resource/restv1/oxauth/userinfo"
-        user-info-converter: "org.springframework.security.oauth2.client.user.converter.UserInfoConverter"
-        client-name: TCBL_manager_dev
-        client-alias: tcbl-manager-dev
+        user-info-converter: org.springframework.security.oauth2.client.user.converter.UserInfoConverter
+        client-name: TCBL_manager
+        client-alias: tcbl-manager
+  scim:
+    domain: "https://honegger.elis.ugent.be/identity/seam/resource/restv1"
+    meta-data-url: "https://honegger.elis.ugent.be/.well-known/uma-configuration"
+    aat-client-id: "@!4F1B.EBA3.75E2.F47A!0001!EF35.6902!0008!224B.6C55"
+    aat-client-jks-path: /home/ghaesen/projects/TCBL/config/scim-rp-honegger.jks
+    aat-client-jks-password: secret
+    aat-client-key-id:
 ```
 
-First, take a look at the `server` section.
-This config starts a server listening at port 8443. Then, in subsection `ssl`, configure the keystore according to the set-up
-in the previous section.
-
-Then, take a look at the `security:oauth2:client` section. Here is where the OpenID Connect client (RP) settings are defined.
-In this case, there is one client, with settings to use the Gluu Server on honegger (our temporary dev machine).
+Of course, change ports and host names accordingly.
 
 ## Running
 
@@ -112,5 +208,5 @@ mvn spring-boot:run
 ```
 
 ### 2. In IntelliJ IDEA
-IntelliJ IDEA supports Spring Boot apps out of the box. Navigate to `be.ugent.idlab.tcbl.OAuth2LoginApplication`, right-click on
+IntelliJ IDEA supports Spring Boot apps out of the box. Navigate to `be.ugent.idlab.tcbl.userdatamanager.TCBLUserDataManager`, right-click on
 the class name or the `main` function and create an application. Ready to run!

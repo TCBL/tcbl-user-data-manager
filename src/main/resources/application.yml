@@ -3,13 +3,14 @@
 # This is a sample configuration. Copy this and place next to the application jar file to override.
 #
 ####
+
 server:
   port: 8443
   ssl:
-    key-store: /home/ghaesen/projects/TCBL/test_project/OpenIDConnectTest/cert/keystore.p12
+    key-store: /home/ghaesen/projects/TCBL/config/tudm.jks
     key-store-password: secret
     key-store-type: PKCS12
-    key-alias: tomcat
+    key-alias: tudm
 
 logging:
   level:
@@ -36,13 +37,13 @@ security:
         authorization-uri: "https://honegger.elis.ugent.be/oxauth/seam/resource/restv1/oxauth/authorize"
         token-uri: "https://honegger.elis.ugent.be/oxauth/seam/resource/restv1/oxauth/token"
         user-info-uri: "https://honegger.elis.ugent.be/oxauth/seam/resource/restv1/oxauth/userinfo"
-        user-info-converter: "org.springframework.security.oauth2.client.user.converter.UserInfoConverter"
+        user-info-converter: org.springframework.security.oauth2.client.user.converter.UserInfoConverter
         client-name: TCBL_manager
         client-alias: tcbl-manager
   scim:
     domain: "https://honegger.elis.ugent.be/identity/seam/resource/restv1"
     meta-data-url: "https://honegger.elis.ugent.be/.well-known/uma-configuration"
     aat-client-id: "@!4F1B.EBA3.75E2.F47A!0001!EF35.6902!0008!224B.6C55"
-    aat-client-jks-path: "/home/ghaesen/projects/TCBL/config/scim-rp-honegger.jks"
+    aat-client-jks-path: /home/ghaesen/projects/TCBL/config/scim-rp-honegger.jks
     aat-client-jks-password: secret
     aat-client-key-id:

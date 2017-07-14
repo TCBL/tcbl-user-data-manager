@@ -16,7 +16,7 @@ import org.springframework.lang.Nullable;
  * @author Gerald Haesendonck
  */
 @SpringBootApplication
-public class OAuth2LoginApplication {
+public class TCBLUserDataManager {
 
 	@Bean
 	public TCBLUserRepository tcblUserRepository(final Environment environment) throws Exception {
@@ -42,6 +42,6 @@ public class OAuth2LoginApplication {
 	}  */
 
 	public static void main(String[] args) {
-		SpringApplication.run(OAuth2LoginApplication.class, args);
+		SpringApplication.run(TCBLUserDataManager.class, args);
 	}
 }

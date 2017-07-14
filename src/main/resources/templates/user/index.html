@@ -1,14 +1,15 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Hello Spring Security</title>
+    <title>TCBL User Manager</title>
     <meta charset="utf-8" />
     <link rel="stylesheet" href="/css/main.css" th:href="@{/css/main.css}" />
 </head>
 <body>
 <!--div th:substituteby="index::logout"></div-->
-<h1>This is a secured page!</h1>
-<div>You are successfully logged in <span style="font-weight:bold" th:object="${tcblUser}" th:text="${tcblUser.userName}"></span></div>
-<p><a href="/index" th:href="@{/index}">Back to home page</a></p>
+<h1>Your information</h1>
+<div>Welcome <span style="font-weight:bold" th:text="${tcblUser.userName}"></span>
+    <span>. We know you like cars (but not the ones with big rioolputtekes), David Gilmour and regenputmeetsystemen. </span></div>
+<p><a href="/index" th:href="@{/index}">Back to home page</a> (you cannot change anything yet)</p>
 </body>
 </html>
