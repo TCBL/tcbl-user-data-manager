@@ -8,7 +8,7 @@
 <body>
 <!--div th:substituteby="index::logout"></div-->
 <h1>This is a secured page!</h1>
-<div>You are successfully logged in <span style="font-weight:bold" th:text="${userName}"></span></div>
+<div>You are successfully logged in <span style="font-weight:bold" th:object="${tcblUser}" th:text="${tcblUser.userName}"></span></div>
 <p><a href="/index" th:href="@{/index}">Back to home page</a></p>
 </body>
 </html>

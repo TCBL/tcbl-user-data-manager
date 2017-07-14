@@ -6,8 +6,8 @@ package be.ugent.idlab.tcbl.userdatamanager.model;
  * @author Gerald Haesendonck
  */
 public interface TCBLUserRepository {
-	Iterable<TCBLUser> findAll();
-	TCBLUser save(TCBLUser tcblUser);
-	TCBLUser find(String userName);
-	void deleteTCBLUser(String userName);
+	Iterable<TCBLUser> findAll() throws Exception;
+	TCBLUser save(TCBLUser tcblUser) throws Exception;
+	TCBLUser find(String userName) throws  Exception;
+	void deleteTCBLUser(String userName) throws Exception;
 }

@@ -2,6 +2,8 @@ package be.ugent.idlab.tcbl.userdatamanager.controller;
 
 import be.ugent.idlab.tcbl.userdatamanager.model.TCBLUser;
 import be.ugent.idlab.tcbl.userdatamanager.model.TCBLUserRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.stereotype.Controller;
@@ -21,16 +23,15 @@ import java.util.Map;
  */
 @Controller
 public class UserController {
-
+	private final Logger log = LoggerFactory.getLogger(this.getClass());
 	private WebClient webClient = WebClient.create();
-
 	private final TCBLUserRepository tcblUserRepository;
 
 	public UserController(TCBLUserRepository tcblUserRepository) {
 		this.tcblUserRepository = tcblUserRepository;
 	}
 
-	@RequestMapping("/userinfo")
+	@RequestMapping("/user/index")
 	public String userinfo(Model model, OAuth2AuthenticationToken authentication) {
 		Map userAttributes = this.webClient
 				.filter(oauth2Credentials(authentication))
@@ -39,15 +40,20 @@ public class UserController {
 				.retrieve()
 				.bodyToMono(Map.class)
 				.block();
-		String userName = userAttributes.get("user_name").toString();
-		TCBLUser tcblUser = tcblUserRepository.find(userName);
-		if (tcblUser == null) {
-			tcblUser = new TCBLUser();
-			tcblUser.setUserName(userName);
+		String id = userAttributes.get("inum").toString();
+		try {
+			TCBLUser tcblUser = tcblUserRepository.find(id);
+			if (tcblUser == null) {
+				tcblUser = new TCBLUser();
+				tcblUser.setUserName(id);
+			}
+			model.addAttribute("userAttributes", userAttributes);
+			model.addAttribute("tcblUser", tcblUser);
+		} catch (Exception e) {
+			log.error("Cannot get user info", e);
+			// TODO
 		}
-		model.addAttribute("userAttributes", userAttributes);
-		model.addAttribute("tcblUser", tcblUser);
-		return "userinfo";
+		return "user/index";
 	}
 
 	private ExchangeFilterFunction oauth2Credentials(OAuth2AuthenticationToken authentication) {

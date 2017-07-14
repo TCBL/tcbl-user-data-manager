@@ -19,7 +19,7 @@ import org.springframework.lang.Nullable;
 public class OAuth2LoginApplication {
 
 	@Bean
-	public TCBLUserRepository tcblUserRepository(final Environment environment) {
+	public TCBLUserRepository tcblUserRepository(final Environment environment) throws Exception {
 		return new ScimTCBLUserRepository(environment);
 	}
 
@@ -28,8 +28,12 @@ public class OAuth2LoginApplication {
 		return new Converter<String, TCBLUser>() {
 			@Nullable
 			@Override
-			public TCBLUser convert(String userName) {
-				return tcblUserRepository(environment).find(userName);
+			public TCBLUser convert(String id) {
+				try {
+					return tcblUserRepository(environment).find(id);
+				} catch (Exception e) {
+					throw new IllegalArgumentException(e);
+				}
 			}
 		};
 	}

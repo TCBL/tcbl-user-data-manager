@@ -13,9 +13,10 @@ server:
 
 logging:
   level:
-    root: debug
-    org.springframework.web: debug
-    org.springframework.security: debug
+    root: info
+    be.ugent.idlab: debug
+    org.springframework.web: warn
+    org.springframework.security: warn
 
 spring:
   thymeleaf:
@@ -31,7 +32,7 @@ security:
         client-authentication-method: post
         authorized-grant-type: authorization_code
         redirect-uri: "https://ravel.elis.ugent.be:8443/oauth2/authorize/code/tcbl_manager"
-        scopes: openid, minimum
+        scopes: openid, inum
         authorization-uri: "https://honegger.elis.ugent.be/oxauth/seam/resource/restv1/oxauth/authorize"
         token-uri: "https://honegger.elis.ugent.be/oxauth/seam/resource/restv1/oxauth/token"
         user-info-uri: "https://honegger.elis.ugent.be/oxauth/seam/resource/restv1/oxauth/userinfo"
