@@ -17,9 +17,11 @@ To create a runnable jar, open a console, go to the root of the project director
 mvn package
 ```
 
+This creates something like `target/UserDataManager-1.0-SNAPSHOT.jar`.
+
 ## Configuring
 
-### 1. Enable SHTTP for the application
+### 1. Enable HTTPS for the application
 
 In order to use OpenID Connect, the application needs to be able to receive https requests.
 Two options here: using a self-signed certificate or a certificate from a Certificate Authority.
@@ -200,13 +202,25 @@ Of course, change ports and host names accordingly.
 
 ## Running
 
-### 1. Using maven
+### 1. Using the packaged jar (production)
+
+Put a (modified) `application.yml` file besides the jar. The run it with
+
+```
+java -jar UserDataManager-<verison>.jar
+```
+
+### 1. Using maven (development)
 In the root directory of the project, type:
 
 ```
 mvn spring-boot:run
 ```
 
+It uses the configuration file in the source tree!
+
 ### 2. In IntelliJ IDEA
 IntelliJ IDEA supports Spring Boot apps out of the box. Navigate to `be.ugent.idlab.tcbl.userdatamanager.TCBLUserDataManager`, right-click on
 the class name or the `main` function and create an application. Ready to run!
+
+It uses the configuration file in the source tree!
