@@ -214,13 +214,14 @@ Of course, change ports and host names accordingly.
 
 ### 1. Using the packaged jar (production)
 
-Put a (modified) `application.yml` file besides the jar. The run it with
+Put a (modified) `application.yml` file besides the jar. Then run with:
 
 ```
-java -jar UserDataManager-<verison>.jar
+java -jar UserDataManager-<version>.jar
 ```
 
-### 1. Using maven (development)
+### 2. Using maven (development)
+
 In the root directory of the project, type:
 
 ```
@@ -229,7 +230,8 @@ mvn spring-boot:run
 
 It uses the configuration file in the source tree!
 
-### 2. In IntelliJ IDEA
+### 3. In IntelliJ IDEA
+
 IntelliJ IDEA supports Spring Boot apps out of the box. Navigate to `be.ugent.idlab.tcbl.userdatamanager.TCBLUserDataManager`, right-click on
 the class name or the `main` function and create an application. Ready to run!
 
