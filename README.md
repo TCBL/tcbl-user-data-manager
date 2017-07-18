@@ -29,7 +29,7 @@ Two options here: using a self-signed certificate or a certificate from a Certif
 #### a. Self-signed
 
 Use `keytool` (shipped with a JDK or JRE) to generate a certificate and store it in a keystore.
-You can choose the alias (`tudm`) and the name of the keystore (`tudm.p12`) (TODO extension .p12 ???)
+You can choose the alias (`tudm`) and the name of the keystore (`tudm.jks`)
 as you wish, but remember them for later.
 
 Execute the next command in a directory where you will (permanently) store the keystore file:
@@ -150,15 +150,12 @@ security:
 
 ### 4. Configure the application
 
-(TODO waarom niet de voorbeeld configuratie in `tcbl-user-data-manager/src/main/resources/application.yml.dist` en dan een kopie laten maken in
-`tcbl-user-data-manager/src/main/resources/application.yml.dist`, die zelf een git-ignored file is?)
-
-Putting it all together, the client configuration file should look like `tcbl-user-data-manager/src/main/resources/application.yml`. Example:
+Putting it all together, the client configuration file should look like `tcbl-user-data-manager/src/main/resources/application.yml.dist`. Example:
 
 ```yaml
 ####
 #
-# This is a sample configuration. Copy this and place next to the application jar file to override.
+# This is a sample configuration. Copy this into application.yml, adapt to your needs and place next to the application jar file.
 #
 ####
 
@@ -218,7 +215,9 @@ There are a few options to start the application:
 
 ### a. Using the packaged jar (production)
 
-Put a (modified) `application.yml` file besides the jar. Then run with:
+Go to the directory of the jar.
+
+Copy src/main/resources/application.yml.dist into this directory. Then run with:
 
 ```
 java -jar UserDataManager-<version>.jar
@@ -226,17 +225,19 @@ java -jar UserDataManager-<version>.jar
 
 ### b. Using maven (development)
 
+Copy src/main/resources/application.yml.dist to src/main/resources/application.yml and adapt to your needs.
+
 In the root directory of the project, type:
 
 ```
 mvn spring-boot:run
 ```
 
-It uses the configuration file in the source tree!
-
 ### c. In IntelliJ IDEA
 
 IntelliJ IDEA supports Spring Boot apps out of the box. Navigate to `be.ugent.idlab.tcbl.userdatamanager.TCBLUserDataManager`, right-click on
-the class name or the `main` function and create an application. Ready to run!
+the class name or the `main` function and create an application.
 
-It uses the configuration file in the source tree!
+Copy src/main/resources/application.yml.dist to src/main/resources/application.yml and adapt to your needs.
+
+Ready to run!
