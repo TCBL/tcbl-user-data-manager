@@ -29,8 +29,10 @@ Two options here: using a self-signed certificate or a certificate from a Certif
 #### a. Self-signed
 
 Use `keytool` (shipped with a JDK or JRE) to generate a certificate and store it in a keystore.
-You can choose the alias (`tudm`) and the name of the keystore (`tudm.p12`) as you whish, but remember them for later.
+You can choose the alias (`tudm`) and the name of the keystore (`tudm.p12`) (TODO extension .p12 ???)
+as you wish, but remember them for later.
 
+Execute the next command in a directory where you will (permanently) store the keystore file:
 ```
 keytool -genkey -alias tudm -storetype PKCS12 -keyalg RSA -keysize 2048 -keystore tudm.jks -validity 3650
 ```
@@ -58,14 +60,18 @@ Enter keystore password:
 
 #### b. From a CA
 
-If you already have a certificate (chain), find the .crt file. Then import it into the keystore:
+If you already have a certificate (chain), find the .crt file. Then import it into the keystore.
+
+Execute the next command in a directory where you will (permanently) store the keystore file:
 
 ```
-/usr/lib/jvm/java-8-openjdk-amd64/bin/keytool -importcert -file the_certificate.crt -alias tudm -keystore tudm.jks
+keytool -importcert -file the_certificate.crt -alias tudm -keystore tudm.jks
 
 ```
 
-This results in the following configuration snippet (example):
+#### Configuration snippet
+
+Whatever option you chose above, this requires the following configuration snippet (example):
 
 ```yaml
 server:
@@ -77,7 +83,7 @@ server:
     key-alias: tudm
 ```
 
-*The complete configuration can be viewed in "4. Configure the application"*
+*The complete configuration is discussed in "4. Configure the application"*
 
 ### 2. Register the client on the server
 
@@ -98,7 +104,7 @@ Here are the settings (example, adjust to correct hosts):
 * Response Types: code
 * Grant Types: authorization_code
 
-For the client, this results in the following configuration snippet (example):
+For the client, this requires the following configuration snippet (example):
 
 ```yaml
 security:
@@ -129,7 +135,7 @@ Skip **2 Setting up the client application**.
 Now you should have a client ID, a jks file (containing the certificate from the host running the Gluu Server) and the password of the jks file.
 The client key id can be left empty since there is only one key in the store.
 
-This results in the following configuration snippet (example):
+This requires the following configuration snippet (example):
 
 ```yaml
 security:
@@ -144,7 +150,10 @@ security:
 
 ### 4. Configure the application
 
-Putting it all together, the client congfiguration ashould look like in `tcbl-user-data-manager/src/main/resources/application.yml`. Example:
+(TODO waarom niet de voorbeeld configuratie in `tcbl-user-data-manager/src/main/resources/application.yml.dist` en dan een kopie laten maken in
+`tcbl-user-data-manager/src/main/resources/application.yml.dist`, die zelf een git-ignored file is?)
+
+Putting it all together, the client configuration file should look like `tcbl-user-data-manager/src/main/resources/application.yml`. Example:
 
 ```yaml
 ####
@@ -202,15 +211,21 @@ Of course, change ports and host names accordingly.
 
 ## Running
 
-### 1. Using the packaged jar (production)
+After you start the application, you will be able to enjoy it by browsing to its URL, for example:
+`https://ravel.elis.ugent.be:8443`.
 
-Put a (modified) `application.yml` file besides the jar. The run it with
+There are a few options to start the application:
+
+### a. Using the packaged jar (production)
+
+Put a (modified) `application.yml` file besides the jar. Then run with:
 
 ```
-java -jar UserDataManager-<verison>.jar
+java -jar UserDataManager-<version>.jar
 ```
 
-### 1. Using maven (development)
+### b. Using maven (development)
+
 In the root directory of the project, type:
 
 ```
@@ -219,7 +234,8 @@ mvn spring-boot:run
 
 It uses the configuration file in the source tree!
 
-### 2. In IntelliJ IDEA
+### c. In IntelliJ IDEA
+
 IntelliJ IDEA supports Spring Boot apps out of the box. Navigate to `be.ugent.idlab.tcbl.userdatamanager.TCBLUserDataManager`, right-click on
 the class name or the `main` function and create an application. Ready to run!
 
