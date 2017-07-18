@@ -56,6 +56,12 @@ public class UserController {
 		return "user/index";
 	}
 
+	@RequestMapping("/user/update")
+	public String update (TCBLUser user) {
+		// TODO: save
+		return "/user/index";
+	}
+
 	private ExchangeFilterFunction oauth2Credentials(OAuth2AuthenticationToken authentication) {
 		return ExchangeFilterFunction.ofRequestProcessor(
 				clientRequest -> {

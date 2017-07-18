@@ -9,6 +9,7 @@ import org.gluu.oxtrust.model.scim2.User;
  */
 public class TCBLUser {
 
+	private String id;
 	private String userName;
 	private String firstName;
 	private String lastName;
@@ -31,6 +32,7 @@ public class TCBLUser {
 
 	static TCBLUser createFromScimUser(final User scimUser) {
 		TCBLUser user = new TCBLUser();
+		user.setId(scimUser.getId());
 		user.setUserName(scimUser.getUserName());
 		user.setFirstName(scimUser.getName().getGivenName());
 		user.setLastName(scimUser.getName().getFamilyName());
@@ -52,5 +54,13 @@ public class TCBLUser {
 				", firstName='" + firstName + '\'' +
 				", lastName='" + lastName + '\'' +
 				'}';
+	}
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
 	}
 }
