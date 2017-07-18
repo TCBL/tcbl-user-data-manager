@@ -63,10 +63,9 @@ Enter keystore password:
 If you already have a certificate (chain), find the .crt file. Then import it into the keystore.
 
 Execute the next command in a directory where you will (permanently) store the keystore file:
-(TODO: why path to keytool here?)
 
 ```
-/usr/lib/jvm/java-8-openjdk-amd64/bin/keytool -importcert -file the_certificate.crt -alias tudm -keystore tudm.jks
+keytool -importcert -file the_certificate.crt -alias tudm -keystore tudm.jks
 
 ```
 
@@ -212,7 +211,12 @@ Of course, change ports and host names accordingly.
 
 ## Running
 
-### 1. Using the packaged jar (production)
+After you start the application, you will be able to enjoy it by browsing to its URL, for example:
+`https://ravel.elis.ugent.be:8443`.
+
+There are a few options to start the application:
+
+### a. Using the packaged jar (production)
 
 Put a (modified) `application.yml` file besides the jar. Then run with:
 
@@ -220,7 +224,7 @@ Put a (modified) `application.yml` file besides the jar. Then run with:
 java -jar UserDataManager-<version>.jar
 ```
 
-### 2. Using maven (development)
+### b. Using maven (development)
 
 In the root directory of the project, type:
 
@@ -230,7 +234,7 @@ mvn spring-boot:run
 
 It uses the configuration file in the source tree!
 
-### 3. In IntelliJ IDEA
+### c. In IntelliJ IDEA
 
 IntelliJ IDEA supports Spring Boot apps out of the box. Navigate to `be.ugent.idlab.tcbl.userdatamanager.TCBLUserDataManager`, right-click on
 the class name or the `main` function and create an application. Ready to run!
