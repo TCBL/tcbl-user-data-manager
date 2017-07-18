@@ -1,6 +1,7 @@
 ####
 #
-# This is a sample configuration. Copy this and place next to the application jar file to override.
+# This is a sample configuration. Copy this into application.yml, adapt to your needs and place it into the working directory
+# or next to the built jar file.
 #
 ####
 

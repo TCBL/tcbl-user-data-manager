@@ -155,7 +155,8 @@ Putting it all together, the client configuration file should look like `tcbl-us
 ```yaml
 ####
 #
-# This is a sample configuration. Copy this into application.yml, adapt to your needs and place next to the application jar file.
+# This is a sample configuration. Copy this into application.yml, adapt to your needs and place it into the working directory
+# or next to the built jar file.
 #
 ####
 
