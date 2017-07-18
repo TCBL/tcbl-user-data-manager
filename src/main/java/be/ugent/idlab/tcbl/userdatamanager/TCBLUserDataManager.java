@@ -38,9 +38,6 @@ public class TCBLUserDataManager {
 		};
 	}
 
-	/*public OAuth2LoginApplication() {
-	}  */
-
 	public static void main(String[] args) {
 		SpringApplication.run(TCBLUserDataManager.class, args);
 	}
