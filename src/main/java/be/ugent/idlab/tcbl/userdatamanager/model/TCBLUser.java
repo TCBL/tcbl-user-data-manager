@@ -1,5 +1,6 @@
 package be.ugent.idlab.tcbl.userdatamanager.model;
 
+import org.gluu.oxtrust.model.scim2.Name;
 import org.gluu.oxtrust.model.scim2.User;
 
 /**
@@ -13,6 +14,24 @@ public class TCBLUser {
 	private String userName;
 	private String firstName;
 	private String lastName;
+
+	static TCBLUser createFromScimUser(final User scimUser) {
+		TCBLUser user = new TCBLUser();
+		user.setId(scimUser.getId());
+		user.setUserName(scimUser.getUserName());
+		user.setFirstName(scimUser.getName().getGivenName());
+		user.setLastName(scimUser.getName().getFamilyName());
+		return user;
+	}
+
+	void updateScimUser(final User scimUser) {
+		//scimUser.setUserName(userName);
+		Name newName = new Name();
+		newName.setGivenName(firstName);
+		newName.setFamilyName(lastName);
+		newName.setFormatted(firstName + " " + lastName);
+		scimUser.setName(newName);
+	}
 
 	public String getFirstName() {
 		return firstName;
@@ -28,15 +47,6 @@ public class TCBLUser {
 
 	public void setLastName(String lastName) {
 		this.lastName = lastName;
-	}
-
-	static TCBLUser createFromScimUser(final User scimUser) {
-		TCBLUser user = new TCBLUser();
-		user.setId(scimUser.getId());
-		user.setUserName(scimUser.getUserName());
-		user.setFirstName(scimUser.getName().getGivenName());
-		user.setLastName(scimUser.getName().getFamilyName());
-		return user;
 	}
 
 	public String getUserName() {

@@ -75,18 +75,36 @@ public class ScimTCBLUserRepository implements TCBLUserRepository {
 	}
 
 	@Override
-	public TCBLUser save(TCBLUser tcblUser) {
-		// TODO
+	public TCBLUser save(TCBLUser tcblUser) throws Exception {
+		User user = findUser(tcblUser.getId());
+		tcblUser.updateScimUser(user);
+		client.updateUser(user, tcblUser.getId(), new String[0]);
 		return tcblUser;
 	}
 
 	@Override
 	public TCBLUser find(String id) throws Exception {
+		User user = findUser(id);
+		return TCBLUser.createFromScimUser(user);
+	}
+
+	@Override
+	public void deleteTCBLUser(String userName) {
+		// TODO or not TODO
+	}
+
+	private static Map<String, String> resolveScimClientProperties(final Environment environment) {
+		Binder binder = Binder.get(environment);
+		BindResult<Map<String, String>> result = binder.bind(
+				"security.scim", Bindable.mapOf(String.class, String.class));
+		return result.get();
+	}
+
+	private User findUser(final String id) throws Exception {
 		try {
 			ScimResponse response = client.retrieveUser(id, new String[0]);
 			if (response.getStatusCode() == 200) {
-				User user = Util.toUser(response,userExtensionSchema);
-				return TCBLUser.createFromScimUser(user);
+				return Util.toUser(response,userExtensionSchema);
 			} else {
 				String message = "Cannot request user info to OpenID Connect server: " + response.getStatusCode() + ": " + response.getStatus() + ". " + response.getResponseBodyString();
 				log.error(message);
@@ -97,17 +115,5 @@ public class ScimTCBLUserRepository implements TCBLUserRepository {
 			log.error(message, e);
 			throw new Exception(message, e);
 		}
-	}
-
-	@Override
-	public void deleteTCBLUser(String userName) {
-		// TODO
-	}
-
-	private static Map<String, String> resolveScimClientProperties(final Environment environment) {
-		Binder binder = Binder.get(environment);
-		BindResult<Map<String, String>> result = binder.bind(
-				"security.scim", Bindable.mapOf(String.class, String.class));
-		return result.get();
 	}
 }

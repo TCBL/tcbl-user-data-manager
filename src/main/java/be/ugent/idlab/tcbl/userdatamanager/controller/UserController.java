@@ -57,8 +57,13 @@ public class UserController {
 	}
 
 	@RequestMapping("/user/update")
-	public String update (TCBLUser user) {
-		// TODO: save
+	public String update (TCBLUser user, Model model) {
+		try {
+			tcblUserRepository.save(user);
+			model.addAttribute("tcblUser", user);
+		} catch (Exception e) {
+			// TODO
+		}
 		return "/user/index";
 	}
 
