@@ -19,6 +19,8 @@ import java.util.Map;
 /**
  * <p>Copyright 2017 IDLab (Ghent University - imec)</p>
  *
+ * Controller for actions where (TCBL) users are involved.
+ *
  * @author Gerald Haesendonck
  */
 @Controller
@@ -27,10 +29,23 @@ public class UserController {
 	private WebClient webClient = WebClient.create();
 	private final TCBLUserRepository tcblUserRepository;
 
+	/**
+	 * Creates a UserController; Spring injects the TCBLUserRepository.
+	 *
+	 * @param tcblUserRepository A repository where TCBLUsers are stored.
+	 */
 	public UserController(TCBLUserRepository tcblUserRepository) {
 		this.tcblUserRepository = tcblUserRepository;
 	}
 
+	/**
+	 * Gets info from the currently authenticated / authorized user, using OpenID Connect to get the inum (Gluu specific)
+	 * and SCIM to get other attributes.
+	 *
+	 * @param model				Gets updated with a TCBLUser object.
+	 * @param authentication	Required to perform a UserInfo request.
+	 * @return					The path of the view to be rendered.
+	 */
 	@RequestMapping("/user/index")
 	public String userinfo(Model model, OAuth2AuthenticationToken authentication) {
 		Map userAttributes = this.webClient
