@@ -9,6 +9,7 @@ import org.springframework.security.oauth2.client.authentication.OAuth2Authentic
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.reactive.function.client.ClientRequest;
 import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -71,7 +72,7 @@ public class UserController {
 		return "user/index";
 	}
 
-	@RequestMapping("/user/update")
+	@RequestMapping(value = "/user/update", method = RequestMethod.POST)
 	public String update (TCBLUser user, Model model) {
 		try {
 			tcblUserRepository.save(user);
@@ -80,6 +81,11 @@ public class UserController {
 			// TODO
 		}
 		return "/user/index";
+	}
+
+	@RequestMapping(value = "/user/register", method = RequestMethod.GET)
+	public String getRegister() {
+		return "/user/register";
 	}
 
 	private ExchangeFilterFunction oauth2Credentials(OAuth2AuthenticationToken authentication) {
