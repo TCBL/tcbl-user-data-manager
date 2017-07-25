@@ -77,6 +77,7 @@ public class ScimTCBLUserRepository implements TCBLUserRepository {
 	@Override
 	public TCBLUser save(TCBLUser tcblUser) throws Exception {
 		User user = findUser(tcblUser.getId());
+		user.setPassword("");
 		tcblUser.updateScimUser(user);
 		client.updateUser(user, tcblUser.getId(), new String[0]);
 		return tcblUser;
