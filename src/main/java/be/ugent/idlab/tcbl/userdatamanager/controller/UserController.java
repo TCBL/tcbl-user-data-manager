@@ -88,6 +88,7 @@ public class UserController {
 	public String getRegister(Model model) {
 		TCBLUser user = new TCBLUser();
 		model.addAttribute("tcblUser", user);
+		// TODO: send id (sub) in mail to activate user.
 		return "/user/register";
 	}
 
