@@ -8,17 +8,14 @@
 <body>
 <!--div th:substituteby="index::logout"></div-->
 <h1>Your information</h1>
-<div>Welcome <span style="font-weight:bold" th:text="${tcblUser.userName}"></span>
-    <span>. We know you like cars (but not the ones with big rioolputtekes), David Gilmour and regenputmeetsystemen. </span></div>
-<div>Here's a form:</div>
- <form action="#" th:action="@{/user/update}" th:object="${tcblUser}" method="post">
+<form action="#" th:action="@{/user/update}" th:object="${tcblUser}" method="post">
      <label for="firstName">First name</label>
      <input type="text" th:field="*{firstName}"/><br>
      <label for="lastName">Last name</label>
      <input type="text" th:field="*{lastName}"/><br>
      <input type="hidden" th:field="*{id}"/>
-     <input type="submit"/>
+     <input type="submit" value="Update"/>
 </form>
-<p><a href="/index" th:href="@{/index}">Back to home page</a> (you cannot change anything yet)</p>
+<p><a href="/index" th:href="@{/index}">Back to home page</a></p>
 </body>
 </html>
