@@ -9,5 +9,6 @@ public interface TCBLUserRepository {
 	Iterable<TCBLUser> findAll() throws Exception;
 	TCBLUser save(TCBLUser tcblUser) throws Exception;
 	TCBLUser find(String userName) throws  Exception;
+	TCBLUser create(TCBLUser tcblUser) throws Exception;
 	void deleteTCBLUser(String userName) throws Exception;
 }

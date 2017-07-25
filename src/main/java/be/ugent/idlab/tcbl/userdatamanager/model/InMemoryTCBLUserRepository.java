@@ -30,6 +30,11 @@ public class InMemoryTCBLUserRepository implements TCBLUserRepository {
 	}
 
 	@Override
+	public TCBLUser create(TCBLUser tcblUser) throws Exception {
+		return save(tcblUser);
+	}
+
+	@Override
 	public void deleteTCBLUser(String userName) {
 		users.remove(userName);
 	}

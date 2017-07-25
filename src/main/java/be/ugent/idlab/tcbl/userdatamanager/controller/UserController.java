@@ -78,14 +78,28 @@ public class UserController {
 			tcblUserRepository.save(user);
 			model.addAttribute("tcblUser", user);
 		} catch (Exception e) {
+			e.printStackTrace();
 			// TODO
 		}
 		return "/user/index";
 	}
 
 	@RequestMapping(value = "/user/register", method = RequestMethod.GET)
-	public String getRegister() {
+	public String getRegister(Model model) {
+		TCBLUser user = new TCBLUser();
+		model.addAttribute("tcblUser", user);
 		return "/user/register";
+	}
+
+	@RequestMapping(value = "/user/register", method = RequestMethod.POST)
+	public String postRegister(TCBLUser user) {
+		try {
+			tcblUserRepository.create(user);
+		} catch (Exception e) {
+			e.printStackTrace();
+			// TODO
+		}
+		return "/index";
 	}
 
 	private ExchangeFilterFunction oauth2Credentials(OAuth2AuthenticationToken authentication) {

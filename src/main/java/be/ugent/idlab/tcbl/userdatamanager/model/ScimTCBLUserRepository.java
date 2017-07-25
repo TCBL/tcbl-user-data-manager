@@ -90,6 +90,29 @@ public class ScimTCBLUserRepository implements TCBLUserRepository {
 	}
 
 	@Override
+	public TCBLUser create(TCBLUser tcblUser) throws Exception {
+		try {
+			User user = new User();
+			tcblUser.updateScimUser(user);
+			user.setActive(true);
+			ScimResponse response = client.createUser(user, new String[0]);
+			if (response.getStatusCode() == 201) {
+				user = Util.toUser(response, userExtensionSchema);
+				tcblUser.setId(user.getId());
+				return tcblUser;
+			} else {
+				String message = "Cannot create user on OpenID Connect server: " + response.getStatusCode() + ": " + response.getStatus() + ". " + response.getResponseBodyString();
+				log.error(message);
+				throw new Exception(message);
+			}
+		} catch (Exception e) {
+			String message = "Cannot create user: " + e.getMessage();
+			log.error(message, e);
+			throw new Exception(message, e);
+		}
+	}
+
+	@Override
 	public void deleteTCBLUser(String userName) {
 		// TODO or not TODO
 	}
@@ -105,7 +128,7 @@ public class ScimTCBLUserRepository implements TCBLUserRepository {
 		try {
 			ScimResponse response = client.retrieveUser(id, new String[0]);
 			if (response.getStatusCode() == 200) {
-				return Util.toUser(response,userExtensionSchema);
+				return Util.toUser(response, userExtensionSchema);
 			} else {
 				String message = "Cannot request user info to OpenID Connect server: " + response.getStatusCode() + ": " + response.getStatus() + ". " + response.getResponseBodyString();
 				log.error(message);

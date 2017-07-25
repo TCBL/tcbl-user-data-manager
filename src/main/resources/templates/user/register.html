@@ -8,13 +8,16 @@
 <body>
 <!--div th:substituteby="index::logout"></div-->
 <h1>Your information</h1>
-<form action="#" th:action="@{/user/update}" th:object="${tcblUser}" method="post">
+<form action="#" th:action="@{/user/register}" th:object="${tcblUser}" method="post">
     <label for="firstName">First name</label>
     <input type="text" th:field="*{firstName}"/><br>
     <label for="lastName">Last name</label>
     <input type="text" th:field="*{lastName}"/><br>
-    <input type="hidden" th:field="*{id}"/>
-    <input type="submit" value="Update"/>
+    <label for="lastName">E-mail</label>
+    <input type="text" th:field="*{userName}"/><br>
+    <label for="lastName">password</label>
+    <input type="text" th:field="*{password}"/><br>
+    <input type="submit" value="Create"/>
 </form>
 <p><a href="/index" th:href="@{/index}">Back to home page</a></p>
 </body>
