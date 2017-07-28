@@ -1,5 +1,6 @@
 package be.ugent.idlab.tcbl.userdatamanager.controller;
 
+import be.ugent.idlab.tcbl.userdatamanager.TCBLUserDataManager;
 import be.ugent.idlab.tcbl.userdatamanager.model.TCBLUser;
 import be.ugent.idlab.tcbl.userdatamanager.model.TCBLUserRepository;
 import org.slf4j.Logger;
@@ -23,6 +24,7 @@ import javax.mail.internet.MimeMessage;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
 
 /**
  * <p>Copyright 2017 IDLab (Ghent University - imec)</p>
@@ -40,13 +42,17 @@ public class UserController {
 	private final Base64.Encoder encoder;
 	private final Base64.Decoder decoder;
 
+	private final ExecutorService executor;
+
 	/**
 	 * Creates a UserController; Spring injects the TCBLUserRepository.
 	 *
 	 * @param tcblUserRepository A repository where TCBLUsers are stored.
 	 * @param mailSender The Spring library to send mails.
+	 * @param executor	 An executor service to send mails asynchronously. Configured in {@link TCBLUserDataManager}.
 	 */
-	public UserController(TCBLUserRepository tcblUserRepository, JavaMailSender mailSender) {
+	public UserController(TCBLUserRepository tcblUserRepository, JavaMailSender mailSender, ExecutorService executor) {
+		this.executor = executor;
 		this.tcblUserRepository = tcblUserRepository;
 		this.mailSender = mailSender;
 		encoder = Base64.getUrlEncoder();
@@ -149,18 +155,28 @@ public class UserController {
 		return new String(decoder.decode(input), StandardCharsets.UTF_8);
 	}
 
-	private void sendRegisterMessage(final TCBLUser user) throws MessagingException {
-		String encodedId = encodeBase64(user.getId());
-		MimeMessage message = mailSender.createMimeMessage();
-		MimeMessageHelper helper = new MimeMessageHelper(message);
-		helper.setSubject("Registration TCBL");
-		helper.setFrom("gerald.haesendonck@ugent.be");	// TODO parametrize
-		helper.setTo(user.getUserName());
-		helper.setText("<p>Thank you for becoming a TCBL member. Click <a href=\""
-				+ "https://ravel.elis.ugent.be:8443/user/confirm/" + encodedId
-				+ "\">here</a> to activate your account.</p>", true);
-		mailSender.send(message);
-
+	/**
+	 * Sends the mail for registration asynchronously. We don't want the app to block.
+	 * @param user	The user to send a mail to.
+	 */
+	private void sendRegisterMessage(final TCBLUser user) {
+		executor.execute(() -> {
+			try {
+				String encodedId = encodeBase64(user.getId());
+				MimeMessage message = mailSender.createMimeMessage();
+				MimeMessageHelper helper = new MimeMessageHelper(message);
+				helper.setSubject("Registration TCBL");
+				helper.setFrom("no-reply@tcbl.eu");
+				helper.setTo(user.getUserName());
+				helper.setText("<p>Thank you for becoming a TCBL member. Click <a href=\""
+						+ "https://ravel.elis.ugent.be:8443/user/confirm/" + encodedId
+						+ "\">here</a> to activate your account.</p>", true);
+				mailSender.send(message);
+				log.debug("Mail sent to " + user.getUserName());
+			} catch (MessagingException e) {
+				log.error("Could not send mail. ", e);
+			}
+		});
 	}
 
 }

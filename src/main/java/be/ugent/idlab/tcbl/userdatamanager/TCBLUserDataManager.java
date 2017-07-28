@@ -10,6 +10,8 @@ import org.springframework.core.convert.converter.Converter;
 import org.springframework.core.env.Environment;
 import org.springframework.lang.Nullable;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 /**
  * <p>Copyright 2017 IDLab (Ghent University - imec)</p>
  *
@@ -36,6 +38,11 @@ public class TCBLUserDataManager {
 				}
 			}
 		};
+	}
+
+	@Bean
+	ExecutorService executor() {
+		return Executors.newFixedThreadPool(10);
 	}
 
 	public static void main(String[] args) {
