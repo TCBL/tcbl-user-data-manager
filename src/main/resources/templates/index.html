@@ -1,9 +1,17 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-<head>
+<head th:fragment="head">
     <title>TCBL User Manager</title>
     <meta charset="utf-8" />
     <link rel="stylesheet" href="/static/css/main.css" th:href="@{/css/tcbl.css}" />
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script>
+        $( function() {
+            $( "#dialog" ).dialog();
+        } );
+    </script>
 </head>
 <body>
 
@@ -28,6 +36,10 @@
     via the OAuth 2.0 Client <span style="font-weight:bold" th:text="${clientName}"></span> -->
 </div>
 <div>&nbsp;</div>
+
+<div th:if="${message} != null" id="dialog" th:title="${message.title}">
+   <p th:text="${message.message}"></p>
+</div>
 
 <div sec:authorize="hasRole('ROLE_ANONYMOUS')">
     <a href="/oiclogin" th:href="@{/oiclogin}">Log in with TCBL</a>

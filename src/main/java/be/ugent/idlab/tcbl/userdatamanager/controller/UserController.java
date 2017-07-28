@@ -1,6 +1,7 @@
 package be.ugent.idlab.tcbl.userdatamanager.controller;
 
 import be.ugent.idlab.tcbl.userdatamanager.TCBLUserDataManager;
+import be.ugent.idlab.tcbl.userdatamanager.model.Message;
 import be.ugent.idlab.tcbl.userdatamanager.model.TCBLUser;
 import be.ugent.idlab.tcbl.userdatamanager.model.TCBLUserRepository;
 import org.slf4j.Logger;
@@ -81,15 +82,16 @@ public class UserController {
 			TCBLUser tcblUser = tcblUserRepository.find(id);
 			if (tcblUser == null) {
 				tcblUser = new TCBLUser();
-				tcblUser.setUserName(id);
+				tcblUser.setId(id);
 			}
 			model.addAttribute("userAttributes", userAttributes);
 			model.addAttribute("tcblUser", tcblUser);
+			return "/user/index";
 		} catch (Exception e) {
+			model.addAttribute("message", new Message("Error", "Cannot get your information."));
 			log.error("Cannot get user info", e);
-			// TODO
+			return "/index";
 		}
-		return "user/index";
 	}
 
 	@RequestMapping(value = "/user/update", method = RequestMethod.POST)
@@ -97,9 +99,10 @@ public class UserController {
 		try {
 			tcblUserRepository.save(user);
 			model.addAttribute("tcblUser", user);
+			//model.addAttribute("message", new Message("Update successful", "Your information is successfully updated."));
 		} catch (Exception e) {
-			e.printStackTrace();
-			// TODO
+			log.error("Cannot update user info", e);
+			model.addAttribute("message", new Message("Error", "Cannot update your information."));
 		}
 		return "/user/index";
 	}
@@ -112,29 +115,37 @@ public class UserController {
 	}
 
 	@RequestMapping(value = "/user/register", method = RequestMethod.POST)
-	public String postRegister(TCBLUser user) {
+	public String postRegister(Model model, TCBLUser user) {
 		try {
 			TCBLUser newUser = tcblUserRepository.create(user);
 			sendRegisterMessage(newUser);
+			model.addAttribute("message", new Message("Registration almost complete",
+					"An e-mail containing a link to confirm the registration will arrive soon."));
 		} catch (Exception e) {
-			e.printStackTrace();
-			// TODO
+			log.error("Cannot register user {}", user.getUserName(), e);
+			model.addAttribute("message", new Message("Registration failed",
+					e.getMessage()));
 		}
-		return "/index"; // TODO message that a mail has been / will be sent.
+		return "/index";
 	}
 
 	@RequestMapping(value = "/user/confirm/{id}", method = RequestMethod.GET)
-	public String confirmRegistration(@PathVariable String id) {
+	public String confirmRegistration(Model model, @PathVariable String id) {
 		String inum = decodeBase64(id);
 		try {
 			TCBLUser user = tcblUserRepository.find(inum);
-			user.setActive(true);
-			tcblUserRepository.save(user);
+			if (!user.isActive()) {
+				user.setActive(true);
+				tcblUserRepository.save(user);
+				model.addAttribute("message", new Message("Registration completed",
+						"You can now log in."));
+			}
 		} catch (Exception e) {
-			// TODO
-			e.printStackTrace();
+			log.error("Cannot confirm registration of {}", inum, e);
+			model.addAttribute("message", new Message("Registration failed",
+					e.getMessage()));
 		}
-		return "/index";	// TODO message...
+		return "/index";
 	}
 
 	private ExchangeFilterFunction oauth2Credentials(OAuth2AuthenticationToken authentication) {

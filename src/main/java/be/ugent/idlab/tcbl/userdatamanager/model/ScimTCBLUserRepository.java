@@ -102,7 +102,7 @@ public class ScimTCBLUserRepository implements TCBLUserRepository {
 				return tcblUser;
 			} else if (response.getStatusCode() == 409) {
 				// TODO conflict (existing user)
-				throw new Exception("User already exists!");
+				throw new Exception("User already exists.");
 			} else {
 				String message = "Cannot create user on OpenID Connect server: " + response.getStatusCode() + ": " + response.getStatus() + ". " + response.getResponseBodyString();
 				log.error(message);
