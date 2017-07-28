@@ -5,8 +5,8 @@ import be.ugent.idlab.tcbl.userdatamanager.model.TCBLUserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
-import org.springframework.mail.MailSender;
-import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -18,6 +18,8 @@ import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Map;
@@ -34,7 +36,7 @@ public class UserController {
 	private final Logger log = LoggerFactory.getLogger(this.getClass());
 	private WebClient webClient = WebClient.create();
 	private final TCBLUserRepository tcblUserRepository;
-	private final MailSender mailSender;
+	private final JavaMailSender mailSender;
 	private final Base64.Encoder encoder;
 	private final Base64.Decoder decoder;
 
@@ -44,7 +46,7 @@ public class UserController {
 	 * @param tcblUserRepository A repository where TCBLUsers are stored.
 	 * @param mailSender The Spring library to send mails.
 	 */
-	public UserController(TCBLUserRepository tcblUserRepository, MailSender mailSender) {
+	public UserController(TCBLUserRepository tcblUserRepository, JavaMailSender mailSender) {
 		this.tcblUserRepository = tcblUserRepository;
 		this.mailSender = mailSender;
 		encoder = Base64.getUrlEncoder();
@@ -107,13 +109,7 @@ public class UserController {
 	public String postRegister(TCBLUser user) {
 		try {
 			TCBLUser newUser = tcblUserRepository.create(user);
-			SimpleMailMessage message = new SimpleMailMessage();
-			message.setSubject("Registration TCBL");
-			message.setFrom("gerald.haesendonck@ugent.be");
-			message.setTo(newUser.getUserName());
-			String encodedId = encodeBase64(newUser.getId());
-			message.setText("Click here to activate your account: https://ravel.elis.ugent.be:8443/user/confirm/" + encodedId);
-			mailSender.send(message);
+			sendRegisterMessage(newUser);
 		} catch (Exception e) {
 			e.printStackTrace();
 			// TODO
@@ -151,6 +147,20 @@ public class UserController {
 
 	private String decodeBase64(final String input) {
 		return new String(decoder.decode(input), StandardCharsets.UTF_8);
+	}
+
+	private void sendRegisterMessage(final TCBLUser user) throws MessagingException {
+		String encodedId = encodeBase64(user.getId());
+		MimeMessage message = mailSender.createMimeMessage();
+		MimeMessageHelper helper = new MimeMessageHelper(message);
+		helper.setSubject("Registration TCBL");
+		helper.setFrom("gerald.haesendonck@ugent.be");	// TODO parametrize
+		helper.setTo(user.getUserName());
+		helper.setText("<p>Thank you for becoming a TCBL member. Click <a href=\""
+				+ "https://ravel.elis.ugent.be:8443/user/confirm/" + encodedId
+				+ "\">here</a> to activate your account.</p>", true);
+		mailSender.send(message);
+
 	}
 
 }
