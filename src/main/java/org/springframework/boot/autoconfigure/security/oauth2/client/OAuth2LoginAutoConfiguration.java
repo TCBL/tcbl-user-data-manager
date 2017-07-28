@@ -58,7 +58,14 @@ public class OAuth2LoginAutoConfiguration {
 		protected void configure(HttpSecurity http) throws Exception {
 			http
 					.authorizeRequests()
-					.antMatchers("/favicon.ico", "/css/*", "/index", "/", "/oiclogin", "/user/register").permitAll()
+					.antMatchers(
+							"/favicon.ico",
+							"/css/*",
+							"/index",
+							"/",
+							"/oiclogin",
+							"/user/register",
+							"/user/confirm/*").permitAll()
 					.anyRequest().authenticated()
 					.and()
 					.oauth2Login();

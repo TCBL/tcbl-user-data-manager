@@ -14,8 +14,7 @@
         <spring.boot.version>2.0.0.M2</spring.boot.version>
         <spring.security.version>5.0.0.M2
         </spring.security.version>  <!-- The latest release does not offer OpenID Connect, so we need this Milestone version-->
-        <scim.client.version>3.0.2
-        </scim.client.version>             <!-- Must be the same as the Gluu server version -->
+        <scim.client.version>3.0.2</scim.client.version>             <!-- Must be the same as the Gluu server version -->
         <java.version>1.8</java.version>
     </properties>
 
@@ -73,6 +72,10 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-webflux</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-mail</artifactId>
         </dependency>
 
         <!-- This is neede because we hacked the Nimbus OAuth2 code -->

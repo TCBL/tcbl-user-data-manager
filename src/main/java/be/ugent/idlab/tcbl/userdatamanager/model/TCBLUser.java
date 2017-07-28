@@ -18,6 +18,11 @@ public class TCBLUser {
 	private String firstName;
 	private String lastName;
 	private String password;
+	private boolean active;
+
+	public TCBLUser() {
+		active = false;
+	}
 
 	static TCBLUser createFromScimUser(final User scimUser) {
 		TCBLUser user = new TCBLUser();
@@ -25,6 +30,7 @@ public class TCBLUser {
 		user.setUserName(scimUser.getUserName());
 		user.setFirstName(scimUser.getName().getGivenName());
 		user.setLastName(scimUser.getName().getFamilyName());
+		user.setActive(scimUser.isActive() == null ? false : scimUser.isActive());
 		return user;
 	}
 
@@ -40,7 +46,6 @@ public class TCBLUser {
 			email.setValue(scimUser.getUserName());
 			scimUser.setEmails(Collections.singletonList(email));
 		}
-		//scimUser.setUserName(userName);
 		String displayName = firstName + " " + lastName;
 		Name newName = new Name();
 		newName.setGivenName(firstName);
@@ -48,6 +53,7 @@ public class TCBLUser {
 		newName.setFormatted(displayName);
 		scimUser.setName(newName);
 		scimUser.setDisplayName(displayName);
+		scimUser.setActive(active);
 	}
 
 	public String getFirstName() {
@@ -97,5 +103,13 @@ public class TCBLUser {
 
 	public void setPassword(String password) {
 		this.password = password;
+	}
+
+	public boolean isActive() {
+		return active;
+	}
+
+	public void setActive(boolean active) {
+		this.active = active;
 	}
 }

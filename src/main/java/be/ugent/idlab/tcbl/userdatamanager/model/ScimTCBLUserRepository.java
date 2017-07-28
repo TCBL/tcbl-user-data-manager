@@ -94,12 +94,15 @@ public class ScimTCBLUserRepository implements TCBLUserRepository {
 		try {
 			User user = new User();
 			tcblUser.updateScimUser(user);
-			user.setActive(true);
+			//user.setActive(true);
 			ScimResponse response = client.createUser(user, new String[0]);
 			if (response.getStatusCode() == 201) {
 				user = Util.toUser(response, userExtensionSchema);
 				tcblUser.setId(user.getId());
 				return tcblUser;
+			} else if (response.getStatusCode() == 409) {
+				// TODO conflict (existing user)
+				throw new Exception("User already exists!");
 			} else {
 				String message = "Cannot create user on OpenID Connect server: " + response.getStatusCode() + ": " + response.getStatus() + ". " + response.getResponseBodyString();
 				log.error(message);

@@ -5,9 +5,12 @@ import be.ugent.idlab.tcbl.userdatamanager.model.TCBLUserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
+import org.springframework.mail.MailSender;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.reactive.function.client.ClientRequest;
@@ -15,6 +18,8 @@ import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.Map;
 
 /**
@@ -29,14 +34,21 @@ public class UserController {
 	private final Logger log = LoggerFactory.getLogger(this.getClass());
 	private WebClient webClient = WebClient.create();
 	private final TCBLUserRepository tcblUserRepository;
+	private final MailSender mailSender;
+	private final Base64.Encoder encoder;
+	private final Base64.Decoder decoder;
 
 	/**
 	 * Creates a UserController; Spring injects the TCBLUserRepository.
 	 *
 	 * @param tcblUserRepository A repository where TCBLUsers are stored.
+	 * @param mailSender The Spring library to send mails.
 	 */
-	public UserController(TCBLUserRepository tcblUserRepository) {
+	public UserController(TCBLUserRepository tcblUserRepository, MailSender mailSender) {
 		this.tcblUserRepository = tcblUserRepository;
+		this.mailSender = mailSender;
+		encoder = Base64.getUrlEncoder();
+		decoder = Base64.getUrlDecoder();
 	}
 
 	/**
@@ -88,19 +100,39 @@ public class UserController {
 	public String getRegister(Model model) {
 		TCBLUser user = new TCBLUser();
 		model.addAttribute("tcblUser", user);
-		// TODO: send id (sub) in mail to activate user.
 		return "/user/register";
 	}
 
 	@RequestMapping(value = "/user/register", method = RequestMethod.POST)
 	public String postRegister(TCBLUser user) {
 		try {
-			tcblUserRepository.create(user);
+			TCBLUser newUser = tcblUserRepository.create(user);
+			SimpleMailMessage message = new SimpleMailMessage();
+			message.setSubject("Registration TCBL");
+			message.setFrom("gerald.haesendonck@ugent.be");
+			message.setTo(newUser.getUserName());
+			String encodedId = encodeBase64(newUser.getId());
+			message.setText("Click here to activate your account: https://ravel.elis.ugent.be:8443/user/confirm/" + encodedId);
+			mailSender.send(message);
 		} catch (Exception e) {
 			e.printStackTrace();
 			// TODO
 		}
-		return "/index";
+		return "/index"; // TODO message that a mail has been / will be sent.
+	}
+
+	@RequestMapping(value = "/user/confirm/{id}", method = RequestMethod.GET)
+	public String confirmRegistration(@PathVariable String id) {
+		String inum = decodeBase64(id);
+		try {
+			TCBLUser user = tcblUserRepository.find(inum);
+			user.setActive(true);
+			tcblUserRepository.save(user);
+		} catch (Exception e) {
+			// TODO
+			e.printStackTrace();
+		}
+		return "/index";	// TODO message...
 	}
 
 	private ExchangeFilterFunction oauth2Credentials(OAuth2AuthenticationToken authentication) {
@@ -111,6 +143,14 @@ public class UserController {
 							.build();
 					return Mono.just(authorizedRequest);
 				});
+	}
+
+	private String encodeBase64(final String input) {
+		return encoder.encodeToString(input.getBytes(StandardCharsets.UTF_8));
+	}
+
+	private String decodeBase64(final String input) {
+		return new String(decoder.decode(input), StandardCharsets.UTF_8);
 	}
 
 }
