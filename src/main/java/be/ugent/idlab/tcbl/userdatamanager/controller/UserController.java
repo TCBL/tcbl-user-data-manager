@@ -119,8 +119,8 @@ public class UserController {
 		try {
 			TCBLUser newUser = tcblUserRepository.create(user);
 			sendRegisterMessage(newUser);
-			model.addAttribute("message", new Message("Registration almost complete",
-					"An e-mail containing a link to confirm the registration will arrive soon."));
+			model.addAttribute("message", new Message("Registration accepted",
+					"An confirmation e-mail will be sent to you. Please follow the instructions to complete the registration process."));
 		} catch (Exception e) {
 			log.error("Cannot register user {}", user.getUserName(), e);
 			model.addAttribute("message", new Message("Registration failed",
