@@ -119,8 +119,8 @@ security:
         scopes: openid, inum
         authorization-uri: "https://honegger.elis.ugent.be/oxauth/seam/resource/restv1/oxauth/authorize"
         token-uri: "https://honegger.elis.ugent.be/oxauth/seam/resource/restv1/oxauth/token"
+        jwk-set-uri: "https://honegger.elis.ugent.be/oxauth/seam/resource/restv1/oxauth/jwks"
         user-info-uri: "https://honegger.elis.ugent.be/oxauth/seam/resource/restv1/oxauth/userinfo"
-        user-info-converter: org.springframework.security.oauth2.client.user.converter.UserInfoConverter
         client-name: TCBL_manager
         client-alias: tcbl-manager
 ```
@@ -193,7 +193,7 @@ security:
         authorization-uri: "https://honegger.elis.ugent.be/oxauth/seam/resource/restv1/oxauth/authorize"
         token-uri: "https://honegger.elis.ugent.be/oxauth/seam/resource/restv1/oxauth/token"
         user-info-uri: "https://honegger.elis.ugent.be/oxauth/seam/resource/restv1/oxauth/userinfo"
-        user-info-converter: org.springframework.security.oauth2.client.user.converter.UserInfoConverter
+        jwk-set-uri: "https://honegger.elis.ugent.be/oxauth/seam/resource/restv1/oxauth/jwks"
         client-name: TCBL_manager
         client-alias: tcbl-manager
   scim:
