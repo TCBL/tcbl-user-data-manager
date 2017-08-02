@@ -13,7 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.springframework.security.oauth2.client.authentication.jwt;
+
+import org.springframework.security.jwt.JwtDecoder;
+
 /**
- * Support classes for converting to {@link org.springframework.security.oauth2.core.user.OAuth2User}.
+ * A registry for {@link JwtDecoder}'s that are associated to an <i>OAuth 2.0 Provider</i>.
+ *
+ * @author Joe Grandja
+ * @since 5.0
  */
-package org.springframework.security.oauth2.client.user.converter;
+public interface ProviderJwtDecoderRegistry {
+
+	JwtDecoder getJwtDecoder(String providerIdentifier);
+
+}

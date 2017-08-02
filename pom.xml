@@ -9,20 +9,19 @@
 
     <name>UserDataManager</name>
 
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <spring.boot.version>2.0.0.M2</spring.boot.version>
-        <spring.security.version>5.0.0.M2
-        </spring.security.version>  <!-- The latest release does not offer OpenID Connect, so we need this Milestone version-->
-        <scim.client.version>3.0.2</scim.client.version>             <!-- Must be the same as the Gluu server version -->
-        <java.version>1.8</java.version>
-    </properties>
-
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.0.0.M2</version>
+        <version>2.0.0.M3</version>
     </parent>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <spring.boot.version>2.0.0.M3</spring.boot.version>
+        <spring.security.version>5.0.0.M3</spring.security.version>  <!-- The latest release does not offer OpenID Connect, so we need this Milestone version-->
+        <scim.client.version>3.0.2</scim.client.version>             <!-- Must be the same as the Gluu server version -->
+        <java.version>1.8</java.version>
+    </properties>
 
     <build>
         <plugins>
@@ -82,13 +81,18 @@
         <dependency>
             <groupId>com.nimbusds</groupId>
             <artifactId>oauth2-oidc-sdk</artifactId>
-            <version>5.28</version>
+            <version>5.34</version>
         </dependency>
 
         <!-- Spring Security offers a security framework so we don't need to write too much code -->
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-oauth2-core</artifactId>
+            <version>${spring.security.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-jwt-jose</artifactId>
             <version>${spring.security.version}</version>
         </dependency>
         <dependency>
@@ -107,6 +111,11 @@
             <version>${spring.security.version}</version>
             <scope>compile</scope>
         </dependency>
+        <!--dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-oauth2-client</artifactId>
+            <version>${spring.security.version}</version>
+        </dependency-->
 
         <!-- Template engine (for rendering html pages) that integrates with Spring -->
         <dependency>

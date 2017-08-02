@@ -71,7 +71,7 @@ public class UserController {
 	@RequestMapping("/user/index")
 	public String userinfo(Model model, OAuth2AuthenticationToken authentication) {
 		Map userAttributes = this.webClient
-				.filter(oauth2Credentials(authentication))
+				.mutate().filter(oauth2Credentials(authentication)).build()
 				.get()
 				.uri(authentication.getClientRegistration().getProviderDetails().getUserInfoUri())
 				.retrieve()
