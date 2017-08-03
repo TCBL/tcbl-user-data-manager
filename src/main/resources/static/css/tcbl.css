@@ -13,6 +13,10 @@ a:hover {
     color: #24A8E0;
 }
 
+a.normal {
+    text-decoration: underline;
+}
+
 body {
     font-family: raleway, Helvetica, Arial, sans-serif;
 }
@@ -64,30 +68,19 @@ h1 {
     color: #222222;
 }
 
-form {  /* set width in form, not fieldset (still takes up more room w/ fieldset width */
-/*    margin: 0;
-    padding: 0;
-    min-width: 500px;
-    max-width: 600px;
-    width: 560px;*/
-}
-
 form fieldset {
-/* clear: both; note that this clear causes inputs to break to left in ie5.x mac, commented out */
     border-color: #DDDDDD;
     border-width: 1px;
     border-style: solid;
-    padding: 20px;        /* padding in fieldset support spotty in IE */
+    padding: 20px;
     margin: 20px;
 }
 
 form fieldset legend {
-    font-size:1.1em; /* bump up legend font size, not too large or it'll overwrite border on left */
-    /* be careful with padding, it'll shift the nice offset on top of border  */
+    font-size:1.1em;
 }
 
 form label {
-    /*font-size: 0.8em;*/
     padding-bottom: 10px;
     color: #4d4d4d;
     cursor: pointer;
@@ -96,14 +89,6 @@ form label {
     line-height: 1.5;
     margin-bottom: 0;
 }
-
-/*form fieldset label:first-letter { /* use first-letter pseudo-class to underline accesskey, note that */
-/*    text-decoration:underline;    /* Firefox 1.07 WIN and Explorer 5.2 Mac don't support first-letter */
-    /* pseudo-class on legend elements, but do support it on label elements */
-    /* we instead underline first letter on each label element and accesskey */
-    /* each input. doing only legends would  lessens cognitive load */
-    /* opera breaks after first letter underlined legends but not labels */
-/*}*/
 
 form input, form textarea {
     margin-bottom: 1em;
@@ -126,24 +111,12 @@ form input, form textarea {
 }
 
 form input#reset {
-    margin-left:0px; /* set margin-left back to zero on reset button (set above) */
+    margin-left: 0;
 }
 
 textarea { overflow: auto; }
 
-form small {
-/*    display: block;
-    margin: 0 0 5px 160px; /* instructions/comments left margin set to align w/ right column inputs */
-/*    padding: 1px 3px;
-    font-size: 88%;*/
-}
-
-form .required{font-weight:bold;} /* uses class instead of div, more efficient */
-
-form br {
-    clear:left; /* setting clear on inputs didn't work consistently, so brs added for degrade */
-}
-
+form .required{font-weight:bold;}
 
 .red-button {
     margin: 2em;
