@@ -7,13 +7,14 @@
 <div th:if="${message} != null" class="row">
     <h1>Registration failed</h1>
     <p>We are sorry to tell you that the registration process failed.
-    Please <a th:href="@{/user/register}">try again</a>.
+        Please <a th:href="@{/user/register}">try again</a>.
 </div>
 
 <!-- if successful -->
-<div th:unless="${message} != null" class="row">
+<div th:unless="${message} != null">
     <h1>Successfully registered!</h1>
-    <p>You are successfully registered. You can now log in to the following TCBL services or Associated Service Providers:</p>
+    <p>You are successfully registered. You can now log in to the following TCBL services or Associated Service
+        Providers:</p>
     <ul>
         <li><a href="http://tcbl.ditf-mr.de/">TCBL website</a></li>
         <li><a href="http://labs.tcbl.eu/">TCBL Labs</a></li>

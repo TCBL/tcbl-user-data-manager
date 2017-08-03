@@ -3,6 +3,16 @@
     src: url('/css/Raleway-Regular.woff');
 }
 
+a {
+    color: #333;
+    background-color: transparent;
+    text-decoration: none;
+}
+
+a:hover {
+    color: #24A8E0;
+}
+
 body {
     font-family: raleway, Helvetica, Arial, sans-serif;
 }
@@ -10,6 +20,10 @@ body {
 div {
     margin: 0;
     padding: 0;
+}
+
+ul {
+    list-style-type: none;
 }
 
 .row {
@@ -136,7 +150,6 @@ form br {
     background-color: #F190A0;
     color: #000000;
     box-shadow: none !important;
-    text-transform: uppercase;
     font-weight: bold;
     border: none;
     border-radius: 4px;
