@@ -54,6 +54,7 @@ public class OAuth2LoginAutoConfiguration {
 					.antMatchers(
 							"/favicon.ico",
 							"/css/*",
+							"/assets/*",
 							"/index",
 							"/",
 							"/oiclogin",
