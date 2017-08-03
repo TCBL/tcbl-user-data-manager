@@ -6,7 +6,7 @@
 <!--div th:substituteby="index::logout"></div-->
 <div class="row">
     <h1>Sign up to TCBL</h1>
-    <p>All fieds are required.</p>
+    <p class="smallFont">All fieds are required.</p>
     <form action="#" th:action="@{/user/register}" th:object="${tcblUser}" method="post" name="regForm"
           onsubmit="return validateForm()">
         <fieldset>
@@ -41,10 +41,11 @@
             </div>
         </fieldset>
 
-
-        <input type="submit" value="Register"/>
+        <!--div class="row"-->
+            <input type="submit" value="SIGN UP NOW" class="red-button"/>
+        <!--/div-->
     </form>
-    <p><a href="/index" th:href="@{/index}">Back to home page</a></p>
+    <!--<p><a href="/index" th:href="@{/index}">Back to home page</a></p>-->
 </div>
 <script>
     function validateForm() {
