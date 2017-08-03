@@ -4,7 +4,12 @@
 }
 
 body {
-    font-family: raleway;
+    font-family: raleway, Helvetica, Arial, sans-serif;
+}
+
+div {
+    margin: 0;
+    padding: 0;
 }
 
 .row {
@@ -13,6 +18,30 @@ body {
     max-width: 62.5rem;
     width: 100%;
 }
+
+.row::before, .row .row::after {
+    content: " ";
+    display: table;
+}
+
+
+.large-3 {
+    width: 30%;
+}
+
+.large-12 {
+    width: 100%;
+}
+
+
+.columns {
+    position: relative;
+    padding-left: 0.9375rem;
+    padding-right: 0.9375rem;
+    float: left;
+    min-width: 250px;
+}
+
 
 h1 {
     font-weight: bold;
@@ -54,16 +83,16 @@ form label {
     margin-bottom: 0;
 }
 
-form fieldset label:first-letter { /* use first-letter pseudo-class to underline accesskey, note that */
-    text-decoration:underline;    /* Firefox 1.07 WIN and Explorer 5.2 Mac don't support first-letter */
+/*form fieldset label:first-letter { /* use first-letter pseudo-class to underline accesskey, note that */
+/*    text-decoration:underline;    /* Firefox 1.07 WIN and Explorer 5.2 Mac don't support first-letter */
     /* pseudo-class on legend elements, but do support it on label elements */
     /* we instead underline first letter on each label element and accesskey */
     /* each input. doing only legends would  lessens cognitive load */
     /* opera breaks after first letter underlined legends but not labels */
-}
+/*}*/
 
 form input, form textarea {
-    margin-bottom: 0;
+    margin-bottom: 1em;
     margin-right: 1em;
     border-radius: 0;
     background-color: #FFFFFF;

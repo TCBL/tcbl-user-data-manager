@@ -9,14 +9,22 @@
     <p>All fieds are required.</p>
     <form action="#" th:action="@{/user/register}" th:object="${tcblUser}" method="post" name="regForm"
           onsubmit="return validateForm()">
-        <fieldset class="row">
+        <fieldset>
             <legend>Login details</legend>
-            <label for="userName">E-mail</label>
-            <input type="email" th:field="*{userName}" required/>
-            <label for="password">password</label>
-            <input type="password" th:field="*{password}" required/>
-            <label for="cpassword">Confirm Password</label>
-            <input type="password" id="cpassword" name="cpassword" value="" required/>
+            <div class="row">
+                <div class="columns large-3">
+                    <label for="userName" >E-mail</label>
+                    <input type="email" th:field="*{userName}" required/>
+                </div>
+                <div class="columns large-3">
+                    <label for="password">password</label>
+                    <input type="password" th:field="*{password}" required/>
+                </div>
+                <div class="columns large-3">
+                    <label for="cpassword">Confirm Password</label>
+                    <input type="password" id="cpassword" name="cpassword" value="" required/>
+                </div>
+            </div>
         </fieldset>
 
         <fieldset>
