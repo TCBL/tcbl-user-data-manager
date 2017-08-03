@@ -59,6 +59,7 @@ public class OAuth2LoginAutoConfiguration {
 							"/",
 							"/oiclogin",
 							"/user/register",
+							"/user/registered",
 							"/user/confirm/*").permitAll()
 					.anyRequest().authenticated()
 					.and()

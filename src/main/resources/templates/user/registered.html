@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="index :: head">
+<body>
+
+<!-- if registration failed -->
+<div th:if="${message} != null" class="row">
+    <h1>Registration failed</h1>
+    <p>We are sorry to tell you that the registration process failed. This is the reason: </p>
+    <p th:text="${message.message}"></p>
+    Please <a th:href="@{/user/register}">try again</a>.
+</div>
+
+<!-- if successful -->
+<div th:unless="${message} != null" class="row">
+    <h1>Almost done!</h1>
+    <p>Your registration is almost completed. An e-mail with a confirmation link will be sent to you shortly.</p>
+    <p>If it doesn't arrive within one hour, please <a th:href="@{/user/register}">try again</a>.</p>
+</div>
+
+<div th:replace="index :: footer"/>
+</body>
+</html>
