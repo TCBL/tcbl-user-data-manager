@@ -119,8 +119,6 @@ public class UserController {
 		try {
 			TCBLUser newUser = tcblUserRepository.create(user);
 			sendRegisterMessage(newUser);
-			//model.addAttribute("message", new Message("Registration accepted",
-			//		"An confirmation e-mail will be sent to you. Please follow the instructions to complete the registration process."));
 		} catch (Exception e) {
 			log.error("Cannot register user {}", user.getUserName(), e);
 			model.addAttribute("message", new Message("Registration failed",
@@ -137,15 +135,15 @@ public class UserController {
 			if (!user.isActive()) {
 				user.setActive(true);
 				tcblUserRepository.save(user);
-				model.addAttribute("message", new Message("Registration completed",
-						"You can now log in."));
+				/*model.addAttribute("message", new Message("Registration completed",
+						"You can now log in."));*/
 			}
 		} catch (Exception e) {
 			log.error("Cannot confirm registration of {}", inum, e);
 			model.addAttribute("message", new Message("Registration failed",
 					e.getMessage()));
 		}
-		return "/index";
+		return "/user/confirmed";
 	}
 
 	private ExchangeFilterFunction oauth2Credentials(OAuth2AuthenticationToken authentication) {

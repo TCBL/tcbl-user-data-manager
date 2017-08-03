@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="index :: head">
+<body>
+
+<!-- if registration failed -->
+<div th:if="${message} != null" class="row">
+    <h1>Registration failed</h1>
+    <p>We are sorry to tell you that the registration process failed.
+    Please <a th:href="@{/user/register}">try again</a>.
+</div>
+
+<!-- if successful -->
+<div th:unless="${message} != null" class="row">
+    <h1>Successfully registered!</h1>
+    <p>You are successfully registered. You can now log in to the following TCBL services or Associated Service Providers:</p>
+    <ul>
+        <li><a href="http://tcbl.ditf-mr.de/">TCBL website</a></li>
+        <li><a href="http://labs.tcbl.eu/">TCBL Labs</a></li>
+    </ul>
+</div>
+
+<div th:replace="index :: footer"/>
+</body>
+</html>
