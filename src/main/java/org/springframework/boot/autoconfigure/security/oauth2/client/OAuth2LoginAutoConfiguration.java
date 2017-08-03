@@ -60,7 +60,12 @@ public class OAuth2LoginAutoConfiguration {
 							"/oiclogin",
 							"/user/register",
 							"/user/registered",
-							"/user/confirm/*").permitAll()
+							"/user/confirm/*",
+							"/user/resetpw",
+							"/user/resetpwform",
+							"/user/resetpwform/*",
+							"/user/passwordset"
+							).permitAll()
 					.anyRequest().authenticated()
 					.and()
 					.oauth2Login();

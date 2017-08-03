@@ -22,6 +22,7 @@ import reactor.core.publisher.Mono;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
+import javax.servlet.http.HttpServletRequest;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Map;
@@ -115,10 +116,11 @@ public class UserController {
 	}
 
 	@RequestMapping(value = "/user/register", method = RequestMethod.POST)
-	public String postRegister(Model model, TCBLUser user) {
+	public String postRegister(HttpServletRequest request, Model model, TCBLUser user) {
 		try {
 			TCBLUser newUser = tcblUserRepository.create(user);
-			sendRegisterMessage(newUser);
+			String baseUri = getUriOneLevelUp(request);
+			sendRegisterMessage(newUser, baseUri);
 		} catch (Exception e) {
 			log.error("Cannot register user {}", user.getUserName(), e);
 			model.addAttribute("message", new Message("Registration failed",
@@ -146,6 +148,45 @@ public class UserController {
 		return "/user/confirmed";
 	}
 
+	@RequestMapping(value="/user/resetpw", method = RequestMethod.GET)
+	public String getResetPassword() {
+		return "/user/resetpw";
+	}
+
+	@RequestMapping(value="/user/resetpw", method = RequestMethod.POST)
+	public String postResetPassword(HttpServletRequest request, Model model, String mail) {
+		try {
+			TCBLUser user = tcblUserRepository.findByName(mail);
+			String baseUri = getUriOneLevelUp(request);
+			sendResetMessage(user, baseUri);
+		} catch (Exception e) {
+			log.error("Cannot send reset pw mail for {} ", mail);
+			model.addAttribute("message", new Message("Reset Password failed", "Cannot reset password."));
+		}
+		return "/user/pwmailsent";
+	}
+
+	@RequestMapping(value = "/user/resetpwform/{rpc}", method = RequestMethod.GET)
+	public String resetPasswordForm(Model model, @PathVariable String rpc) {
+		model.addAttribute("rpc", rpc);
+		return "/user/resetpwform";
+	}
+
+	@RequestMapping(value = "/user/resetpwform", method = RequestMethod.POST)
+	public String resetPasswordForm(Model model, String password, String rpc) {
+		String inum = decodeBase64(rpc);
+		try {
+			TCBLUser user = tcblUserRepository.find(inum);
+			user.setPassword(password);
+			tcblUserRepository.save(user);
+		} catch (Exception e) {
+			log.error("Cannot reset password of {}", rpc, e);
+			model.addAttribute("message", new Message("Resetting password failed",
+					e.getMessage()));
+		}
+		return "/user/passwordset";
+	}
+
 	private ExchangeFilterFunction oauth2Credentials(OAuth2AuthenticationToken authentication) {
 		return ExchangeFilterFunction.ofRequestProcessor(
 				clientRequest -> {
@@ -168,7 +209,7 @@ public class UserController {
 	 * Sends the mail for registration asynchronously. We don't want the app to block.
 	 * @param user	The user to send a mail to.
 	 */
-	private void sendRegisterMessage(final TCBLUser user) {
+	private void sendRegisterMessage(final TCBLUser user, final String baseUri) {
 		executor.execute(() -> {
 			try {
 				String encodedId = encodeBase64(user.getId());
@@ -178,14 +219,39 @@ public class UserController {
 				helper.setFrom("no-reply@tcbl.eu");
 				helper.setTo(user.getUserName());
 				helper.setText("<p>Thank you for becoming a TCBL member. Click <a href=\""
-						+ "https://ravel.elis.ugent.be:8443/user/confirm/" + encodedId
+						+ baseUri + "/confirm/" + encodedId
 						+ "\">here</a> to activate your account.</p>", true);
 				mailSender.send(message);
 				log.debug("Mail sent to " + user.getUserName());
 			} catch (MessagingException e) {
-				log.error("Could not send mail. ", e);
+				log.error("Could not send mail to {}. ", user.getUserName(), e);
 			}
 		});
+	}
+
+	private void sendResetMessage(final TCBLUser user, final String baseUri) {
+		executor.execute(() -> {
+			try {
+				String encodedId = encodeBase64(user.getId());
+				MimeMessage message = mailSender.createMimeMessage();
+				MimeMessageHelper helper = new MimeMessageHelper(message);
+				helper.setSubject("Reset password for TCBL");
+				helper.setFrom("no-reply@tcbl.eu");
+				helper.setTo(user.getUserName());
+				helper.setText("<p>You receive this mail because you want to reset your TCBL password. Click <a href=\""
+						+ baseUri + "/resetpwform/" + encodedId
+						+ "\">here</a> to do so.</p>", true);
+				mailSender.send(message);
+				log.debug("Mail sent to " + user.getUserName());
+			} catch (MessagingException e) {
+				log.error("Could not send mail to {}. ", user.getUserName(), e);
+			}
+		});
+	}
+
+	private String getUriOneLevelUp(final HttpServletRequest request) {
+		String reqUri = request.getRequestURL().toString();
+		return reqUri.substring(0, reqUri.lastIndexOf('/'));
 	}
 
 }

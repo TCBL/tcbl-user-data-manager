@@ -30,6 +30,11 @@ public class InMemoryTCBLUserRepository implements TCBLUserRepository {
 	}
 
 	@Override
+	public TCBLUser findByName(String userName) throws Exception {
+		return find(userName);
+	}
+
+	@Override
 	public TCBLUser create(TCBLUser tcblUser) throws Exception {
 		return save(tcblUser);
 	}

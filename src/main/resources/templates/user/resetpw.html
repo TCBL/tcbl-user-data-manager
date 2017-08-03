@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="index :: head">
+<body>
+
+<div class="row">
+    <h1>Reset Password</h1>
+    <p>Forgot your password? No problem.</p>
+    <form action="#" th:action="@{/user/resetpw}" method="post" name="resetPwForm">
+            <div class="row">
+                <div class="columns large-3">
+                    <label for="mail">E-mail</label>
+                    <input type="email" name="mail" id="mail" required/>
+                </div>
+            </div>
+        <input type="submit" value="Reset password" class="red-button"/>
+    </form>
+</div>
+
+<div th:replace="index :: footer"/>
+</body>
+</html>

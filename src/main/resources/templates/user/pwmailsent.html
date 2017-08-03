@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="index :: head">
+<body>
+
+<!-- if registration failed -->
+<div th:if="${message} != null" class="row">
+    <h1>Resetting password failed</h1>
+    <p>We are sorry to tell you that resetting the password failed. This is the reason: </p>
+    <p th:text="${message.message}"></p>
+    <p>Please <a class="normal" th:href="@{/user/resetpw}">try again</a>.</p>
+</div>
+
+<!-- if successful -->
+<div th:unless="${message} != null">
+    <h1>Reset password mail sent</h1>
+    <p>An e-mail with a link to reset your password will be sent to you shortly.</p>
+    <p>If it doesn't arrive within one hour, please <a class="normal" th:href="@{/user/resetpw}">try again</a>.</p>
+</div>
+
+<div th:replace="index :: footer"/>
+</body>
+</html>

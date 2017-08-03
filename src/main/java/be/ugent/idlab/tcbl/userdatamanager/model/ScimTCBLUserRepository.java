@@ -75,7 +75,7 @@ public class ScimTCBLUserRepository implements TCBLUserRepository {
 	}
 
 	@Override
-	public TCBLUser save(TCBLUser tcblUser) throws Exception {
+	public TCBLUser save(final TCBLUser tcblUser) throws Exception {
 		User user = findUser(tcblUser.getId());
 		user.setPassword("");
 		tcblUser.updateScimUser(user);
@@ -84,13 +84,28 @@ public class ScimTCBLUserRepository implements TCBLUserRepository {
 	}
 
 	@Override
-	public TCBLUser find(String id) throws Exception {
+	public TCBLUser find(final String id) throws Exception {
 		User user = findUser(id);
 		return TCBLUser.createFromScimUser(user);
 	}
 
 	@Override
-	public TCBLUser create(TCBLUser tcblUser) throws Exception {
+	public TCBLUser findByName(final String userName) throws Exception {
+		String usernameQuery = "userName eq \"" + userName + "\"";
+		ScimResponse existsResponse = client.searchUsers(usernameQuery, 1, 1, "", "", null);
+		ListResponse userList = Util.toListResponseUser(existsResponse, userExtensionSchema);
+		if (userList.getTotalResults() == 1) {
+			User user = (User) userList.getResources().get(0);
+			return TCBLUser.createFromScimUser(user);
+		} else {
+			String message = "Did not find user " + userName;
+			log.error(message);
+			throw new Exception(message);
+		}
+	}
+
+	@Override
+	public TCBLUser create(final TCBLUser tcblUser) throws Exception {
 		try {
 			User user = new User();
 			tcblUser.updateScimUser(user);
@@ -116,7 +131,7 @@ public class ScimTCBLUserRepository implements TCBLUserRepository {
 	}
 
 	@Override
-	public void deleteTCBLUser(String userName) {
+	public void deleteTCBLUser(final String userName) {
 		// TODO or not TODO
 	}
 

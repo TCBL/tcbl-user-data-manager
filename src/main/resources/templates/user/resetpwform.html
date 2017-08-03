@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="index :: head">
+<body>
+
+<div class="row" th:if="${rpc} != null">
+    <h1>Reset Password</h1>
+    <form action="#" th:action="@{/user/resetpwform}" method="post" name="resetPwForm">
+        <div class="row">
+            <div class="columns large-3">
+                <label for="password">New password</label>
+                <input type="password" name="password" id="password" required/>
+            </div>
+            <input type="hidden" th:value="${rpc}" name="rpc" id="rpc"/>
+        </div>
+        <input type="submit" value="Set password" class="red-button"/>
+    </form>
+</div>
+
+<div th:replace="index :: footer"/>
+</body>
+</html>
