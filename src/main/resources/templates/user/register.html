@@ -13,7 +13,7 @@
             <legend>Login details</legend>
             <div class="row">
                 <div class="columns large-3">
-                    <label for="userName" >E-mail</label>
+                    <label for="userName">E-mail</label>
                     <input type="email" th:field="*{userName}" required/>
                 </div>
                 <div class="columns large-3">
@@ -28,11 +28,17 @@
         </fieldset>
 
         <fieldset>
-            <legend>Personal information</legend>
-            <label for="firstName">First name</label>
-            <input type="text" th:field="*{firstName}" required/>
-            <label for="lastName">Last name</label>
-            <input type="text" th:field="*{lastName}" required/>
+            <div class="row">
+                <legend>Personal information</legend>
+                <div class="columns large-2">
+                    <label for="firstName">First name</label>
+                    <input type="text" th:field="*{firstName}" required/>
+                </div>
+                <div class="columns large-2">
+                    <label for="lastName">Last name</label>
+                    <input type="text" th:field="*{lastName}" required/>
+                </div>
+            </div>
         </fieldset>
 
 
