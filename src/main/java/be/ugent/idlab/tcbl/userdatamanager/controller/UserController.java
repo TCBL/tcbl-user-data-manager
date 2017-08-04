@@ -240,7 +240,8 @@ public class UserController {
 				helper.setTo(user.getUserName());
 				helper.setText("<p>You receive this mail because you want to reset your TCBL password. Click <a href=\""
 						+ baseUri + "/resetpwform/" + encodedId
-						+ "\">here</a> to do so.</p>", true);
+						+ "\">here</a> to do so.</p>" +
+						"<p>If you didn't request to reset your password, you can just ignore this e-mail.</p>", true);
 				mailSender.send(message);
 				log.debug("Mail sent to " + user.getUserName());
 			} catch (MessagingException e) {

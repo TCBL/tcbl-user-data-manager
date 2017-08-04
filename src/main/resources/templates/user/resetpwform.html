@@ -5,11 +5,15 @@
 
 <div class="row" th:if="${rpc} != null">
     <h1>Reset Password</h1>
-    <form action="#" th:action="@{/user/resetpwform}" method="post" name="resetPwForm">
+    <form action="#" th:action="@{/user/resetpwform}" method="post" name="resetPwForm" onsubmit="return validateForm()">
         <div class="row">
             <div class="columns large-3">
                 <label for="password">New password</label>
                 <input type="password" name="password" id="password" required/>
+            </div>
+            <div class="columns large-3">
+                <label for="password">Confirm new password</label>
+                <input type="password" name="cpassword" id="cpassword" required/>
             </div>
             <input type="hidden" th:value="${rpc}" name="rpc" id="rpc"/>
         </div>
@@ -18,5 +22,17 @@
 </div>
 
 <div th:replace="index :: footer"/>
+
+<script>
+    function validateForm() {
+        var p1 = document.forms["resetPwForm"]["password"].value;
+        var p2 = document.forms["resetPwForm"]["cpassword"].value;
+        if (p1 !== p2) {
+            alert("Passwords do not match.");
+            return false;
+        }
+    }
+</script>
+
 </body>
 </html>

@@ -12,7 +12,7 @@
 </div>
 
 <!-- if successful -->
-<div th:unless="${message} != null">
+<div th:unless="${message} != null" class="row">
     <h1>Reset password mail sent</h1>
     <p>An e-mail with a link to reset your password will be sent to you shortly.</p>
     <p>If it doesn't arrive within one hour, please <a class="normal" th:href="@{/user/resetpw}">try again</a>.</p>
