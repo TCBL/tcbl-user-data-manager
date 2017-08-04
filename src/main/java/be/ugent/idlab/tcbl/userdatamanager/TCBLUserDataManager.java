@@ -42,7 +42,7 @@ public class TCBLUserDataManager {
 
 	@Bean
 	ExecutorService executor() {
-		return Executors.newFixedThreadPool(10);
+		return Executors.newFixedThreadPool(100);
 	}
 
 	public static void main(String[] args) {
