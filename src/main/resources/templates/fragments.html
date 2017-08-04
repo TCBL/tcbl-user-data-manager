@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+
+<!--
+This document is never rendered directly. Its purpose is to provide reusable fragments (pieces of html/js code) in
+the other templates.
+-->
+
+<!-- This is the standard <head> element. Should be used on every page. -->
+<head th:fragment="head">
+    <title>TCBL User Manager</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" th:href="@{/css/tcbl.css}" />
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script>
+        $( function() {
+            $( "#dialog" ).dialog();
+        } );
+    </script>
+</head>
+
+<body>
+
+<div th:fragment="header(title, main)" class="row">
+
+    <!-- common heading -->
+    <div class="columns">
+        <img th:src="@{/assets/TCBLAltsm.png}">
+    </div>
+    <div class="columns">
+        <h1 th:replace="${title}">Hello</h1>
+    </div>
+    <div class="colums break">&nbsp</div>
+
+    <!--/* main page contents goes here */-->
+    <th:block th:replace="${main}"/>
+
+    <!-- common footer -->
+    <div class="tcbl-footer row">
+        <div class="columns">
+            <p>This project has received funding from the European Union's Horizon 2020 Programme for research, technology development, and innovation under grant Agreement n.646133</p>
+        </div>
+        <div class="columns">
+            <img th:src="@{/assets/euh2020.png}">
+        </div>
+    </div>
+</div>
+
+<script th:fragment="validatePassword">
+    function validatePassword() {
+        var p1 = document.forms["regForm"]["password"].value;
+        var p2 = document.forms["regForm"]["cpassword"].value;
+        if (p1 !== p2) {
+            alert("Passwords do not match.");
+            return false;
+        }
+    }
+</script>
+
+</body>

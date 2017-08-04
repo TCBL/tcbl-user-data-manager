@@ -1,18 +1,6 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-<head th:fragment="head">
-    <title>TCBL User Manager</title>
-    <meta charset="utf-8" />
-    <link rel="stylesheet" th:href="@{/css/tcbl.css}" />
-    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
-    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-    <script>
-        $( function() {
-            $( "#dialog" ).dialog();
-        } );
-    </script>
-</head>
+<head th:replace="fragments :: head"/>
 <body>
 
 <!-- render this if the user is logged in -->

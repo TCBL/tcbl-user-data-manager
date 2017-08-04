@@ -3,10 +3,9 @@
 <head th:replace="index :: head">
 <body>
 
-<!--div th:substituteby="index::logout"></div-->
-<div class="row">
+<div th:replace="fragments :: header( ~{::h1}, ~{::main})">
     <h1>Sign up to TCBL</h1>
-    <p class="smallFont">All fieds are required.</p>
+    <main>
     <form action="#" th:action="@{/user/register}" th:object="${tcblUser}" method="post" name="regForm"
           onsubmit="return validateForm()">
         <fieldset>
@@ -43,19 +42,9 @@
 
         <input type="submit" value="SIGN UP NOW" class="red-button"/>
     </form>
+</main>
 </div>
 
-<div th:replace="index :: footer"/>
-
-<script>
-    function validateForm() {
-        var p1 = document.forms["regForm"]["password"].value;
-        var p2 = document.forms["regForm"]["cpassword"].value;
-        if (p1 !== p2) {
-            alert("Passwords do not match.");
-            return false;
-        }
-    }
-</script>
+<script th:replace="fragments :: validatePassword"></script>
 </body>
 </html>
