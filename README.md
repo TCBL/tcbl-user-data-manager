@@ -23,6 +23,9 @@ This creates something like `target/UserDataManager-1.0-SNAPSHOT.jar`.
 
 ### 1. Enable HTTPS for the application
 
+**Only when run as a standalone application. You can also run it in combination with a reverse proxy that provides a
+certificate. In this case, omit the "ssl:" configuration in application.yml**
+
 In order to use OpenID Connect, the application needs to be able to receive https requests.
 Two options here: using a self-signed certificate or a certificate from a Certificate Authority.
 
