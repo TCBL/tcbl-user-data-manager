@@ -1,26 +1,34 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="index :: head">
+<head th:replace="fragments :: head">
 <body>
 
 <!-- if registration failed -->
-<div th:if="${message} != null" class="row">
-    <h1>Registration failed</h1>
-    <p>We are sorry to tell you that the registration process failed.
-        Please <a class="normal" th:href="@{/user/register}">try again</a>.
+<div th:if="${message} != null">
+    <div th:replace="fragments :: header( ~{::h1}, ~{::aside})">
+        <h1>Registration failed</h1>
+        <aside>
+            <p><br>We are sorry to tell you that the registration process failed.
+                Please <a class="normal" th:href="@{/user/register}">try again</a>.
+            </p>
+        </aside>
+    </div>
 </div>
 
 <!-- if successful -->
 <div th:unless="${message} != null">
-    <h1>Successfully registered!</h1>
-    <p>You are successfully registered. You can now log in to the following TCBL services or Associated Service
-        Providers:</p>
-    <ul>
-        <li><a href="http://tcbl.ditf-mr.de/">TCBL website</a></li>
-        <li><a href="http://labs.tcbl.eu/">TCBL Labs</a></li>
-    </ul>
+    <div th:replace="fragments :: header( ~{::h2}, ~{::main})">
+        <h2>Successfully registered!</h2>
+        <main>
+            <p><br>You are successfully registered. You can now log in to the following TCBL services or Associated Service
+                Providers:</p>
+            <ul>
+                <li><a href="http://tcbl.ditf-mr.de/">TCBL website</a></li>
+                <li><a href="http://labs.tcbl.eu/">TCBL Labs</a></li>
+            </ul>
+        </main>
+    </div>
 </div>
 
-<div th:replace="index :: footer"/>
 </body>
 </html>

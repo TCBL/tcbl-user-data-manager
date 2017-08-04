@@ -1,23 +1,32 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="index :: head">
+<head th:replace="fragments :: head">
 <body>
 
 <!-- if registration failed -->
-<div th:if="${message} != null" class="row">
-    <h1>Registration failed</h1>
-    <p>We are sorry to tell you that the registration process failed. This is the reason: </p>
-    <p th:text="${message.message}"></p>
-    Please <a class="normal" th:href="@{/user/register}">try again</a>.
+<div th:if="${message} != null">
+    <div th:replace="fragments :: header( ~{::h1}, ~{::aside})">
+        <h1>Registration failed</h1>
+        <aside>
+            <p><br>We are sorry to tell you that the registration process failed. This is the reason: </p>
+            <p th:text="${message.message}"></p>
+            <p>Please <a class="normal" th:href="@{/user/register}">try again</a>.</p>
+        </aside>
+    </div>
 </div>
 
 <!-- if successful -->
-<div th:unless="${message} != null" class="row">
-    <h1>Almost done!</h1>
-    <p>Your registration is almost completed. An e-mail with a confirmation link will be sent to you shortly.</p>
-    <p>If it doesn't arrive within one hour, please <a class="normal" th:href="@{/user/register}">try again</a>.</p>
+<div th:unless="${message} != null">
+    <div th:replace="fragments :: header( ~{::h2}, ~{::main})">
+        <h2>Almost done!</h2>
+        <main>
+            <p><br>Your registration is almost completed. An e-mail with a confirmation link will be sent to you
+                shortly.</p>
+            <p>If it doesn't arrive within one hour, please <a class="normal" th:href="@{/user/register}">try again</a>.
+            </p>
+        </main>
+    </div>
 </div>
 
-<div th:replace="index :: footer"/>
 </body>
 </html>

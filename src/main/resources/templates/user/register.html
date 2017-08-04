@@ -1,48 +1,48 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="index :: head">
+<head th:replace="fragments :: head">
 <body>
 
 <div th:replace="fragments :: header( ~{::h1}, ~{::main})">
     <h1>Sign up to TCBL</h1>
     <main>
-    <form action="#" th:action="@{/user/register}" th:object="${tcblUser}" method="post" name="regForm"
-          onsubmit="return validateForm()">
-        <fieldset>
-            <legend>Login details</legend>
-            <div class="row">
-                <div class="columns large-3">
-                    <label for="userName">E-mail</label>
-                    <input type="email" th:field="*{userName}" required/>
+        <form action="#" th:action="@{/user/register}" th:object="${tcblUser}" method="post" name="regForm"
+              onsubmit="return validatePassword()">
+            <fieldset>
+                <legend>Login details</legend>
+                <div class="row">
+                    <div class="columns large-3">
+                        <label for="userName">E-mail</label>
+                        <input type="email" th:field="*{userName}" required/>
+                    </div>
+                    <div class="columns large-3">
+                        <label for="password">password</label>
+                        <input type="password" th:field="*{password}" required/>
+                    </div>
+                    <div class="columns large-3">
+                        <label for="cpassword">Confirm Password</label>
+                        <input type="password" id="cpassword" name="cpassword" value="" required/>
+                    </div>
                 </div>
-                <div class="columns large-3">
-                    <label for="password">password</label>
-                    <input type="password" th:field="*{password}" required/>
-                </div>
-                <div class="columns large-3">
-                    <label for="cpassword">Confirm Password</label>
-                    <input type="password" id="cpassword" name="cpassword" value="" required/>
-                </div>
-            </div>
-        </fieldset>
+            </fieldset>
 
-        <fieldset>
-            <div class="row">
-                <legend>Personal information</legend>
-                <div class="columns large-2">
-                    <label for="firstName">First name</label>
-                    <input type="text" th:field="*{firstName}" required/>
+            <fieldset>
+                <div class="row">
+                    <legend>Personal information</legend>
+                    <div class="columns large-2">
+                        <label for="firstName">First name</label>
+                        <input type="text" th:field="*{firstName}" required/>
+                    </div>
+                    <div class="columns large-2">
+                        <label for="lastName">Last name</label>
+                        <input type="text" th:field="*{lastName}" required/>
+                    </div>
                 </div>
-                <div class="columns large-2">
-                    <label for="lastName">Last name</label>
-                    <input type="text" th:field="*{lastName}" required/>
-                </div>
-            </div>
-        </fieldset>
+            </fieldset>
 
-        <input type="submit" value="SIGN UP NOW" class="red-button"/>
-    </form>
-</main>
+            <input type="submit" value="SIGN UP NOW" class="red-button"/>
+        </form>
+    </main>
 </div>
 
 <script th:replace="fragments :: validatePassword"></script>
