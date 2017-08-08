@@ -23,6 +23,7 @@ logging:
 spring:
   thymeleaf:
     cache: false
+    prefix: classpath:/templates
   mail:
     host: smtp.ugent.be
     port: 465

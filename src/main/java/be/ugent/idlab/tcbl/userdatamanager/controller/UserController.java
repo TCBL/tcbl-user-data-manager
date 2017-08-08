@@ -89,11 +89,11 @@ public class UserController {
 			}
 			model.addAttribute("userAttributes", userAttributes);
 			model.addAttribute("tcblUser", tcblUser);
-			return "user/index";
+			return "/user/index";
 		} catch (Exception e) {
 			model.addAttribute("message", new Message("Error", "Cannot get your information."));
 			log.error("Cannot get user info", e);
-			return "index";
+			return "/index";
 		}
 	}
 
@@ -114,7 +114,7 @@ public class UserController {
 	public String getRegister(Model model) {
 		TCBLUser user = new TCBLUser();
 		model.addAttribute("tcblUser", user);
-		return "user/register";
+		return "/user/register";
 	}
 
 	@PostMapping("/register")
@@ -128,7 +128,7 @@ public class UserController {
 			model.addAttribute("message", new Message("Registration failed",
 					e.getMessage()));
 		}
-		return "user/registered";
+		return "/user/registered";
 	}
 
 	@GetMapping("/confirm/{id}")
@@ -147,7 +147,7 @@ public class UserController {
 			model.addAttribute("message", new Message("Registration failed",
 					e.getMessage()));
 		}
-		return "user/confirmed";
+		return "/user/confirmed";
 	}
 
 	@GetMapping("/resetpw")
@@ -165,13 +165,13 @@ public class UserController {
 			log.error("Cannot send reset pw mail for {} ", mail);
 			model.addAttribute("message", new Message("Reset Password failed", "Cannot reset password."));
 		}
-		return "user/pwmailsent";
+		return "/user/pwmailsent";
 	}
 
 	@GetMapping("/resetpwform/{rpc}")
 	public String resetPasswordForm(Model model, @PathVariable String rpc) {
 		model.addAttribute("rpc", rpc);
-		return "user/resetpwform";
+		return "/user/resetpwform";
 	}
 
 	@PostMapping("/resetpwform")
@@ -186,7 +186,7 @@ public class UserController {
 			model.addAttribute("message", new Message("Resetting password failed",
 					e.getMessage()));
 		}
-		return "user/passwordset";
+		return "/user/passwordset";
 	}
 
 	private ExchangeFilterFunction oauth2Credentials(OAuth2AuthenticationToken authentication) {
