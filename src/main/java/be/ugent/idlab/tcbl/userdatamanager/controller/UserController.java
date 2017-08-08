@@ -12,9 +12,10 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.reactive.function.client.ClientRequest;
 import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -36,6 +37,7 @@ import java.util.concurrent.ExecutorService;
  * @author Gerald Haesendonck
  */
 @Controller
+@RequestMapping("user")
 public class UserController {
 	private final Logger log = LoggerFactory.getLogger(this.getClass());
 	private WebClient webClient = WebClient.create();
@@ -69,7 +71,7 @@ public class UserController {
 	 * @param authentication	Required to perform a UserInfo request.
 	 * @return					The path of the view to be rendered.
 	 */
-	@RequestMapping("/user/index")
+	@GetMapping("/index")
 	public String userinfo(Model model, OAuth2AuthenticationToken authentication) {
 		Map userAttributes = this.webClient
 				.mutate().filter(oauth2Credentials(authentication)).build()
@@ -87,15 +89,15 @@ public class UserController {
 			}
 			model.addAttribute("userAttributes", userAttributes);
 			model.addAttribute("tcblUser", tcblUser);
-			return "/user/index";
+			return "user/index";
 		} catch (Exception e) {
 			model.addAttribute("message", new Message("Error", "Cannot get your information."));
 			log.error("Cannot get user info", e);
-			return "/index";
+			return "index";
 		}
 	}
 
-	@RequestMapping(value = "/user/update", method = RequestMethod.POST)
+	@PostMapping("/update")
 	public String update (TCBLUser user, Model model) {
 		try {
 			tcblUserRepository.save(user);
@@ -108,14 +110,14 @@ public class UserController {
 		return "/user/index";
 	}
 
-	@RequestMapping(value = "/user/register", method = RequestMethod.GET)
+	@GetMapping("/register")
 	public String getRegister(Model model) {
 		TCBLUser user = new TCBLUser();
 		model.addAttribute("tcblUser", user);
-		return "/user/register";
+		return "user/register";
 	}
 
-	@RequestMapping(value = "/user/register", method = RequestMethod.POST)
+	@PostMapping("/register")
 	public String postRegister(HttpServletRequest request, Model model, TCBLUser user) {
 		try {
 			TCBLUser newUser = tcblUserRepository.create(user);
@@ -126,10 +128,10 @@ public class UserController {
 			model.addAttribute("message", new Message("Registration failed",
 					e.getMessage()));
 		}
-		return "/user/registered";
+		return "user/registered";
 	}
 
-	@RequestMapping(value = "/user/confirm/{id}", method = RequestMethod.GET)
+	@GetMapping("/confirm/{id}")
 	public String confirmRegistration(Model model, @PathVariable String id) {
 		String inum = decodeBase64(id);
 		try {
@@ -145,15 +147,15 @@ public class UserController {
 			model.addAttribute("message", new Message("Registration failed",
 					e.getMessage()));
 		}
-		return "/user/confirmed";
+		return "user/confirmed";
 	}
 
-	@RequestMapping(value="/user/resetpw", method = RequestMethod.GET)
+	@GetMapping("/resetpw")
 	public String getResetPassword() {
-		return "/user/resetpw";
+		return "user/resetpw";
 	}
 
-	@RequestMapping(value="/user/resetpw", method = RequestMethod.POST)
+	@PostMapping("/user/resetpw")
 	public String postResetPassword(HttpServletRequest request, Model model, String mail) {
 		try {
 			TCBLUser user = tcblUserRepository.findByName(mail);
@@ -163,16 +165,16 @@ public class UserController {
 			log.error("Cannot send reset pw mail for {} ", mail);
 			model.addAttribute("message", new Message("Reset Password failed", "Cannot reset password."));
 		}
-		return "/user/pwmailsent";
+		return "user/pwmailsent";
 	}
 
-	@RequestMapping(value = "/user/resetpwform/{rpc}", method = RequestMethod.GET)
+	@GetMapping("/resetpwform/{rpc}")
 	public String resetPasswordForm(Model model, @PathVariable String rpc) {
 		model.addAttribute("rpc", rpc);
-		return "/user/resetpwform";
+		return "user/resetpwform";
 	}
 
-	@RequestMapping(value = "/user/resetpwform", method = RequestMethod.POST)
+	@PostMapping("/resetpwform")
 	public String resetPasswordForm(Model model, String password, String rpc) {
 		String inum = decodeBase64(rpc);
 		try {
@@ -184,7 +186,7 @@ public class UserController {
 			model.addAttribute("message", new Message("Resetting password failed",
 					e.getMessage()));
 		}
-		return "/user/passwordset";
+		return "user/passwordset";
 	}
 
 	private ExchangeFilterFunction oauth2Credentials(OAuth2AuthenticationToken authentication) {
