@@ -21,10 +21,24 @@ This creates something like `target/UserDataManager-1.0-SNAPSHOT.jar`.
 
 ## Configuring
 
-### 1. Enable HTTPS for the application
+### 1. Basic Application Container configuration
+
+Every Spring Boot app runs on a servlet container (either Tomcat or Jetty; Tomcat by default).
+This requires at least one configuration parameter, i.e. the port the server will listen to:
+
+```yaml
+server:
+  port: 8444
+```
+
+There are two options to let the outside world communicate with the application, and both have their configuration implications:
+1. Direct communication (no reverse proxy). See **1.a Enable HTTPS for the application**. Typical for testing.
+1. Via a reverse proxy. See **1.b. Configure a reverse proxy**. Typical for a production environment.
+
+### 1.a Enable HTTPS for the application (optional)
 
 **Only when run as a standalone application. You can also run it in combination with a reverse proxy that provides a
-certificate. In this case, omit the "ssl:" configuration in application.yml**
+certificate. In this case, see **1.b. Configure a reverse proxy**
 
 In order to use OpenID Connect, the application needs to be able to receive https requests.
 Two options here: using a self-signed certificate or a certificate from a Certificate Authority.
@@ -78,13 +92,39 @@ Whatever option you chose above, this requires the following configuration snipp
 
 ```yaml
 server:
-  port: 8443
+  port: 8444
   ssl:
     key-store: /home/ghaesen/projects/TCBL/config/tudm.jks
     key-store-password: secret
     key-store-type: PKCS12
     key-alias: tudm
 ```
+
+*The complete configuration is discussed in "4. Configure the application"*
+
+### 1.b Configure a reverse proxy (optional)
+In this scenario, you already have an HTTP server installed which provides the TLS certificate and serves some contents.
+We have to configure the HTTP server to act as a reverse proxy, which means requests will be forwarded to another URL.
+We take Apache 2.4 as HTTP server, because that's the one used on the TCBL test and production servers.
+
+The set-up is:
+* Our app listens on `http://localhost:8444/usermanager`.
+* Apache redirects requests originating from `/usermanager` to `http://localhost:8444/usermanager`
+
+For example, on the test server, this means that requests to `https://tcblsso2.ilabt.imec.be:8443/usermanager` reach our app.
+
+First, configure Apache on how to act as a reverse proxy, as described [here](https://git.datasciencelab.ugent.be/TCBL/internal-server-docs/wikis/apache#reverse-proxy).
+
+The app requires some configuration too:
+
+```yaml
+server:
+  port: 8444
+  servlet:
+    context-path: /usermanager
+```
+
+We have to set the context path explicitly, because the app needs to know how to generate correct URL's for its hyperlinks.
 
 *The complete configuration is discussed in "4. Configure the application"*
 
@@ -102,7 +142,7 @@ Here are the settings (example, adjust to correct hosts):
 * Logo URI: https://tcblsso.ilabt.iminds.be:8443/resources/logos/login-with-TCBL.png (though it won't be shown)
 * Subject Type: pairwise
 * Authentication method for the Token Endpoint: client_secret_post
-* Redirect Login URIs: https://ravel.elis.ugent.be:8443/oauth2/authorize/code/tcbl_manager (or wherever the app lives)
+* Redirect Login URIs: https://ravel.elis.ugent.be:8444/oauth2/authorize/code/tcbl_manager (or wherever the app lives, on the test server, this would be https://tcblsso2.ilabt.imec.be:8443/usermanager/oauth2/authorize/code/tcbl_manager)
 * Scopes: openid, inum
 * Response Types: code
 * Grant Types: authorization_code
@@ -118,7 +158,7 @@ security:
         client-secret: averysecrativesecret
         client-authentication-method: post
         authorized-grant-type: authorization_code
-        redirect-uri: "https://ravel.elis.ugent.be:8443/oauth2/authorize/code/tcbl_manager"
+        redirect-uri: "https://ravel.elis.ugent.be:8444/oauth2/authorize/code/tcbl_manager"
         scopes: openid, inum
         authorization-uri: "https://honegger.elis.ugent.be/oxauth/seam/resource/restv1/oxauth/authorize"
         token-uri: "https://honegger.elis.ugent.be/oxauth/seam/resource/restv1/oxauth/token"
@@ -180,7 +220,12 @@ logging:
 
 spring:
   thymeleaf:
+    # test environment:
     cache: false
+    # production environment:
+    # cache: true
+    # this prefix setting has to do with https://github.com/spring-projects/spring-boot/issues/1744 !
+    prefix: classpath:/templates
 
 security:
   oauth2:
@@ -192,6 +237,8 @@ security:
         client-authentication-method: post
         authorized-grant-type: authorization_code
         redirect-uri: "https://ravel.elis.ugent.be:8443/oauth2/authorize/code/tcbl_manager"
+        #test server:
+        #redirect-uri: "https://tcblsso2.ilabt.imec.be:8443/usermanager/oauth2/authorize/code/tcbl_manager"
         scopes: openid, inum
         authorization-uri: "https://honegger.elis.ugent.be/oxauth/seam/resource/restv1/oxauth/authorize"
         token-uri: "https://honegger.elis.ugent.be/oxauth/seam/resource/restv1/oxauth/token"

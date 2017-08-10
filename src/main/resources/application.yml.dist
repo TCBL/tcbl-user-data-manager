@@ -6,7 +6,7 @@
 ####
 
 server:
-  port: 8443
+  port: 8444
   ssl:
     key-store: /home/ghaesen/projects/TCBL/config/tudm.jks
     key-store-password: secret
@@ -22,7 +22,10 @@ logging:
 
 spring:
   thymeleaf:
+    # test environment:
     cache: false
+    # production environment:
+    # cache: true
     # this prefix setting has to do with https://github.com/spring-projects/spring-boot/issues/1744 !
     prefix: classpath:/templates
   mail:
