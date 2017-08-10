@@ -152,7 +152,7 @@ public class UserController {
 
 	@GetMapping("/resetpw")
 	public String getResetPassword() {
-		return "user/resetpw";
+		return "/user/resetpw";
 	}
 
 	@PostMapping("/user/resetpw")
