@@ -155,7 +155,7 @@ public class UserController {
 		return "/user/resetpw";
 	}
 
-	@PostMapping("/user/resetpw")
+	@PostMapping("/resetpw")
 	public String postResetPassword(HttpServletRequest request, Model model, String mail) {
 		try {
 			TCBLUser user = tcblUserRepository.findByName(mail);
