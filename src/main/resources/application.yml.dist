@@ -5,21 +5,42 @@
 #
 ####
 
+##
+# Tomcat server settings
+##
 server:
+  # HTTP connector port
   port: 8444
+
+  # SSL settings for HTTP connector. Only enable if tomcat has to handle https requests.
   ssl:
+    # contains the TLS certificate to use
     key-store: /home/ghaesen/projects/TCBL/config/tudm.jks
     key-store-password: secret
     key-store-type: PKCS12
     key-alias: tudm
+
+  # Settings for AJP connector (in stead of HTTP connector). Used if running behind Apache HTTP server that acts as reverse proxy.
+  # If these properties are set, the HTTP connector settings are not relevant anymore.
+  # See https://tomcat.apache.org/tomcat-8.5-doc/config/ajp.html for explanation of properties
   ajp:
-      port: 8445
-      scheme: https
-      proxy-name: ravel.elis.ugent.be
-      proxy-port: 443
-      secure: true
+    port: 8445
+    scheme: https
+    proxy-name: ravel.elis.ugent.be
+    proxy-port: 443
+    secure: true
+
+  servlet:
+    # set this if your content will be served from a certain path in stead of the root
+    # e.g. https://myserver.example.com/usermanager/...
+    context-path: /usermanager
 
 
+
+##
+# Logging settings
+# See https://www.slf4j.org/
+##
 logging:
   level:
     root: info
@@ -27,7 +48,12 @@ logging:
     org.springframework.web: warn
     org.springframework.security: warn
 
+##
+# Misc Spring settings
+##
 spring:
+
+  # template engine settings. See http://www.thymeleaf.org/
   thymeleaf:
     # test environment:
     cache: false
@@ -35,6 +61,8 @@ spring:
     # cache: true
     # this prefix setting has to do with https://github.com/spring-projects/spring-boot/issues/1744 !
     prefix: classpath:/templates
+
+  # SMTP settings, necessary to send mails. See https://docs.spring.io/spring-boot/docs/current/reference/html/boot-features-email.html
   mail:
     host: smtp.ugent.be
     port: 465
@@ -50,7 +78,12 @@ spring:
           ssl:
             enable: true
 
+##
+# Security related settings
+##
 security:
+
+  # OpenID Connect (which is OAuth2) properties.
   oauth2:
     client:
       # config for client on honegger
@@ -67,6 +100,8 @@ security:
         user-info-uri: "https://honegger.elis.ugent.be/oxauth/seam/resource/restv1/oxauth/userinfo"
         client-name: TCBL_manager
         client-alias: tcbl-manager
+
+  # Gluu Federation SCIM Client settings
   scim:
     domain: "https://honegger.elis.ugent.be/identity/seam/resource/restv1"
     meta-data-url: "https://honegger.elis.ugent.be/.well-known/uma-configuration"
