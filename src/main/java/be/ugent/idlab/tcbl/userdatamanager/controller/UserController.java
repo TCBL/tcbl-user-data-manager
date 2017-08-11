@@ -26,6 +26,7 @@ import javax.mail.internet.MimeMessage;
 import javax.servlet.http.HttpServletRequest;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 
@@ -43,8 +44,8 @@ public class UserController {
 	private WebClient webClient = WebClient.create();
 	private final TCBLUserRepository tcblUserRepository;
 	private final JavaMailSender mailSender;
-	private final Base64.Encoder encoder;
-	private final Base64.Decoder decoder;
+	private final static Base64.Encoder encoder = Base64.getUrlEncoder();
+	private final static Base64.Decoder decoder = Base64.getUrlDecoder();
 
 	private final ExecutorService executor;
 
@@ -59,8 +60,6 @@ public class UserController {
 		this.executor = executor;
 		this.tcblUserRepository = tcblUserRepository;
 		this.mailSender = mailSender;
-		encoder = Base64.getUrlEncoder();
-		decoder = Base64.getUrlDecoder();
 	}
 
 	/**
@@ -170,8 +169,15 @@ public class UserController {
 
 	@GetMapping("/resetpwform/{rpc}")
 	public String resetPasswordForm(Model model, @PathVariable String rpc) {
-		model.addAttribute("rpc", rpc);
-		return "/user/resetpwform";
+		String userId = decodeIdForPassword(rpc, 3600000);
+		if (userId != null) {
+			String encodedId = encodeBase64(userId);
+			model.addAttribute("rpc", encodedId);
+			return "/user/resetpwform";
+		} else {
+			model.addAttribute("message", new Message("Reset Password failed", "Link expired."));
+			return "/user/pwmailsent";
+		}
 	}
 
 	@PostMapping("/resetpwform")
@@ -199,12 +205,33 @@ public class UserController {
 				});
 	}
 
-	private String encodeBase64(final String input) {
+	static String encodeBase64(final String input) {
 		return encoder.encodeToString(input.getBytes(StandardCharsets.UTF_8));
 	}
 
-	private String decodeBase64(final String input) {
+	static String decodeBase64(final String input) {
 		return new String(decoder.decode(input), StandardCharsets.UTF_8);
+	}
+
+	static String generateResetPasswordCode(final String id) {
+		// Generate a date as string to append to the id, which represents the current time
+		long now = new Date().getTime();
+		String encodedDate = Long.toString(now, Character.MAX_RADIX);
+		return encodeBase64(id + '|' + encodedDate);
+	}
+
+	static String decodeIdForPassword(final String resetPasswordCode, final long maxTime) {
+		String unbase64 = decodeBase64(resetPasswordCode);
+		String[] data = unbase64.split("\\|");
+		String encodedDate = data[1];
+		long requestDate = Long.parseLong(encodedDate, Character.MAX_RADIX);
+		// compare current time with requested time
+		long now = new Date().getTime();
+		if (now - requestDate <= maxTime) {
+			return data[0]; // clicked within one hour, so return user id
+		} else {
+			return null;	// not valid anymore
+		}
 	}
 
 	/**
@@ -234,14 +261,14 @@ public class UserController {
 	private void sendResetMessage(final TCBLUser user, final String baseUri) {
 		executor.execute(() -> {
 			try {
-				String encodedId = encodeBase64(user.getId());
+				String passwordResetCode = generateResetPasswordCode(user.getId());
 				MimeMessage message = mailSender.createMimeMessage();
 				MimeMessageHelper helper = new MimeMessageHelper(message);
 				helper.setSubject("Reset password for TCBL");
 				helper.setFrom("no-reply@tcbl.eu");
 				helper.setTo(user.getUserName());
 				helper.setText("<p>You receive this mail because you want to reset your TCBL password. Click <a href=\""
-						+ baseUri + "/resetpwform/" + encodedId
+						+ baseUri + "/resetpwform/" + passwordResetCode
 						+ "\">here</a> to do so.</p>" +
 						"<p>If you didn't request to reset your password, you can just ignore this e-mail.</p>", true);
 				mailSender.send(message);
