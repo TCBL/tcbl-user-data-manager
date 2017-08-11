@@ -24,11 +24,15 @@ This creates something like `target/UserDataManager-1.0-SNAPSHOT.jar`.
 ### 1. Basic Application Container configuration
 
 Every Spring Boot app runs on a servlet container (either Tomcat or Jetty; Tomcat by default).
-This requires at least one configuration parameter, i.e. the port the server will listen to:
+This requires configuration of the port the server will listen to. Besides that, our application
+will be served with context `/usermanager`, meaning that this will be the root of our application on the URL, and that
+redirect URL's are generated correctly (especially in a reverse proxy configuration).
 
 ```yaml
 server:
   port: 8444
+  servlet:
+    context-path: /usermanager
 ```
 
 There are two options to let the outside world communicate with the application, and both have their configuration implications:
@@ -37,8 +41,8 @@ There are two options to let the outside world communicate with the application,
 
 ### 1.a Enable HTTPS for the application (optional)
 
-**Only when run as a standalone application. You can also run it in combination with a reverse proxy that provides a
-certificate. In this case, see **1.b. Configure a reverse proxy**
+*Only when run as a standalone application. You can also run it in combination with a reverse proxy that provides a
+certificate. In this case, see **1.b. Configure a reverse proxy**.*
 
 In order to use OpenID Connect, the application needs to be able to receive https requests.
 Two options here: using a self-signed certificate or a certificate from a Certificate Authority.
@@ -93,6 +97,8 @@ Whatever option you chose above, this requires the following configuration snipp
 ```yaml
 server:
   port: 8444
+  servlet:
+    context-path: /usermanager
   ssl:
     key-store: /home/ghaesen/projects/TCBL/config/tudm.jks
     key-store-password: secret
@@ -106,10 +112,12 @@ server:
 In this scenario, you already have an HTTP server installed which provides the TLS certificate and serves some contents.
 We have to configure the HTTP server to act as a reverse proxy, which means requests will be forwarded to another URL.
 We take Apache 2.4 as HTTP server, because that's the one used on the TCBL test and production servers.
+Our application uses AJP in stead of HTTP for communication with the proxy because then it pretends to be part of the
+HTTP (proxy) server. It is more efficient and automatically takes care of rewrites, header passing, etc.
 
 The set-up is:
-* Our app listens on `http://localhost:8444/usermanager`.
-* Apache redirects requests originating from `/usermanager` to `http://localhost:8444/usermanager`
+* Our app listens on `ajp://127.0.0.1:8445/usermanager`.
+* Apache redirects requests originating from `/usermanager` to `http://127.0.0.1:8445/usermanager`
 
 For example, on the test server, this means that requests to `https://tcblsso2.ilabt.imec.be:8443/usermanager` reach our app.
 
@@ -122,9 +130,22 @@ server:
   port: 8444
   servlet:
     context-path: /usermanager
+  ajp:
+    port: 8445
+    scheme: https
+    proxy-name: tcblsso2.ilabt.imec.be
+    proxy-port: 8443
+    secure: true
 ```
+Here is what the parameters do:
+* **port**: port where the *application server* listens at (i.e. our application).
+* **scheme**: the scheme of the incoming requests *on the proxy*, what the outside world uses.
+* **proxy-name**: the name of the host as known by the outside world.
+* **proxy-port**: the port reachable for the outside world.
+* **secure**: do we trust requests to the application server? In this case we do, because the proxy uses https and runs
+on the same host.
 
-We have to set the context path explicitly, because the app needs to know how to generate correct URL's for its hyperlinks.
+More info about these parameters [here](https://tomcat.apache.org/tomcat-8.5-doc/config/ajp.html).
 
 *The complete configuration is discussed in "4. Configure the application"*
 
@@ -142,7 +163,7 @@ Here are the settings (example, adjust to correct hosts):
 * Logo URI: https://tcblsso.ilabt.iminds.be:8443/resources/logos/login-with-TCBL.png (though it won't be shown)
 * Subject Type: pairwise
 * Authentication method for the Token Endpoint: client_secret_post
-* Redirect Login URIs: https://ravel.elis.ugent.be:8444/oauth2/authorize/code/tcbl_manager (or wherever the app lives, on the test server, this would be https://tcblsso2.ilabt.imec.be:8443/usermanager/oauth2/authorize/code/tcbl_manager)
+* Redirect Login URIs: https://ravel.elis.ugent.be:8444/usermanager/oauth2/authorize/code/tcbl_manager (or wherever the app lives, on the test server, this would be https://tcblsso2.ilabt.imec.be:8443/usermanager/oauth2/authorize/code/tcbl_manager)
 * Scopes: openid, inum
 * Response Types: code
 * Grant Types: authorization_code
@@ -158,7 +179,7 @@ security:
         client-secret: averysecrativesecret
         client-authentication-method: post
         authorized-grant-type: authorization_code
-        redirect-uri: "https://ravel.elis.ugent.be:8444/oauth2/authorize/code/tcbl_manager"
+        redirect-uri: "https://ravel.elis.ugent.be:8444/usermanager/oauth2/authorize/code/tcbl_manager"
         scopes: openid, inum
         authorization-uri: "https://honegger.elis.ugent.be/oxauth/seam/resource/restv1/oxauth/authorize"
         token-uri: "https://honegger.elis.ugent.be/oxauth/seam/resource/restv1/oxauth/token"
@@ -205,11 +226,19 @@ Putting it all together, the client configuration file should look like `tcbl-us
 
 server:
   port: 8443
+  # -- either
   ssl:
     key-store: /home/ghaesen/projects/TCBL/config/tudm.jks
     key-store-password: secret
     key-store-type: PKCS12
     key-alias: tudm
+  # -- or
+  ajp:
+    port: 8445
+    scheme: https
+    proxy-name: ravel.elis.ugent.be
+    proxy-port: 443
+    secure: true
 
 logging:
   level:
@@ -236,7 +265,7 @@ security:
         client-secret: averysecrativesecret
         client-authentication-method: post
         authorized-grant-type: authorization_code
-        redirect-uri: "https://ravel.elis.ugent.be:8443/oauth2/authorize/code/tcbl_manager"
+        redirect-uri: "https://ravel.elis.ugent.be:8443/usermanager/oauth2/authorize/code/tcbl_manager"
         #test server:
         #redirect-uri: "https://tcblsso2.ilabt.imec.be:8443/usermanager/oauth2/authorize/code/tcbl_manager"
         scopes: openid, inum
@@ -260,7 +289,7 @@ Of course, change ports and host names accordingly.
 ## Running
 
 After you start the application, you will be able to enjoy it by browsing to its URL, for example:
-`https://ravel.elis.ugent.be:8443`.
+`https://ravel.elis.ugent.be:8443/usermanager`.
 
 There are a few options to start the application:
 
