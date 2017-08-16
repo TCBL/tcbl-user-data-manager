@@ -1,4 +1,18 @@
 image: maven:3-jdk-8
 
-build:
-  script: "mvn package -B"
+stages:
+  - build
+  - test
+  - package
+
+build-job:
+  stage: build
+  script: "mvn compile"
+
+test-job:
+  stage: test
+  script: "mvn test"
+
+package:
+  stage: package
+  script: "mvn package"
