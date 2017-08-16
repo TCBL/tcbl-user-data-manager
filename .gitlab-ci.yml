@@ -7,12 +7,12 @@ stages:
 
 build-job:
   stage: build
-  script: "mvn compile"
+  script: "mvn -B compile"
 
 test-job:
   stage: test
-  script: "mvn test"
+  script: "mvn -B test"
 
 package:
   stage: package
-  script: "mvn package"
+  script: "mvn -B package"
