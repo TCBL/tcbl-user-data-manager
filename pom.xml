@@ -18,7 +18,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <spring.boot.version>2.0.0.M3</spring.boot.version>
-        <spring.security.version>5.0.0.M3</spring.security.version>  <!-- The latest release does not offer OpenID Connect, so we need this Milestone version-->
+        <spring.security.version>5.0.0.BUILD-SNAPSHOT</spring.security.version>  <!-- The latest release does not offer OpenID Connect, so we need this Milestone version-->
         <scim.client.version>3.0.2</scim.client.version>             <!-- Must be the same as the Gluu server version -->
         <java.version>1.8</java.version>
     </properties>
@@ -53,6 +53,15 @@
             </snapshots>
         </repository>
 
+        <repository>
+            <id>spring-snapshots</id>
+            <name>Spring Snapshots</name>
+            <url>https://repo.spring.io/libs-snapshot</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+
         <!-- Gluu software repo -->
         <repository>
             <id>gluu</id>
@@ -82,11 +91,11 @@
         </dependency>
 
         <!-- This is neede because we hacked the Nimbus OAuth2 code -->
-        <dependency>
+        <!--dependency>
             <groupId>com.nimbusds</groupId>
             <artifactId>oauth2-oidc-sdk</artifactId>
             <version>5.34</version>
-        </dependency>
+        </dependency-->
 
         <!-- Spring Security offers a security framework so we don't need to write too much code -->
         <dependency>
@@ -115,11 +124,11 @@
             <version>${spring.security.version}</version>
             <scope>compile</scope>
         </dependency>
-        <!--dependency>
+        <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-oauth2-client</artifactId>
             <version>${spring.security.version}</version>
-        </dependency-->
+        </dependency>
 
         <!-- Template engine (for rendering html pages) that integrates with Spring -->
         <dependency>
