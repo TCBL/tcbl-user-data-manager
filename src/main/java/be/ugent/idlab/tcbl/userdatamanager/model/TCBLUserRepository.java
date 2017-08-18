@@ -7,9 +7,10 @@ package be.ugent.idlab.tcbl.userdatamanager.model;
  */
 public interface TCBLUserRepository {
 	Iterable<TCBLUser> findAll() throws Exception;
-	TCBLUser save(TCBLUser tcblUser) throws Exception;
+	TCBLUser save(TCBLUser user) throws Exception;
 	TCBLUser find(String id) throws  Exception;
 	TCBLUser findByName(final String userName) throws Exception;
-	TCBLUser create(TCBLUser tcblUser) throws Exception;
-	void deleteTCBLUser(String id) throws Exception;
+	TCBLUser create(TCBLUser user) throws Exception;
+	void deleteTCBLUser(TCBLUser user) throws Exception;
+	Iterable<TCBLUser> findInactive() throws Exception;
 }

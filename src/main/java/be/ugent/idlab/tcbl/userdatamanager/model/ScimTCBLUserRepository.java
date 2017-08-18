@@ -3,6 +3,7 @@ package be.ugent.idlab.tcbl.userdatamanager.model;
 import gluu.scim.client.ScimResponse;
 import gluu.scim2.client.Scim2Client;
 import gluu.scim2.client.util.Util;
+import org.gluu.oxtrust.model.scim2.Constants;
 import org.gluu.oxtrust.model.scim2.ListResponse;
 import org.gluu.oxtrust.model.scim2.Resource;
 import org.gluu.oxtrust.model.scim2.User;
@@ -24,6 +25,9 @@ import java.util.Map;
  * @author Gerald Haesendonck
  */
 public class ScimTCBLUserRepository implements TCBLUserRepository {
+
+	// SCIM query language: see https://tools.ietf.org/html/rfc7644#section-3.4.2.2
+
 	private final Logger log = LoggerFactory.getLogger(this.getClass());
 
 	private final Scim2Client client;
@@ -51,6 +55,7 @@ public class ScimTCBLUserRepository implements TCBLUserRepository {
 
 	@Override
 	public Iterable<TCBLUser> findAll() throws Exception {
+		log.debug("Find all users.");
 		try {
 			ScimResponse response = client.retrieveAllUsers();
 			if (response.getStatusCode() == 200) {
@@ -76,6 +81,7 @@ public class ScimTCBLUserRepository implements TCBLUserRepository {
 
 	@Override
 	public TCBLUser save(final TCBLUser tcblUser) throws Exception {
+		log.debug("Saving user {}", tcblUser.getUserName() );
 		User user = findUser(tcblUser.getId());
 		user.setPassword("");
 		tcblUser.updateScimUser(user);
@@ -85,12 +91,14 @@ public class ScimTCBLUserRepository implements TCBLUserRepository {
 
 	@Override
 	public TCBLUser find(final String id) throws Exception {
+		log.debug("Finding user with id {}", id);
 		User user = findUser(id);
 		return TCBLUser.createFromScimUser(user);
 	}
 
 	@Override
 	public TCBLUser findByName(final String userName) throws Exception {
+		log.debug("Finding user by userName {}", userName);
 		String usernameQuery = "userName eq \"" + userName + "\"";
 		ScimResponse existsResponse = client.searchUsers(usernameQuery, 1, 1, "", "", null);
 		ListResponse userList = Util.toListResponseUser(existsResponse, userExtensionSchema);
@@ -106,10 +114,10 @@ public class ScimTCBLUserRepository implements TCBLUserRepository {
 
 	@Override
 	public TCBLUser create(final TCBLUser tcblUser) throws Exception {
+		log.debug("Creating user {}", tcblUser.getUserName());
 		try {
 			User user = new User();
 			tcblUser.updateScimUser(user);
-			//user.setActive(true);
 			ScimResponse response = client.createUser(user, new String[0]);
 			if (response.getStatusCode() == 201) {
 				user = Util.toUser(response, userExtensionSchema);
@@ -131,8 +139,57 @@ public class ScimTCBLUserRepository implements TCBLUserRepository {
 	}
 
 	@Override
-	public void deleteTCBLUser(final String userName) {
-		// TODO or not TODO
+	public void deleteTCBLUser(final TCBLUser user) throws Exception {
+		log.debug("Deleting user {}", user.getUserName());
+		try {
+			ScimResponse response = client.deletePerson(user.getId());
+			if (response.getStatusCode() != 204) {
+				String message = "Cannot delete user on OpenID Connect server: " + response.getStatusCode() + ": " + response.getStatus() + ". " + response.getResponseBodyString();
+				log.error(message);
+				throw new Exception(message);
+			}
+		} catch (Exception e) {
+				String message = "Cannot create user: " + e.getMessage();
+				log.error(message, e);
+				throw new Exception(message, e);
+		}
+	}
+
+	@Override
+	public Iterable<TCBLUser> findInactive() throws Exception {
+		log.debug("Finding inactive users.");
+		String query = "active eq \"false\"";
+		try {
+			boolean ready = false;
+			int startIndex = 1;
+			List<TCBLUser> users = new ArrayList<>();
+			while (!ready) {
+				ScimResponse inactiveUsersResponse = client.searchUsers(query, startIndex, Constants.MAX_COUNT, "", "", null);
+				if (inactiveUsersResponse.getStatusCode() == 200) {
+					ListResponse userListResponse = Util.toListResponseUser(inactiveUsersResponse, userExtensionSchema);
+					List<Resource> userList = userListResponse.getResources();
+					if (!userList.isEmpty()) {
+						for (Resource userResource : userListResponse.getResources()) {
+							User user = (User) userResource;
+							TCBLUser tcblUser = TCBLUser.createFromScimUser(user);
+							users.add(tcblUser);
+						}
+						startIndex += Constants.MAX_COUNT;
+					} else {
+						ready = true;
+					}
+				} else {
+					String message = "Cannot search for inactive users on the OpenID Connect server: " + inactiveUsersResponse.getStatusCode() + ": " + inactiveUsersResponse.getStatus() + ". " + inactiveUsersResponse.getResponseBodyString();
+					log.error(message);
+					throw new Exception(message);
+				}
+			}
+			return users;
+		} catch (Exception e) {
+			String message = "Cannot search for inactive users: " + e.getMessage();
+			log.error(message, e);
+			throw new Exception(message, e);
+		}
 	}
 
 	private static Map<String, String> resolveScimClientProperties(final Environment environment) {
