@@ -22,8 +22,6 @@ public class DeleteInactiveUsers {
 		this.userRepository = userRepository;
 	}
 
-	//@Scheduled(fixedDelay = 5000)
-
 	/**
 	 * Deletes all inactive users every morning at 2:00. Users are inactive if they are registered but not activated
 	 * yet.

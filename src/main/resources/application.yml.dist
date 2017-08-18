@@ -69,6 +69,7 @@ spring:
     username: yourusernameoremail
     password: yourpassword
     test-connection: true
+    from: "no-reply@ilabt.iminds.be"
     properties:
       mail:
         smtp:

@@ -1,14 +1,12 @@
 package be.ugent.idlab.tcbl.userdatamanager.controller;
 
-import be.ugent.idlab.tcbl.userdatamanager.TCBLUserDataManager;
+import be.ugent.idlab.tcbl.userdatamanager.background.Mail;
 import be.ugent.idlab.tcbl.userdatamanager.model.Message;
 import be.ugent.idlab.tcbl.userdatamanager.model.TCBLUser;
 import be.ugent.idlab.tcbl.userdatamanager.model.TCBLUserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -21,14 +19,11 @@ import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
-import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
 import javax.servlet.http.HttpServletRequest;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Date;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
 
 /**
  * <p>Copyright 2017 IDLab (Ghent University - imec)</p>
@@ -43,23 +38,19 @@ public class UserController {
 	private final Logger log = LoggerFactory.getLogger(this.getClass());
 	private WebClient webClient = WebClient.create();
 	private final TCBLUserRepository tcblUserRepository;
-	private final JavaMailSender mailSender;
+	private final Mail mail;
 	private final static Base64.Encoder encoder = Base64.getUrlEncoder();
 	private final static Base64.Decoder decoder = Base64.getUrlDecoder();
-
-	private final ExecutorService executor;
 
 	/**
 	 * Creates a UserController; Spring injects the TCBLUserRepository.
 	 *
 	 * @param tcblUserRepository A repository where TCBLUsers are stored.
-	 * @param mailSender The Spring library to send mails.
-	 * @param executor	 An executor service to send mails asynchronously. Configured in {@link TCBLUserDataManager}.
+	 * @param mail The background mail sender.
 	 */
-	public UserController(TCBLUserRepository tcblUserRepository, JavaMailSender mailSender, ExecutorService executor) {
-		this.executor = executor;
+	public UserController(TCBLUserRepository tcblUserRepository, Mail mail) {
 		this.tcblUserRepository = tcblUserRepository;
-		this.mailSender = mailSender;
+		this.mail = mail;
 	}
 
 	/**
@@ -239,44 +230,20 @@ public class UserController {
 	 * @param user	The user to send a mail to.
 	 */
 	private void sendRegisterMessage(final TCBLUser user, final String baseUri) {
-		executor.execute(() -> {
-			try {
-				String encodedId = encodeBase64(user.getId());
-				MimeMessage message = mailSender.createMimeMessage();
-				MimeMessageHelper helper = new MimeMessageHelper(message);
-				helper.setSubject("Registration TCBL");
-				helper.setFrom("no-reply@tcbl.eu");
-				helper.setTo(user.getUserName());
-				helper.setText("<p>Thank you for becoming a TCBL member. Click <a href=\""
-						+ baseUri + "/confirm/" + encodedId
-						+ "\">here</a> to activate your account.</p>", true);
-				mailSender.send(message);
-				log.debug("Mail sent to " + user.getUserName());
-			} catch (MessagingException e) {
-				log.error("Could not send mail to {}. ", user.getUserName(), e);
-			}
-		});
+		String encodedId = encodeBase64(user.getId());
+		String text = "<p>Thank you for becoming a TCBL member. Click <a href=\""
+				+ baseUri + "/confirm/" + encodedId
+				+ "\">here</a> to activate your account.</p>";
+		mail.send(user.getUserName(), "Registration TCBL", text);
 	}
 
 	private void sendResetMessage(final TCBLUser user, final String baseUri) {
-		executor.execute(() -> {
-			try {
-				String passwordResetCode = generateResetPasswordCode(user.getId());
-				MimeMessage message = mailSender.createMimeMessage();
-				MimeMessageHelper helper = new MimeMessageHelper(message);
-				helper.setSubject("Reset password for TCBL");
-				helper.setFrom("no-reply@tcbl.eu");
-				helper.setTo(user.getUserName());
-				helper.setText("<p>You receive this mail because you want to reset your TCBL password. Click <a href=\""
-						+ baseUri + "/resetpwform/" + passwordResetCode
-						+ "\">here</a> to do so.</p>" +
-						"<p>If you didn't request to reset your password, you can just ignore this e-mail.</p>", true);
-				mailSender.send(message);
-				log.debug("Mail sent to " + user.getUserName());
-			} catch (MessagingException e) {
-				log.error("Could not send mail to {}. ", user.getUserName(), e);
-			}
-		});
+		String passwordResetCode = generateResetPasswordCode(user.getId());
+		String text = "<p>You receive this mail because you want to reset your TCBL password. Click <a href=\""
+				+ baseUri + "/resetpwform/" + passwordResetCode
+				+ "\">here</a> to do so.</p>" +
+				"<p>If you didn't request to reset your password, you can just ignore this e-mail.</p>";
+		mail.send(user.getUserName(), "Reset password for TCBL", text);
 	}
 
 	private String getUriOneLevelUp(final HttpServletRequest request) {
