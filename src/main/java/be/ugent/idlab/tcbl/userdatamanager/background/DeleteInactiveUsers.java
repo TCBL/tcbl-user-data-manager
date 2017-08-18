@@ -1,4 +1,4 @@
-package be.ugent.idlab.tcbl.userdatamanager.scheduled;
+package be.ugent.idlab.tcbl.userdatamanager.background;
 
 import be.ugent.idlab.tcbl.userdatamanager.model.TCBLUser;
 import be.ugent.idlab.tcbl.userdatamanager.model.TCBLUserRepository;
