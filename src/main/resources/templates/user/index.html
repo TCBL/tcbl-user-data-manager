@@ -3,15 +3,28 @@
 <head th:substituteby="/fragments :: head">
 </head>
 <body>
-<h1>Your information</h1>
-<form action="#" th:action="@{/user/update}" th:object="${tcblUser}" method="post">
-     <label for="firstName">First name</label>
-     <input type="text" th:field="*{firstName}"/><br>
-     <label for="lastName">Last name</label>
-     <input type="text" th:field="*{lastName}"/><br>
-     <input type="hidden" th:field="*{id}"/>
-     <input type="submit" value="Update"/>
-</form>
-<p><a href="/index" th:href="@{/index}">Back to home page</a></p>
+
+<div th:replace="/fragments :: header( ~{::h1}, ~{::main})">
+    <h1>Manage your information</h1>
+    <main>
+        <form action="#" th:action="@{/user/update}" th:object="${tcblUser}" method="post">
+            <fieldset>
+                <div class="row">
+                    <legend>Your information</legend>
+                    <div class="columns large-2">
+                        <label for="firstName">First name</label>
+                        <input type="text" th:field="*{firstName}" required/><br>
+                    </div>
+                    <div class="columns large-2">
+                        <label for="lastName">Last name</label>
+                        <input type="text" th:field="*{lastName}" required/><br>
+                    </div>
+                </div>
+            </fieldset>
+            <input type="hidden" th:field="*{id}"/>
+            <input type="submit" value="Update" class="red-button"/>
+        </form>
+    </main>
+</div>
 </body>
 </html>
