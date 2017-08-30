@@ -9,8 +9,8 @@
     <main>
         <form action="#" th:action="@{/user/update}" th:object="${tcblUser}" method="post">
             <fieldset>
+                <legend>Your information</legend>
                 <div class="row">
-                    <legend>Your information</legend>
                     <div class="columns large-2">
                         <label for="firstName">First name</label>
                         <input type="text" th:field="*{firstName}" required/><br>

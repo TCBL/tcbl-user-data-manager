@@ -27,12 +27,12 @@ the other templates.
 
     <!-- common heading -->
     <div class="columns">
-        <img th:src="@{/assets/TCBLAltsm.png}">
+        <img th:src="@{/assets/TCBLAltsm.png}" alt="TCBL logo">
     </div>
     <div class="columns">
         <h1 th:replace="${title}">Hello</h1>
     </div>
-    <div class="colums break">&nbsp</div>
+    <div class="colums break">&nbsp;</div>
 
     <!--/* main page contents goes here */-->
     <th:block th:replace="${main}"/>
@@ -43,7 +43,7 @@ the other templates.
             <p>This project has received funding from the European Union's Horizon 2020 Programme for research, technology development, and innovation under grant Agreement n.646133</p>
         </div>
         <div class="columns">
-            <img th:src="@{/assets/euh2020.png}">
+            <img th:src="@{/assets/euh2020.png}" alt="European Commission logo">
         </div>
     </div>
 </div>
