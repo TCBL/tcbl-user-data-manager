@@ -16,12 +16,12 @@
                         <input type="email" th:field="*{userName}" required/>
                     </div>
                     <div class="columns large-3">
-                        <label for="password">password</label>
-                        <input type="password" th:field="*{password}" required/>
+                        <label for="password">Password</label>
+                        <input type="password" th:field="*{password}" autocomplete="off" required/>
                     </div>
                     <div class="columns large-3">
                         <label for="cpassword">Confirm Password</label>
-                        <input type="password" id="cpassword" name="cpassword" value="" required/>
+                        <input type="password" id="cpassword" name="cpassword" autocomplete="off" value="" required/>
                     </div>
                 </div>
             </fieldset>
