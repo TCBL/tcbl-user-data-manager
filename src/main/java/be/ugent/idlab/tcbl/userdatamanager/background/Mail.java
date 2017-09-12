@@ -9,6 +9,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import javax.mail.internet.MimeMessage;
+import java.util.Arrays;
 
 /**
  * <p>Copyright 2017 IDLab (Ghent University - imec)</p>
@@ -26,18 +27,28 @@ public class Mail {
 		from = environment.getProperty("spring.mail.from", "no-reply@tcbl.eu");
 	}
 
-	@Async
 	public void send(final String to, final String subject, final String text) {
+		send(new String[]{to}, subject, text);
+	}
+
+	@Async
+	public void send(final String[] to, final String subject, final String text) {
 		log.debug("Preparing mail \"{}\" to {}", subject, to);
 		MimeMessage message = mailSender.createMimeMessage();
 		MimeMessageHelper helper = new MimeMessageHelper(message);
 		try {
 			helper.setSubject(subject);
 			helper.setFrom(from, "TCBL notifications");
-			helper.setTo(to);
+			if (to.length == 1) {
+				helper.setTo(to);
+			} else {
+				helper.setBcc(to);
+			}
 			helper.setText(text, true);
 			mailSender.send(message);
-			log.debug("Mail sent to {}", to);
+			if (log.isDebugEnabled()) {
+				log.debug("Mail sent to {}", Arrays.toString(to));
+			}
 		} catch (Exception e) {
 			log.error("Could not send mail to {}. ", to, e);
 		}
