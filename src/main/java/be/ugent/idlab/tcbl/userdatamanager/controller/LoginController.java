@@ -25,14 +25,14 @@ public class LoginController {
 		if (!clientPropertyKeys.isEmpty()) {
 			String clientPropertyKey = clientPropertyKeys.iterator().next();
 			String fullClientPropertyKey = ClientRegistrationAutoConfiguration.CLIENT_PROPERTY_PREFIX + "." + clientPropertyKey;
-			String authGrantTypeKey = fullClientPropertyKey + ".authorized-grant-type";
+			String authGrantTypeKey = fullClientPropertyKey + ".authorization-grant-type";
 			String clientAliasKey = fullClientPropertyKey + ".client-alias";
 			if (environment.containsProperty(clientAliasKey) && environment.containsProperty(authGrantTypeKey)) {
 				String authGrantTypeDirective = environment.getProperty(authGrantTypeKey).replace('_', '/');
 				String clientAlias = environment.getProperty(clientAliasKey);
 				redirectDirective = "redirect:/oauth2/" + authGrantTypeDirective + "/" + clientAlias;
 			} else {
-				throw new Exception("authorized-grant-type or client-alias not specified.");
+				throw new Exception("authorization-grant-type or client-alias not specified.");
 			}
 		} else {
 			throw new Exception("No client defined.");

@@ -178,9 +178,9 @@ security:
         client-id: "@!4F1B.EBA3.75E2.F47A!0001!EF35.6902!0008!1B4C.7A50.7F55.50D7"
         client-secret: averysecrativesecret
         client-authentication-method: post
-        authorized-grant-type: authorization_code
+        authorization-grant-type: authorization_code
         redirect-uri: "https://ravel.elis.ugent.be:8444/usermanager/oauth2/authorize/code/tcbl_manager"
-        scopes: openid, inum
+        scope: openid, inum
         authorization-uri: "https://honegger.elis.ugent.be/oxauth/seam/resource/restv1/oxauth/authorize"
         token-uri: "https://honegger.elis.ugent.be/oxauth/seam/resource/restv1/oxauth/token"
         jwk-set-uri: "https://honegger.elis.ugent.be/oxauth/seam/resource/restv1/oxauth/jwks"
@@ -264,11 +264,11 @@ security:
         client-id: "@!4F1B.EBA3.75E2.F47A!0001!EF35.6902!0008!1B4C.7A50.7F55.50D7"
         client-secret: averysecrativesecret
         client-authentication-method: post
-        authorized-grant-type: authorization_code
+        authorization-grant-type: authorization_code
         redirect-uri: "https://ravel.elis.ugent.be:8443/usermanager/oauth2/authorize/code/tcbl_manager"
         #test server:
         #redirect-uri: "https://tcblsso2.ilabt.imec.be:8443/usermanager/oauth2/authorize/code/tcbl_manager"
-        scopes: openid, inum
+        scope: openid, inum
         authorization-uri: "https://honegger.elis.ugent.be/oxauth/seam/resource/restv1/oxauth/authorize"
         token-uri: "https://honegger.elis.ugent.be/oxauth/seam/resource/restv1/oxauth/token"
         user-info-uri: "https://honegger.elis.ugent.be/oxauth/seam/resource/restv1/oxauth/userinfo"
