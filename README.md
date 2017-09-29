@@ -21,12 +21,15 @@ This creates something like `target/UserDataManager-1.0-SNAPSHOT.jar`.
 
 ## Configuring
 
+In this section, some configuration snippets are shown. They all apply to a client configuration file `application.yml`.
+There's a **putting it all together** at the end of this section, where everything is, well, put together.
+
 ### 1. Basic Application Container configuration
 
 Every Spring Boot app runs on a servlet container (either Tomcat or Jetty; Tomcat by default).
 This requires configuration of the port the server will listen to. Besides that, our application
 will be served with context `/usermanager`, meaning that this will be the root of our application on the URL, and that
-redirect URL's are generated correctly (especially in a reverse proxy configuration).
+redirect URL's are generated correctly (especially in a reverse proxy configuration). Configuration snippet (example):
 
 ```yaml
 server:
@@ -106,8 +109,6 @@ server:
     key-alias: tudm
 ```
 
-*The complete configuration is discussed in "4. Configure the application"*
-
 ### 1.b Configure a reverse proxy (optional)
 In this scenario, you already have an HTTP server installed which provides the TLS certificate and serves some contents.
 We have to configure the HTTP server to act as a reverse proxy, which means requests will be forwarded to another URL.
@@ -117,13 +118,13 @@ HTTP (proxy) server. It is more efficient and automatically takes care of rewrit
 
 The set-up is:
 * Our app listens on `ajp://127.0.0.1:8445/usermanager`.
-* Apache redirects requests originating from `/usermanager` to `http://127.0.0.1:8445/usermanager`
+* Apache redirects requests originating from `/usermanager` to `ajp://127.0.0.1:8445/usermanager`
 
 For example, on the test server, this means that requests to `https://tcblsso2.ilabt.imec.be:8443/usermanager` reach our app.
 
 First, configure Apache on how to act as a reverse proxy, as described [here](https://git.datasciencelab.ugent.be/TCBL/internal-server-docs/wikis/apache#reverse-proxy).
 
-The app requires some configuration too:
+The app requires some configuration too; configuration snippet (example):
 
 ```yaml
 server:
@@ -146,8 +147,6 @@ Here is what the parameters do:
 on the same host.
 
 More info about these parameters [here](https://tomcat.apache.org/tomcat-8.5-doc/config/ajp.html).
-
-*The complete configuration is discussed in "4. Configure the application"*
 
 ### 2. Register the client on the server
 
@@ -214,40 +213,77 @@ security:
 
 ### 4. Configure the application
 
-Putting it all together, the client configuration file should look like `tcbl-user-data-manager/src/main/resources/application.yml.dist`. Example:
+**Putting it all together**, your client configuration file `application.yml` should look like `tcbl-user-data-manager/src/main/resources/application.yml.dist`.
+
+Always start your copy from the contents found there.
+ 
+Of course, change ports, host names and other details to your needs.
+
+Contents of `tcbl-user-data-manager/src/main/resources/application.yml.dist` at the time of writing:
 
 ```yaml
 ####
 #
-# This is a sample configuration. Copy this into application.yml, adapt to your needs and place it into the working directory
-# or next to the built jar file.
+# This is a sample configuration.
+# Copy it into your application.yml, adapt to your needs and place it where the application will read it:
+# - in this directory (when running from maven or from your IDE)
+# - in your working directory, next to the built jar file (when starting the jar file from the command line).
 #
 ####
 
+##
+# Tomcat server settings
+##
 server:
+  # HTTP connector port
   port: 8443
+
   # -- either
+  # SSL settings for HTTP connector. Only enable if tomcat has to handle https requests.
   ssl:
+    # contains the TLS certificate to use
     key-store: /home/ghaesen/projects/TCBL/config/tudm.jks
     key-store-password: secret
     key-store-type: PKCS12
     key-alias: tudm
+
   # -- or
+  # Settings for AJP connector (in stead of HTTP connector). Used if running behind Apache HTTP server that acts as reverse proxy.
+  # If these properties are set, the HTTP connector settings are not relevant anymore.
+  # See https://tomcat.apache.org/tomcat-8.5-doc/config/ajp.html for explanation of properties
   ajp:
     port: 8445
     scheme: https
     proxy-name: ravel.elis.ugent.be
-    proxy-port: 443
+    proxy-port: 8443
     secure: true
 
+  servlet:
+    # set this if your content will be served from a certain path in stead of the root
+    # e.g. https://myserver.example.com/usermanager/...
+    context-path: /usermanager
+
+
+
+##
+# Logging settings
+# See https://www.slf4j.org/
+##
 logging:
   level:
     root: info
     be.ugent.idlab: debug
+    org.thymeleaf: info
+    org.apache: info
     org.springframework.web: warn
     org.springframework.security: warn
 
+##
+# Misc Spring settings
+##
 spring:
+
+  # template engine settings. See http://www.thymeleaf.org/
   thymeleaf:
     # test environment:
     cache: false
@@ -256,7 +292,29 @@ spring:
     # this prefix setting has to do with https://github.com/spring-projects/spring-boot/issues/1744 !
     prefix: classpath:/templates
 
+  # SMTP settings, necessary to send mails. See https://docs.spring.io/spring-boot/docs/current/reference/html/boot-features-email.html
+  mail:
+    host: smtp.ugent.be
+    port: 465
+    username: yourusernameoremail
+    password: yourpassword
+    test-connection: true
+    from: "no-reply@ilabt.iminds.be"
+    properties:
+      mail:
+        smtp:
+          connectiontimeout: 5000
+          timeout: 3000
+          writetimeout: 5000
+          ssl:
+            enable: true
+
+##
+# Security related settings
+##
 security:
+
+  # OpenID Connect (which is OAuth2) properties.
   oauth2:
     client:
       # config for client on honegger
@@ -265,16 +323,16 @@ security:
         client-secret: averysecrativesecret
         client-authentication-method: post
         authorization-grant-type: authorization_code
-        redirect-uri: "https://ravel.elis.ugent.be:8443/usermanager/oauth2/authorize/code/tcbl_manager"
-        #test server:
-        #redirect-uri: "https://tcblsso2.ilabt.imec.be:8443/usermanager/oauth2/authorize/code/tcbl_manager"
+        redirect-uri: "https://ravel.elis.ugent.be:8443/oauth2/authorize/code/tcbl_manager"
         scope: openid, inum
         authorization-uri: "https://honegger.elis.ugent.be/oxauth/seam/resource/restv1/oxauth/authorize"
         token-uri: "https://honegger.elis.ugent.be/oxauth/seam/resource/restv1/oxauth/token"
-        user-info-uri: "https://honegger.elis.ugent.be/oxauth/seam/resource/restv1/oxauth/userinfo"
         jwk-set-uri: "https://honegger.elis.ugent.be/oxauth/seam/resource/restv1/oxauth/jwks"
+        user-info-uri: "https://honegger.elis.ugent.be/oxauth/seam/resource/restv1/oxauth/userinfo"
         client-name: TCBL_manager
         client-alias: tcbl-manager
+
+  # Gluu Federation SCIM Client settings
   scim:
     domain: "https://honegger.elis.ugent.be/identity/seam/resource/restv1"
     meta-data-url: "https://honegger.elis.ugent.be/.well-known/uma-configuration"
@@ -283,8 +341,6 @@ security:
     aat-client-jks-password: secret
     aat-client-key-id:
 ```
-
-Of course, change ports and host names accordingly.
 
 ## Running
 
@@ -297,7 +353,9 @@ There are a few options to start the application:
 
 Go to the directory of the jar.
 
-Copy src/main/resources/application.yml.dist into this directory. Then run with:
+Put your specific `application.yml` in this directory.
+ 
+Then run with:
 
 ```
 java -jar UserDataManager-<version>.jar
@@ -307,7 +365,11 @@ java -jar UserDataManager-<version>.jar
 
 Copy src/main/resources/application.yml.dist to src/main/resources/application.yml and adapt to your needs.
 
-In the root directory of the project, type:
+Go to the root directory of the project.
+
+Put your specific `application.yml` in directory `src/main/resources/` (next to the application.yml.dist file).
+
+Then run with:
 
 ```
 mvn spring-boot:run
@@ -318,6 +380,6 @@ mvn spring-boot:run
 IntelliJ IDEA supports Spring Boot apps out of the box. Navigate to `be.ugent.idlab.tcbl.userdatamanager.TCBLUserDataManager`, right-click on
 the class name or the `main` function and create an application.
 
-Copy src/main/resources/application.yml.dist to src/main/resources/application.yml and adapt to your needs.
+Put your specific `application.yml` in directory `src/main/resources/` (next to the application.yml.dist file).
 
 Ready to run!

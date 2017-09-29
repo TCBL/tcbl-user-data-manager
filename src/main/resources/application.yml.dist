@@ -1,7 +1,9 @@
 ####
 #
-# This is a sample configuration. Copy this into application.yml, adapt to your needs and place it into the working directory
-# or next to the built jar file.
+# This is a sample configuration.
+# Copy it into your application.yml, adapt to your needs and place it where the application will read it:
+# - in this directory (when running from maven or from your IDE)
+# - in your working directory, next to the built jar file (when starting the jar file from the command line).
 #
 ####
 
@@ -10,8 +12,9 @@
 ##
 server:
   # HTTP connector port
-  port: 8444
+  port: 8443
 
+  # -- either
   # SSL settings for HTTP connector. Only enable if tomcat has to handle https requests.
   ssl:
     # contains the TLS certificate to use
@@ -20,6 +23,7 @@ server:
     key-store-type: PKCS12
     key-alias: tudm
 
+  # -- or
   # Settings for AJP connector (in stead of HTTP connector). Used if running behind Apache HTTP server that acts as reverse proxy.
   # If these properties are set, the HTTP connector settings are not relevant anymore.
   # See https://tomcat.apache.org/tomcat-8.5-doc/config/ajp.html for explanation of properties
@@ -27,7 +31,7 @@ server:
     port: 8445
     scheme: https
     proxy-name: ravel.elis.ugent.be
-    proxy-port: 443
+    proxy-port: 8443
     secure: true
 
   servlet:
@@ -45,6 +49,8 @@ logging:
   level:
     root: info
     be.ugent.idlab: debug
+    org.thymeleaf: info
+    org.apache: info
     org.springframework.web: warn
     org.springframework.security: warn
 
