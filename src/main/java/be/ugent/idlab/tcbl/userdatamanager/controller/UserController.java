@@ -247,7 +247,7 @@ public class UserController {
 	}
 
 	private String getUriOneLevelUp(final HttpServletRequest request) {
-		String reqUri = request.getRequestURL().toString();
+		String reqUri = request.getRequestURL().toString();		// TODO: this seems to return the port the server is listening on (e.g. 8443), not the proxied port, which should be 443!
 		return reqUri.substring(0, reqUri.lastIndexOf('/'));
 	}
 
