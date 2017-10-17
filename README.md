@@ -56,7 +56,7 @@ redirect URL's are generated correctly (especially in a reverse proxy configurat
 
 ```yaml
 server:
-  port: 8444
+  port: 8443
   servlet:
     context-path: /usermanager
 ```
@@ -122,14 +122,14 @@ Whatever option you chose above, this requires the following configuration snipp
 
 ```yaml
 server:
-  port: 8444
-  servlet:
-    context-path: /usermanager
+  port: 8443
   ssl:
     key-store: /home/ghaesen/projects/TCBL/config/tudm.jks
     key-store-password: secret
     key-store-type: PKCS12
     key-alias: tudm
+  servlet:
+    context-path: /usermanager
 ```
 
 ### 1.b Configure a reverse proxy (optional)
@@ -151,15 +151,14 @@ The app requires some configuration too; configuration snippet (example):
 
 ```yaml
 server:
-  port: 8444
-  servlet:
-    context-path: /usermanager
   ajp:
     port: 8445
     scheme: https
     proxy-name: tcblsso2.ilabt.imec.be
     proxy-port: 8443
     secure: true
+  servlet:
+    context-path: /usermanager
 ```
 Here is what the parameters do:
 * **port**: port where the *application server* listens at (i.e. our application).
@@ -185,7 +184,7 @@ Here are the settings (example, adjust to correct hosts):
 * Logo URI: https://tcblsso.ilabt.iminds.be:8443/resources/logos/login-with-TCBL.png (though it won't be shown)
 * Subject Type: pairwise
 * Authentication method for the Token Endpoint: client_secret_post
-* Redirect Login URIs: https://ravel.elis.ugent.be:8444/usermanager/oauth2/authorize/code/tcbl_manager (or wherever the app lives, on the test server, this would be https://tcblsso2.ilabt.imec.be:8443/usermanager/oauth2/authorize/code/tcbl_manager)
+* Redirect Login URIs: https://ravel.elis.ugent.be:8443/usermanager/oauth2/authorize/code/tcbl_manager (or wherever the app lives, on the test server, this would be https://tcblsso2.ilabt.imec.be:8443/usermanager/oauth2/authorize/code/tcbl_manager)
 * Scopes: openid, inum
 * Response Types: code
 * Grant Types: authorization_code
@@ -201,7 +200,7 @@ security:
         client-secret: averysecrativesecret
         client-authentication-method: post
         authorization-grant-type: authorization_code
-        redirect-uri: "https://ravel.elis.ugent.be:8444/usermanager/oauth2/authorize/code/tcbl_manager"
+        redirect-uri: "https://ravel.elis.ugent.be:8443/usermanager/oauth2/authorize/code/tcbl_manager"
         scope: openid, inum
         authorization-uri: "https://honegger.elis.ugent.be/oxauth/seam/resource/restv1/oxauth/authorize"
         token-uri: "https://honegger.elis.ugent.be/oxauth/seam/resource/restv1/oxauth/token"
