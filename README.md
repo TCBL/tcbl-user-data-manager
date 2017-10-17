@@ -19,6 +19,29 @@ mvn package
 
 This creates something like `target/UserDataManager-1.0-SNAPSHOT.jar`.
 
+## Preparing the Java security environment
+
+***This section is relevant during development, while testing againgt a Gluu server that doesn't use a CA signed certificate.***
+
+On the server running Gluu (e.g. honegger.elis.ugent.be), create a `.der` file from the certificate in use:
+```
+# service gluu-server-3.0.2 login
+# cd /etc/certs
+# openssl x509 -outform der -in httpd.crt -out httpd.der
+# exit
+```
+
+On the server running this app, import the `.der` file in the java `cacerts` keystore:
+```
+(go to the lib/security dir of the active jre:)
+# cd /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/security/
+# keytool -importcert -file /path/to/copied/httpd.der -alias honegger.elis.ugent.be_httpd -keystore cacerts 
+(check:)
+# keytool -list -alias honegger.elis.ugent.be_httpd -keystore cacerts 
+```
+
+ 
+
 ## Configuring
 
 In this section, some configuration snippets are shown. They all apply to a client configuration file `application.yml`.
@@ -226,7 +249,7 @@ Contents of `tcbl-user-data-manager/src/main/resources/application.yml.dist` at 
 #
 # This is a sample configuration.
 # Copy it into your application.yml, adapt to your needs and place it where the application will read it:
-# - in this directory (when running from maven or from your IDE)
+# - in the project directory (when running from maven or from your IDE)
 # - in your working directory, next to the built jar file (when starting the jar file from the command line).
 #
 ####
@@ -235,10 +258,11 @@ Contents of `tcbl-user-data-manager/src/main/resources/application.yml.dist` at 
 # Tomcat server settings
 ##
 server:
+  # --- Enable EITHER 'port' and 'ssl' OR 'ajp'
+  
   # HTTP connector port
   port: 8443
 
-  # -- either
   # SSL settings for HTTP connector. Only enable if tomcat has to handle https requests.
   ssl:
     # contains the TLS certificate to use
@@ -247,16 +271,15 @@ server:
     key-store-type: PKCS12
     key-alias: tudm
 
-  # -- or
   # Settings for AJP connector (in stead of HTTP connector). Used if running behind Apache HTTP server that acts as reverse proxy.
   # If these properties are set, the HTTP connector settings are not relevant anymore.
   # See https://tomcat.apache.org/tomcat-8.5-doc/config/ajp.html for explanation of properties
-  ajp:
-    port: 8445
-    scheme: https
-    proxy-name: ravel.elis.ugent.be
-    proxy-port: 8443
-    secure: true
+  #ajp:
+  #  port: 8445
+  #  scheme: https
+  #  proxy-name: ravel.elis.ugent.be
+  #  proxy-port: 8443
+  #  secure: true
 
   servlet:
     # set this if your content will be served from a certain path in stead of the root
@@ -363,11 +386,9 @@ java -jar UserDataManager-<version>.jar
 
 ### b. Using maven (development)
 
-Copy src/main/resources/application.yml.dist to src/main/resources/application.yml and adapt to your needs.
-
 Go to the root directory of the project.
 
-Put your specific `application.yml` in directory `src/main/resources/` (next to the application.yml.dist file).
+Put your specific `application.yml` in this directory.
 
 Then run with:
 
@@ -375,11 +396,16 @@ Then run with:
 mvn spring-boot:run
 ```
 
+Remark: will also work if `application.yml` is in `src/main/resources` (next to `application.yml.dist`),
+but this is descouraged, because it would lead to unwanted packaging of this `application.yml` into the jar file when building it!
+
 ### c. In IntelliJ IDEA
 
 IntelliJ IDEA supports Spring Boot apps out of the box. Navigate to `be.ugent.idlab.tcbl.userdatamanager.TCBLUserDataManager`, right-click on
 the class name or the `main` function and create an application.
 
-Put your specific `application.yml` in directory `src/main/resources/` (next to the application.yml.dist file).
+Put your specific `application.yml` in the root directory of the project.
 
 Ready to run!
+
+Same remark as for running using maven.
