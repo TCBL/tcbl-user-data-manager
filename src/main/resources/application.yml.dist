@@ -14,7 +14,7 @@ server:
   # --- Enable EITHER 'port' and 'ssl' OR 'ajp'
 
   # HTTP connector port
-  port: 8443
+  port: 443
 
   # SSL settings for HTTP connector. Only enable if tomcat has to handle https requests.
   ssl:
@@ -31,7 +31,7 @@ server:
   #  port: 8445
   #  scheme: https
   #  proxy-name: ravel.elis.ugent.be
-  #  proxy-port: 8443
+  #  proxy-port: 443
   #  secure: true
 
   servlet:
@@ -99,7 +99,7 @@ security:
         client-secret: averysecrativesecret
         client-authentication-method: post
         authorization-grant-type: authorization_code
-        redirect-uri: "https://ravel.elis.ugent.be:8443/oauth2/authorize/code/tcbl_manager"
+        redirect-uri: "https://ravel.elis.ugent.be/oauth2/authorize/code/tcbl_manager"
         scope: openid, inum
         authorization-uri: "https://honegger.elis.ugent.be/oxauth/seam/resource/restv1/oxauth/authorize"
         token-uri: "https://honegger.elis.ugent.be/oxauth/seam/resource/restv1/oxauth/token"

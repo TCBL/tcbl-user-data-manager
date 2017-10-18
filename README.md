@@ -56,19 +56,18 @@ redirect URL's are generated correctly (especially in a reverse proxy configurat
 
 ```yaml
 server:
-  port: 8443
+  port: 443
   servlet:
     context-path: /usermanager
 ```
 
 There are two options to let the outside world communicate with the application, and both have their configuration implications:
-1. Direct communication (no reverse proxy). See **1.a Enable HTTPS for the application**. Typical for testing.
+1. Direct communication (no reverse proxy). See **1.a Enable HTTPS for the application**. Typical for a development environment.
 1. Via a reverse proxy. See **1.b. Configure a reverse proxy**. Typical for a production environment.
 
 ### 1.a Enable HTTPS for the application (optional)
 
-*Only when run as a standalone application. You can also run it in combination with a reverse proxy that provides a
-certificate. In this case, see **1.b. Configure a reverse proxy**.*
+***Only when run as a standalone application.***
 
 In order to use OpenID Connect, the application needs to be able to receive https requests.
 Two options here: using a self-signed certificate or a certificate from a Certificate Authority.
@@ -122,7 +121,7 @@ Whatever option you chose above, this requires the following configuration snipp
 
 ```yaml
 server:
-  port: 8443
+  port: 443
   ssl:
     key-store: /home/ghaesen/projects/TCBL/config/tudm.jks
     key-store-password: secret
@@ -133,33 +132,66 @@ server:
 ```
 
 ### 1.b Configure a reverse proxy (optional)
+
+***Only when run in combination with an external HTTP server.***
+
 In this scenario, you already have an HTTP server installed which provides the TLS certificate and serves some contents.
-We have to configure the HTTP server to act as a reverse proxy, which means requests will be forwarded to another URL.
-We take Apache 2.4 as HTTP server, because that's the one used on the TCBL test and production servers.
+
+We have to configure that HTTP server to act as a reverse proxy, which means requests will be forwarded to another URL.
+
+As an example, consider the Apache 2.4.18 HTTP server used inside the Gluu container (gluu-server-3.0.2).
+It is very interesting to adapt that HTTP server, since it is listening to port 443 for HTTPS.
+This allows our application to be accessible through this port on the same physical server.
+
 Our application uses AJP in stead of HTTP for communication with the proxy because then it pretends to be part of the
 HTTP (proxy) server. It is more efficient and automatically takes care of rewrites, header passing, etc.
 
 The set-up is:
-* Our app listens on `ajp://127.0.0.1:8445/usermanager`.
-* Apache redirects requests originating from `/usermanager` to `ajp://127.0.0.1:8445/usermanager`
+* Our app listens on `ajp://localhost:8445/usermanager`.
+* Apache redirects requests originating from `/usermanager` to `ajp://localhost:8445/usermanager`
 
-For example, on the test server, this means that requests to `https://tcblsso2.ilabt.imec.be:8443/usermanager` reach our app.
+For example, on the test server, this means that requests to `https://tcblsso2.ilabt.imec.be/usermanager` reach our app.
 
-First, configure Apache on how to act as a reverse proxy, as described [here](https://git.datasciencelab.ugent.be/TCBL/internal-server-docs/wikis/apache#reverse-proxy).
+#### First, configure Apache to act as a reverse proxy.
 
-The app requires some configuration too; configuration snippet (example):
+If you're adapting the Gluu container's Apache, first login to the gluu container.
 
+Enable the necessary Apache module:
+```bash
+# a2enmod proxy_ajp
+```
+
+Add the following snippet to the bottom of the appropriate `<VirtualHost>` section in the appropriate Apache configuration file.
+If you're adapting the Gluu container's Apache, it's the file `/etc/apache2/sites-available/https_gluu.conf`.
+```
+# --- IDLab begin
+
+# Reverse proxy so that requests to /usermanager are forwarded via AJP to port 8445
+ProxyPass        /usermanager ajp://localhost:8445/usermanager
+
+# --- IDLab end
+```
+
+Restart Apache:
+```bash
+# service apache2 restart
+```
+
+#### The app requires some configuration too
+
+Configuration snippet (example):
 ```yaml
 server:
   ajp:
     port: 8445
     scheme: https
     proxy-name: tcblsso2.ilabt.imec.be
-    proxy-port: 8443
+    proxy-port: 443
     secure: true
   servlet:
     context-path: /usermanager
 ```
+
 Here is what the parameters do:
 * **port**: port where the *application server* listens at (i.e. our application).
 * **scheme**: the scheme of the incoming requests *on the proxy*, what the outside world uses.
@@ -181,10 +213,10 @@ Here are the settings (example, adjust to correct hosts):
 * Application Type: Web
 * Pre-Authorization: True (this skips the authorization step, since it makes no sence for this application)
 * Persist Client Authorizations: False
-* Logo URI: https://tcblsso.ilabt.iminds.be:8443/resources/logos/login-with-TCBL.png (though it won't be shown)
+* Logo URI: https://tcblsso.ilabt.iminds.be/resources/logos/login-with-TCBL.png
 * Subject Type: pairwise
 * Authentication method for the Token Endpoint: client_secret_post
-* Redirect Login URIs: https://ravel.elis.ugent.be:8443/usermanager/oauth2/authorize/code/tcbl_manager (or wherever the app lives, on the test server, this would be https://tcblsso2.ilabt.imec.be:8443/usermanager/oauth2/authorize/code/tcbl_manager)
+* Redirect Login URIs: https://ravel.elis.ugent.be/usermanager/oauth2/authorize/code/tcbl_manager (or wherever the app lives, on the test server, this would be https://tcblsso2.ilabt.imec.be/usermanager/oauth2/authorize/code/tcbl_manager)
 * Scopes: openid, inum
 * Response Types: code
 * Grant Types: authorization_code
@@ -200,7 +232,7 @@ security:
         client-secret: averysecrativesecret
         client-authentication-method: post
         authorization-grant-type: authorization_code
-        redirect-uri: "https://ravel.elis.ugent.be:8443/usermanager/oauth2/authorize/code/tcbl_manager"
+        redirect-uri: "https://ravel.elis.ugent.be/usermanager/oauth2/authorize/code/tcbl_manager"
         scope: openid, inum
         authorization-uri: "https://honegger.elis.ugent.be/oxauth/seam/resource/restv1/oxauth/authorize"
         token-uri: "https://honegger.elis.ugent.be/oxauth/seam/resource/restv1/oxauth/token"
@@ -260,7 +292,7 @@ server:
   # --- Enable EITHER 'port' and 'ssl' OR 'ajp'
   
   # HTTP connector port
-  port: 8443
+  port: 443
 
   # SSL settings for HTTP connector. Only enable if tomcat has to handle https requests.
   ssl:
@@ -277,7 +309,7 @@ server:
   #  port: 8445
   #  scheme: https
   #  proxy-name: ravel.elis.ugent.be
-  #  proxy-port: 8443
+  #  proxy-port: 443
   #  secure: true
 
   servlet:
@@ -345,7 +377,7 @@ security:
         client-secret: averysecrativesecret
         client-authentication-method: post
         authorization-grant-type: authorization_code
-        redirect-uri: "https://ravel.elis.ugent.be:8443/oauth2/authorize/code/tcbl_manager"
+        redirect-uri: "https://ravel.elis.ugent.be/oauth2/authorize/code/tcbl_manager"
         scope: openid, inum
         authorization-uri: "https://honegger.elis.ugent.be/oxauth/seam/resource/restv1/oxauth/authorize"
         token-uri: "https://honegger.elis.ugent.be/oxauth/seam/resource/restv1/oxauth/token"
@@ -367,7 +399,7 @@ security:
 ## Running
 
 After you start the application, you will be able to enjoy it by browsing to its URL, for example:
-`https://ravel.elis.ugent.be:8443/usermanager`.
+`https://ravel.elis.ugent.be/usermanager`.
 
 There are a few options to start the application:
 
