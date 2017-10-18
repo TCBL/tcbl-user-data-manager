@@ -21,7 +21,7 @@ This creates something like `target/UserDataManager-1.0-SNAPSHOT.jar`.
 
 ## Preparing the Java security environment
 
-***This section is relevant during development, while testing againgt a Gluu server that doesn't use a CA signed certificate.***
+***This section is relevant during development, while testing against a Gluu server that doesn't use a CA signed certificate.***
 
 On the server running Gluu (e.g. honegger.elis.ugent.be), create a `.der` file from the certificate in use:
 ```
