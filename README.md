@@ -182,6 +182,7 @@ Restart Apache:
 Configuration snippet (example):
 ```yaml
 server:
+  port: 8444
   ajp:
     port: 8445
     scheme: https
@@ -192,7 +193,9 @@ server:
     context-path: /usermanager
 ```
 
-Here is what the parameters do:
+Mind the assignment of a free port number to server.port (which seems necessary to let spring work).
+
+Here is what the AJP parameters do:
 * **port**: port where the *application server* listens at (i.e. our application).
 * **scheme**: the scheme of the incoming requests *on the proxy*, what the outside world uses.
 * **proxy-name**: the name of the host as known by the outside world.
@@ -289,12 +292,10 @@ Contents of `tcbl-user-data-manager/src/main/resources/application.yml.dist` at 
 # Tomcat server settings
 ##
 server:
-  # --- Enable EITHER 'port' and 'ssl' OR 'ajp'
-  
-  # HTTP connector port
+  # --- HTTP connector port
   port: 443
 
-  # SSL settings for HTTP connector. Only enable if tomcat has to handle https requests.
+  # --- SSL settings for HTTP connector. Enable only if tomcat has to handle https requests.
   ssl:
     # contains the TLS certificate to use
     key-store: /home/ghaesen/projects/TCBL/config/tudm.jks
@@ -302,8 +303,9 @@ server:
     key-store-type: PKCS12
     key-alias: tudm
 
-  # Settings for AJP connector (in stead of HTTP connector). Used if running behind Apache HTTP server that acts as reverse proxy.
-  # If these properties are set, the HTTP connector settings are not relevant anymore.
+  # --- Settings for AJP connector (in stead of HTTP connector). Enable only if running behind Apache HTTP server that acts as reverse proxy.
+  # If these properties are set, the HTTP connector settings above are not relevant anymore,
+  # except for server.port, which will be in use anyway, so set it to a free port number (such as 8444)!!!!!
   # See https://tomcat.apache.org/tomcat-8.5-doc/config/ajp.html for explanation of properties
   #ajp:
   #  port: 8445
@@ -339,10 +341,8 @@ spring:
 
   # template engine settings. See http://www.thymeleaf.org/
   thymeleaf:
-    # test environment:
+    # --- cache: false for test environment; true for production environment
     cache: false
-    # production environment:
-    # cache: true
     # this prefix setting has to do with https://github.com/spring-projects/spring-boot/issues/1744 !
     prefix: classpath:/templates
 
