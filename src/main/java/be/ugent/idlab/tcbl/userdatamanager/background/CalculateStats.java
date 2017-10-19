@@ -25,8 +25,8 @@ public class CalculateStats implements UserProcessor {
 		this.userRepository = userRepository;
 	}
 
-	//@Scheduled(cron = "0 0 2 * * *")
-	@Scheduled(cron = "0 * * * * *")
+	@Scheduled(cron = "0 0 3 * * *")
+	//@Scheduled(cron = "0 * * * * *")
 	public void go() {
 		log.info("Calculating statistics");
 		stats = new Stats();

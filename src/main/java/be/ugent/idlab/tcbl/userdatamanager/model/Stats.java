@@ -16,10 +16,10 @@ import java.util.*;
  * @author Gerald Haesendonck
  */
 public class Stats implements Serializable {
-	private int totalCount = 0;	// total nr of users in the server
-	private int invited = 0;	// number of invited (pre-registered) users
-	private int invitedInactive = 0;	// number of invited users that never signed in
-	private int newUsers = 0;	// number of users that registered themselves
+	public int totalCount = 0;	// total nr of users in the server
+	public int invited = 0;	// number of invited (pre-registered) users
+	public int invitedInactive = 0;	// number of invited users that never signed in
+	public int newUsers = 0;	// number of users that registered themselves
 	private Map<Long, Integer> activeAtTime = new TreeMap<>();
 
 	
@@ -64,7 +64,6 @@ public class Stats implements Serializable {
 	}
 
 	public void toFile() throws IOException {
-		//String json = gson.toJson(this);
 		File file = new File("/tmp", "usermanager_stats_" + dateFormat.format(new Date(now)) + ".json");
 		try (Writer out = new FileWriter(file)) {
 			gson.toJson(this, out);

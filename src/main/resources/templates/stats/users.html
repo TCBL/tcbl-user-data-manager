@@ -8,6 +8,13 @@
     <main>
         <div th:if="${stats} != null">
             <p>Stats found!</p>
+            <table th:object="${stats}">
+                <tr><td>Total count:</td><td th:text="*{totalCount}"></td> </tr>
+                <tr><td>Invited:</td><td th:text="*{invited}"></td> </tr>
+                <tr><td>Invited, inactive:</td><td th:text="*{invitedInactive}"></td> </tr>
+                <tr><td>new users:</td><td th:text="*{newUsers}"></td> </tr>
+
+            </table>
         </div>
         <div th:unless="${stats} != null">
             <p>No stats found!</p>
