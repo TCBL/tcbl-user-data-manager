@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="/fragments :: head">
+<body>
+
+<div th:replace="/fragments :: header( ~{::h1}, ~{::main})">
+    <h1>User numbers</h1>
+    <main>
+        <div th:if="${stats} != null">
+            <p>Stats found!</p>
+        </div>
+        <div th:unless="${stats} != null">
+            <p>No stats found!</p>
+        </div>
+    </main>
+</div>
+
+</body>
+</html>
