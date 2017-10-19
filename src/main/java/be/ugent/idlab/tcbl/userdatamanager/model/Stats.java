@@ -19,7 +19,7 @@ public class Stats implements Serializable {
 	private int invited = 0;	// number of invited (pre-registered) users
 	private int invitedInactive = 0;	// number of invited users that never signed in
 	private int newUsers = 0;	// number of users that registered themselves
-	private Map<Calendar, Integer> activeAtTime = new TreeMap<>();
+	private Map<Date, Integer> activeAtTime = new TreeMap<>();
 
 	
 	private /*transient*/ final Date now = new Date();
@@ -59,7 +59,7 @@ public class Stats implements Serializable {
 	}
 
 	private void insertActive(final Calendar date) {
-		activeAtTime.compute(date, (existingDate, nrActive) -> (nrActive == null) ? 1 : ++nrActive);
+		activeAtTime.compute(date.getTime(), (existingDate, nrActive) -> (nrActive == null) ? 1 : ++nrActive);
 	}
 
 	public void toFile() throws IOException {
