@@ -19,6 +19,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static org.gluu.oxtrust.model.scim2.Constants.MAX_COUNT;
+
 /**
  * <p>Copyright 2017 IDLab (Ghent University - imec)</p>
  *
@@ -189,6 +191,25 @@ public class ScimTCBLUserRepository implements TCBLUserRepository {
 			String message = "Cannot search for inactive users: " + e.getMessage();
 			log.error(message, e);
 			throw new Exception(message, e);
+		}
+	}
+
+	@Override
+	public void processUsers(UserProcessor processor) throws Exception {
+		// Iterating all users does not work with Gluu Scim, because of pagination does not work.
+		// To work around this, we request users by each letter of the alphabet and some other characters, as to limit
+		// the risk of getting over the maximum of 200 users per request. This is dirty, but what else is there to do...
+		String abc = "abcdefghijklmnopqrstuvwxyz0123456789_-+*";
+		for (char c : abc.toCharArray()) {
+			ScimResponse listResponse = client.searchUsers("userName sw \"" + c + "\"", 1, MAX_COUNT, "", "", new String[]{});
+			ListResponse userListResponse = Util.toListResponseUser(listResponse, client.getUserExtensionSchema());
+			List<Resource> userList = userListResponse.getResources();
+			if (!userList.isEmpty()) {
+				for (Resource userResource : userList) {
+					User user = (User) userResource;
+					processor.process(user);
+				}
+			}
 		}
 	}
 

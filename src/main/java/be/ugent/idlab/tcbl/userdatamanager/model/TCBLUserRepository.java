@@ -13,4 +13,5 @@ public interface TCBLUserRepository {
 	TCBLUser create(TCBLUser user) throws Exception;
 	void deleteTCBLUser(TCBLUser user) throws Exception;
 	Iterable<TCBLUser> findInactive() throws Exception;
+	void processUsers(final UserProcessor processor) throws Exception;
 }
