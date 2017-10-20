@@ -25,6 +25,8 @@ public class StatController {
 		try {
 			Stats stats = Stats.fromLatestFile();
 			model.addAttribute("stats", stats);
+			model.addAttribute("dates", stats.getLabels());
+			model.addAttribute("active", stats.getActiveValues());
 		} catch (IOException e) {
 			log.error("Error while getting stats or stats not calculated yet.", e);
 			model.addAttribute("stats", null);

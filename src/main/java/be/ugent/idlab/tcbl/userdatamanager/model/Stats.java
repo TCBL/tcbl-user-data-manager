@@ -89,5 +89,22 @@ public class Stats implements Serializable {
 		}
 		return null;
 	}
+
+	////// methods to ease drawing of charts: prepare data labels, values, etc
+
+	public String[] getLabels() {
+		List<String> labels = new ArrayList<>();
+		for (Long timestamp : activeAtTime.keySet()) {
+			Date date = new Date(timestamp);
+			labels.add(dateFormat.format(date));
+		}
+		return labels.toArray(new String[labels.size()]);
+	}
+
+	public Integer[] getActiveValues() {
+		List<Integer> values = new ArrayList<>();
+		values.addAll(activeAtTime.values());
+		return values.toArray(new Integer[values.size()]);
+	}
 }
 
