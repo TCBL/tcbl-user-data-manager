@@ -326,6 +326,7 @@ server:
 # See https://www.slf4j.org/
 ##
 logging:
+  file: logs/logfile.log
   level:
     root: info
     be.ugent.idlab: debug
