@@ -19,29 +19,6 @@ mvn package
 
 This creates something like `target/UserDataManager-1.0-SNAPSHOT.jar`.
 
-## Preparing the Java security environment
-
-***This section is relevant during development, while testing against a Gluu server that doesn't use a CA signed certificate.***
-
-On the server running Gluu (e.g. honegger.elis.ugent.be), create a `.der` file from the certificate in use:
-```
-# service gluu-server-3.0.2 login
-# cd /etc/certs
-# openssl x509 -outform der -in httpd.crt -out httpd.der
-# exit
-```
-
-On the server running this app, import the `.der` file in the java `cacerts` keystore:
-```
-(go to the lib/security dir of the active jre:)
-# cd /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/security/
-# keytool -importcert -file /path/to/copied/httpd.der -alias honegger.elis.ugent.be_httpd -keystore cacerts 
-(check:)
-# keytool -list -alias honegger.elis.ugent.be_httpd -keystore cacerts 
-```
-
- 
-
 ## Configuring
 
 In this section, some configuration snippets are shown. They all apply to a client configuration file `application.yml`.
