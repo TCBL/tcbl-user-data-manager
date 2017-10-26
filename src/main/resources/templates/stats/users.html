@@ -17,34 +17,26 @@
         <div th:unless="${stats} != null">
             <p>No stats found!</p>
         </div>
-        <canvas id="myChart" width="600" height="400"></canvas>
+        <canvas id="chartOne" width="600" height="200"></canvas>
+        <canvas id="chartTwo" width="600" height="200"></canvas>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.0/Chart.min.js"></script>
         <script th:inline="javascript">
-            var ctx = document.getElementById("myChart").getContext('2d');
+            var ctx1 = document.getElementById("chartOne").getContext('2d');
+            var ctx2 = document.getElementById("chartTwo").getContext('2d');
             var dates = [[${dates}]];
             var activeCounts = [[${active}]];
             var totalActiveCounts = [[${totalActive}]];
             // see http://www.chartjs.org/docs/latest/
-            var activeChart = new Chart(ctx,
+            var chartTotal = new Chart(ctx1,
                 {
-                    type: 'bar',
+                    type: 'line',
                     data: {
                         labels: dates,
                         datasets: [
                             {
-                                label: 'New users',
-                                yAxisID: 'y1',
-                                data: activeCounts,
-                                borderColor: 'red',
-                                borderWidth: 2
-                            },
-                            {
                                 label: 'Total Users',
-                                yAxisID: 'y2',
                                 data: totalActiveCounts,
-                                borderColor: 'blue',
-                                fill: false,
-                                type: 'line'
+                                borderColor: 'blue'
                             }
                         ]
                     },
@@ -52,31 +44,10 @@
                         scales: {
                             yAxes: [
                                 {
-                                    id: 'y1',
-                                    position: 'left',
                                     ticks: {
-                                        beginAtZero: true,
                                         stepSize: 1
-                                    },
-                                    scaleLabel: {
-                                        display: true,
-                                        labelString: 'New Users',
-                                        fontColor: 'red'
                                     }
 
-                                },
-                                {
-                                    id: 'y2',
-                                    position: 'right',
-                                    ticks: {
-                                        beginAtZero: true,
-                                        stepSize: 1
-                                    },
-                                    scaleLabel: {
-                                        display: true,
-                                        labelString: 'Total Users',
-                                        fontColor: 'blue'
-                                    }
                                 }
                             ]
                         },
@@ -85,6 +56,40 @@
                                 tension: 0 // disables bezier curves
                             }
                         }
+                    }
+                }
+            );
+            var chartTotal = new Chart(ctx2,
+                {
+                    type: 'bar',
+                    data: {
+                        labels: dates,
+                        datasets: [
+                            {
+                                label: 'New users',
+                                data: activeCounts,
+                                borderColor: 'red',
+                                borderWidth: 2
+                            }
+                        ]
+                    },
+                    options: {
+                        scales: {
+                            yAxes: [
+                                {
+                                    ticks: {
+                                        stepSize: 1,
+                                        beginAtZero: true
+                                    }
+
+                                }
+                            ]
+                        }
+                       /* elements: {
+                            line: {
+                                tension: 0 // disables bezier curves
+                            }
+                        }*/
                     }
                 }
             );
