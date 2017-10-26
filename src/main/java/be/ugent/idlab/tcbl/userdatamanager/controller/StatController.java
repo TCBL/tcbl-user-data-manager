@@ -29,6 +29,7 @@ public class StatController {
 				model.addAttribute("dates", stats.getLabels());
 				model.addAttribute("active", stats.getActiveValues());
 				model.addAttribute("totalActive", stats.getTotalActiveValues());
+				//model.addAttribute("invitedActive", stats.getInvitedActive());
 			} else {
 				log.error("Stats not calculated yet.");
 				model.addAttribute("stats", null);

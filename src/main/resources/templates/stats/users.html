@@ -10,33 +10,41 @@
             <table th:object="${stats}">
                 <tr><td>Total count:</td><td th:text="*{totalCount}"></td> </tr>
                 <tr><td>Invited:</td><td th:text="*{invited}"></td> </tr>
-                <tr><td>Invited, inactive:</td><td th:text="*{invitedInactive}"></td> </tr>
-                <tr><td>new users:</td><td th:text="*{newUsers}"></td> </tr>
+                <tr><td>Active (invited):</td><td th:text="*{invitedActive}"></td> </tr>
+                <tr><td>Active (self-registered):</td><td th:text="*{newUsers}"></td> </tr>
             </table>
         </div>
         <div th:unless="${stats} != null">
             <p>No stats found!</p>
         </div>
-        <canvas id="chartOne" width="600" height="200"></canvas>
-        <canvas id="chartTwo" width="600" height="200"></canvas>
+        <canvas id="myChart" width="600" height="400"></canvas>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.0/Chart.min.js"></script>
         <script th:inline="javascript">
-            var ctx1 = document.getElementById("chartOne").getContext('2d');
-            var ctx2 = document.getElementById("chartTwo").getContext('2d');
+            var ctx = document.getElementById("myChart").getContext('2d');
             var dates = [[${dates}]];
             var activeCounts = [[${active}]];
             var totalActiveCounts = [[${totalActive}]];
             // see http://www.chartjs.org/docs/latest/
-            var chartTotal = new Chart(ctx1,
+            var activeChart = new Chart(ctx,
                 {
-                    type: 'line',
+                    type: 'bar',
                     data: {
                         labels: dates,
                         datasets: [
                             {
-                                label: 'Total Users',
+                                label: 'Added active users',
+                                yAxisID: 'y1',
+                                data: activeCounts,
+                                borderColor: 'red',
+                                borderWidth: 2
+                            },
+                            {
+                                label: 'Total active users',
+                                yAxisID: 'y2',
                                 data: totalActiveCounts,
-                                borderColor: 'blue'
+                                borderColor: 'blue',
+                                fill: false,
+                                type: 'line'
                             }
                         ]
                     },
@@ -44,10 +52,32 @@
                         scales: {
                             yAxes: [
                                 {
+                                    id: 'y1',
+                                    position: 'left',
                                     ticks: {
+                                        beginAtZero: true,
                                         stepSize: 1
-                                    }
-
+                                    },
+                                    scaleLabel: {
+                                        display: true,
+                                        labelString: 'Added active users',
+                                        fontColor: 'red'
+                                    },
+                                    gridLines: false
+                                },
+                                {
+                                    id: 'y2',
+                                    position: 'right',
+                                    ticks: {
+                                        beginAtZero: true,
+                                        stepSize: 5
+                                    },
+                                    scaleLabel: {
+                                        display: true,
+                                        labelString: 'Total active users',
+                                        fontColor: 'blue'
+                                    },
+                                    gridLines: false
                                 }
                             ]
                         },
@@ -56,40 +86,6 @@
                                 tension: 0 // disables bezier curves
                             }
                         }
-                    }
-                }
-            );
-            var chartTotal = new Chart(ctx2,
-                {
-                    type: 'bar',
-                    data: {
-                        labels: dates,
-                        datasets: [
-                            {
-                                label: 'New users',
-                                data: activeCounts,
-                                borderColor: 'red',
-                                borderWidth: 2
-                            }
-                        ]
-                    },
-                    options: {
-                        scales: {
-                            yAxes: [
-                                {
-                                    ticks: {
-                                        stepSize: 1,
-                                        beginAtZero: true
-                                    }
-
-                                }
-                            ]
-                        }
-                       /* elements: {
-                            line: {
-                                tension: 0 // disables bezier curves
-                            }
-                        }*/
                     }
                 }
             );
