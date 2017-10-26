@@ -25,34 +25,60 @@
             var activeCounts = [[${active}]];
             var totalActiveCounts = [[${totalActive}]];
             // see http://www.chartjs.org/docs/latest/
-            console.log(dates);
-            console.log(activeCounts);
             var activeChart = new Chart(ctx,
                 {
-                    type: 'line',
+                    type: 'bar',
                     data: {
                         labels: dates,
                         datasets: [
                             {
-                                label: 'Activated users',
+                                label: 'New users',
+                                yAxisID: 'y1',
                                 data: activeCounts,
-                                borderColor: 'red'
+                                borderColor: 'red',
+                                borderWidth: 2
                             },
                             {
-                                label: 'Total number of active users',
+                                label: 'Total Users',
+                                yAxisID: 'y2',
                                 data: totalActiveCounts,
-                                borderColor: 'blue'
+                                borderColor: 'blue',
+                                fill: false,
+                                type: 'line'
                             }
                         ]
                     },
                     options: {
                         scales: {
-                            yAxes: [{
-                                ticks: {
-                                    suggestedMin: 0,
-                                    stepSize: 1
+                            yAxes: [
+                                {
+                                    id: 'y1',
+                                    position: 'left',
+                                    ticks: {
+                                        beginAtZero: true,
+                                        stepSize: 1
+                                    },
+                                    scaleLabel: {
+                                        display: true,
+                                        labelString: 'New Users',
+                                        fontColor: 'red'
+                                    }
+
+                                },
+                                {
+                                    id: 'y2',
+                                    position: 'right',
+                                    ticks: {
+                                        beginAtZero: true,
+                                        stepSize: 1
+                                    },
+                                    scaleLabel: {
+                                        display: true,
+                                        labelString: 'Total Users',
+                                        fontColor: 'blue'
+                                    }
                                 }
-                            }]
+                            ]
                         },
                         elements: {
                             line: {
