@@ -7,18 +7,62 @@
     <h1>User numbers</h1>
     <main>
         <div th:if="${stats} != null">
-            <p>Stats found!</p>
             <table th:object="${stats}">
                 <tr><td>Total count:</td><td th:text="*{totalCount}"></td> </tr>
                 <tr><td>Invited:</td><td th:text="*{invited}"></td> </tr>
                 <tr><td>Invited, inactive:</td><td th:text="*{invitedInactive}"></td> </tr>
                 <tr><td>new users:</td><td th:text="*{newUsers}"></td> </tr>
-
             </table>
         </div>
         <div th:unless="${stats} != null">
             <p>No stats found!</p>
         </div>
+        <canvas id="myChart" width="600" height="400"></canvas>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.0/Chart.min.js"></script>
+        <script th:inline="javascript">
+            var ctx = document.getElementById("myChart").getContext('2d');
+            var dates = [[${dates}]];
+            var activeCounts = [[${active}]];
+            var totalActiveCounts = [[${totalActive}]];
+            // see http://www.chartjs.org/docs/latest/
+            console.log(dates);
+            console.log(activeCounts);
+            var activeChart = new Chart(ctx,
+                {
+                    type: 'line',
+                    data: {
+                        labels: dates,
+                        datasets: [
+                            {
+                                label: 'Activated users',
+                                data: activeCounts,
+                                borderColor: 'red'
+                            },
+                            {
+                                label: 'Total number of active users',
+                                data: totalActiveCounts,
+                                borderColor: 'blue'
+                            }
+                        ]
+                    },
+                    options: {
+                        scales: {
+                            yAxes: [{
+                                ticks: {
+                                    suggestedMin: 0,
+                                    stepSize: 1
+                                }
+                            }]
+                        },
+                        elements: {
+                            line: {
+                                tension: 0 // disables bezier curves
+                            }
+                        }
+                    }
+                }
+            );
+        </script>
     </main>
 </div>
 

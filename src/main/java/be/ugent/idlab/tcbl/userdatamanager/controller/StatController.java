@@ -24,9 +24,15 @@ public class StatController {
 	public String activeUsers(Model model) {
 		try {
 			Stats stats = Stats.fromLatestFile();
-			model.addAttribute("stats", stats);
-			model.addAttribute("dates", stats.getLabels());
-			model.addAttribute("active", stats.getActiveValues());
+			if (stats != null) {
+				model.addAttribute("stats", stats);
+				model.addAttribute("dates", stats.getLabels());
+				model.addAttribute("active", stats.getActiveValues());
+				model.addAttribute("totalActive", stats.getTotalActiveValues());
+			} else {
+				log.error("Stats not calculated yet.");
+				model.addAttribute("stats", null);
+			}
 		} catch (IOException e) {
 			log.error("Error while getting stats or stats not calculated yet.", e);
 			model.addAttribute("stats", null);

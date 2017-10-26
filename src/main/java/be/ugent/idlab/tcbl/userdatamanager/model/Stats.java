@@ -20,6 +20,7 @@ public class Stats implements Serializable {
 	public int invited = 0;	// number of invited (pre-registered) users
 	public int invitedInactive = 0;	// number of invited users that never signed in
 	public int newUsers = 0;	// number of users that registered themselves
+	public int totalActive = 0;
 	private Map<Long, Integer> activeAtTime = new TreeMap<>();
 
 	
@@ -41,9 +42,11 @@ public class Stats implements Serializable {
 			if (created.equals(modified)) {
 				invitedInactive++;
 			} else {
+				totalActive++;
 				insertActive(modifiedCalendar);
 			}
 		} else if (createdCalendar.compareTo(invitation_day) > 0) {
+			totalActive++;
 			newUsers++;
 			insertActive(createdCalendar);
 		}
@@ -104,6 +107,16 @@ public class Stats implements Serializable {
 	public Integer[] getActiveValues() {
 		List<Integer> values = new ArrayList<>();
 		values.addAll(activeAtTime.values());
+		return values.toArray(new Integer[values.size()]);
+	}
+
+	public Integer[] getTotalActiveValues() {
+		List<Integer> values = new ArrayList<>();
+		int totals = 0;
+		for (Integer totalActive : activeAtTime.values()) {
+			totals += totalActive;
+			values.add(totals);
+		}
 		return values.toArray(new Integer[values.size()]);
 	}
 }
