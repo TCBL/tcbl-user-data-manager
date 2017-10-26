@@ -25,18 +25,21 @@ public class StatController {
 		try {
 			Stats stats = Stats.fromLatestFile();
 			if (stats != null) {
-				model.addAttribute("stats", stats);
+				model.addAttribute("totalCount", stats.totalCount);
+				model.addAttribute("invited", stats.invited);
+				model.addAttribute("invitedActive", stats.invitedActive);
+				model.addAttribute("newUsers", stats.newUsers);
 				model.addAttribute("dates", stats.getLabels());
 				model.addAttribute("active", stats.getActiveValues());
 				model.addAttribute("totalActive", stats.getTotalActiveValues());
 				//model.addAttribute("invitedActive", stats.getInvitedActive());
 			} else {
 				log.error("Stats not calculated yet.");
-				model.addAttribute("stats", null);
+				model.addAttribute("totalCount", null);
 			}
 		} catch (IOException e) {
 			log.error("Error while getting stats or stats not calculated yet.", e);
-			model.addAttribute("stats", null);
+			model.addAttribute("totalCount", null);
 		}
 		return "/stats/users";
 	}

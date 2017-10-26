@@ -6,15 +6,15 @@
 <div th:replace="/fragments :: header( ~{::h1}, ~{::main})">
     <h1>User numbers</h1>
     <main>
-        <div th:if="${stats} != null">
-            <table th:object="${stats}">
-                <tr><td>Total count:</td><td th:text="*{totalCount}"></td> </tr>
-                <tr><td>Invited:</td><td th:text="*{invited}"></td> </tr>
-                <tr><td>Active (invited):</td><td th:text="*{invitedActive}"></td> </tr>
-                <tr><td>Active (self-registered):</td><td th:text="*{newUsers}"></td> </tr>
+        <div th:if="${totalCount} != null">
+            <table>
+                <tr><td>Total count:</td><td th:text="${totalCount}"></td> </tr>
+                <tr><td>Invited:</td><td th:text="${invited}"></td> </tr>
+                <tr><td>Active (invited):</td><td th:text="${invitedActive}"></td> </tr>
+                <tr><td>Active (self-registered):</td><td th:text="${newUsers}"></td> </tr>
             </table>
         </div>
-        <div th:unless="${stats} != null">
+        <div th:unless="${totalCount} != null">
             <p>No stats found!</p>
         </div>
         <canvas id="myChart" width="600" height="400"></canvas>

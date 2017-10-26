@@ -17,7 +17,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class CalculateStats implements UserProcessor {
 	private final Logger log = LoggerFactory.getLogger(getClass());
-	//private final DateFormat dateFormat = new SimpleDateFormat("YYYY-LL-dd");
 	private final TCBLUserRepository userRepository;
 	private Stats stats = new Stats();
 
@@ -25,8 +24,8 @@ public class CalculateStats implements UserProcessor {
 		this.userRepository = userRepository;
 	}
 
-	//@Scheduled(cron = "0 0 3 * * *")
-	@Scheduled(cron = "0 * * * * *")
+	@Scheduled(cron = "0 0 3 * * *")
+	//@Scheduled(cron = "0 * * * * *")
 	public void go() {
 		log.info("Calculating statistics");
 		stats = new Stats();
