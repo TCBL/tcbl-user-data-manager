@@ -4,7 +4,7 @@
 <body>
 
 <div th:replace="/fragments :: header( ~{::h1}, ~{::main})">
-    <h1>Sign up to TCBL</h1>
+	<h1>Sign up to TCBL</h1>
     <main>
         <form action="#" th:action="@{/user/register}" th:object="${tcblUser}" method="post" name="regForm"
               onsubmit="return validatePassword()">

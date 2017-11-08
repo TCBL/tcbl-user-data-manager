@@ -4,19 +4,19 @@
 <body>
 
 <div th:replace="/fragments :: header( ~{::h1}, ~{::main})">
-    <h1>Reset Password</h1>
-    <main>
-        <p>First time on the new website? Welcome in!<br>Forgot your password? No problem.</p>
-        <form action="#" th:action="@{/user/resetpw}" method="post" name="resetPwForm">
-            <div class="row">
-                <div class="columns large-3">
-                    <label for="mail">E-mail</label>
-                    <input type="email" name="mail" id="mail" required/>
-                </div>
-            </div>
-            <input type="submit" value="Reset password" class="red-button"/>
-        </form>
-    </main>
+	<h1>Reset Password</h1>
+	<main>
+		<p>First time on the new website? Welcome in!<br>Forgot your password? No problem.</p>
+		<form action="#" th:action="@{/user/resetpw}" method="post" name="resetPwForm">
+			<div class="row">
+				<div class="columns large-3">
+					<label for="mail">E-mail</label>
+					<input type="email" name="mail" id="mail" required/>
+				</div>
+			</div>
+			<input type="submit" value="Reset password" class="red-button"/>
+		</form>
+	</main>
 </div>
 
 </body>

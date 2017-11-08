@@ -4,26 +4,26 @@
 <body>
 
 <div th:if="${rpc} != null">
-    <div th:replace="/fragments :: header( ~{::h1}, ~{::main})">
-        <h1>Reset Password</h1>
-        <main><br>
-            <form action="#" th:action="@{/user/resetpwform}" method="post" name="regForm"
-                  onsubmit="return validatePassword()">
-                <div class="row">
-                    <div class="columns large-3">
-                        <label for="password">New password</label>
-                        <input type="password" name="password" id="password" autocomplete="off" required/>
-                    </div>
-                    <div class="columns large-3">
-                        <label for="password">Confirm new password</label>
-                        <input type="password" name="cpassword" id="cpassword" autocomplete="off" required/>
-                    </div>
-                    <input type="hidden" th:value="${rpc}" name="rpc" id="rpc"/>
-                </div>
-                <input type="submit" value="Set password" class="red-button"/>
-            </form>
-        </main>
-    </div>
+	<div th:replace="/fragments :: header( ~{::h1}, ~{::main})">
+		<h1>Reset Password</h1>
+		<main><br>
+			<form action="#" th:action="@{/user/resetpwform}" method="post" name="regForm"
+				  onsubmit="return validatePassword()">
+				<div class="row">
+					<div class="columns large-3">
+						<label for="password">New password</label>
+						<input type="password" name="password" id="password" autocomplete="off" required/>
+					</div>
+					<div class="columns large-3">
+						<label for="password">Confirm new password</label>
+						<input type="password" name="cpassword" id="cpassword" autocomplete="off" required/>
+					</div>
+					<input type="hidden" th:value="${rpc}" name="rpc" id="rpc"/>
+				</div>
+				<input type="submit" value="Set password" class="red-button"/>
+			</form>
+		</main>
+	</div>
 </div>
 
 <script th:replace="/fragments :: validatePassword"></script>

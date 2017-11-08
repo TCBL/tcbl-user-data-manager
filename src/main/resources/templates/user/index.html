@@ -1,30 +1,30 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
-<head th:substituteby="/fragments :: head">
+<head th:replace="/fragments :: head">
 </head>
 <body>
 
 <div th:replace="/fragments :: header( ~{::h1}, ~{::main})">
-    <h1>Manage your information</h1>
-    <main>
-        <form action="#" th:action="@{/user/update}" th:object="${tcblUser}" method="post">
-            <fieldset>
-                <legend>Your information</legend>
-                <div class="row">
-                    <div class="columns large-2">
-                        <label for="firstName">First name</label>
-                        <input type="text" th:field="*{firstName}" required/><br>
-                    </div>
-                    <div class="columns large-2">
-                        <label for="lastName">Last name</label>
-                        <input type="text" th:field="*{lastName}" required/><br>
-                    </div>
-                </div>
-            </fieldset>
-            <input type="hidden" th:field="*{id}"/>
-            <input type="submit" value="Update" class="red-button"/>
-        </form>
-    </main>
+	<h1>Manage your information</h1>
+	<main>
+		<form action="#" th:action="@{/user/update}" th:object="${tcblUser}" method="post">
+			<fieldset>
+				<legend>Your information</legend>
+				<div class="row">
+					<div class="columns large-2">
+						<label for="firstName">First name</label>
+						<input type="text" th:field="*{firstName}" required/><br>
+					</div>
+					<div class="columns large-2">
+						<label for="lastName">Last name</label>
+						<input type="text" th:field="*{lastName}" required/><br>
+					</div>
+				</div>
+			</fieldset>
+			<input type="hidden" th:field="*{id}"/>
+			<input type="submit" value="Update" class="red-button"/>
+		</form>
+	</main>
 </div>
 </body>
 </html>
