@@ -13,15 +13,9 @@
 			<p>This is still work in progress, more to come soon!</p>
 		</div>
 		<div>&nbsp;</div>
-
-		<div th:if="${message} != null" id="dialog" th:title="${message.title}">
-		   <p th:text="${message.message}"></p>
-		</div>
-
 		<div sec:authorize="hasRole('ROLE_ANONYMOUS')">
 			<a href="/oiclogin" th:href="@{/oiclogin}">Log in with TCBL</a>
 		</div>
-
 		<div sec:authorize="isAuthenticated()">
 			<a href="/user/index" th:href="@{/user/index}">Manage your info</a>
 		</div>

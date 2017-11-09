@@ -16,7 +16,9 @@
  */
 package be.ugent.idlab.tcbl.userdatamanager.controller;
 
+import be.ugent.idlab.tcbl.userdatamanager.model.Message;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
@@ -33,7 +35,8 @@ public class MainController {
 	}
 
 	@RequestMapping("/index")
-	public String index() {
+	public String index(Model model) {
+		model.addAttribute("message", new Message("The message is", "No message today."));
 		return "/index";
 	}
 }

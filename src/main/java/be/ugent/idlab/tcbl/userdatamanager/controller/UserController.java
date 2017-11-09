@@ -92,7 +92,7 @@ public class UserController {
 		try {
 			tcblUserRepository.save(user);
 			model.addAttribute("tcblUser", user);
-			//model.addAttribute("message", new Message("Update successful", "Your information is successfully updated."));
+			/* activated: */ model.addAttribute("message", new Message("Update successful", "Your information is successfully updated."));
 		} catch (Exception e) {
 			log.error("Cannot update user info", e);
 			model.addAttribute("message", new Message("Error", "Cannot update your information."));
@@ -129,8 +129,7 @@ public class UserController {
 			if (!user.isActive()) {
 				user.setActive(true);
 				tcblUserRepository.save(user);
-				/*model.addAttribute("message", new Message("Registration completed",
-						"You can now log in."));*/
+				/* activated: */ model.addAttribute("message", new Message("Registration completed", "You can now log in."));
 			}
 		} catch (Exception e) {
 			log.error("Cannot confirm registration of {}", inum, e);

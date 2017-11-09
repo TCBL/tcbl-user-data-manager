@@ -35,29 +35,8 @@ ul {
     margin: 0 auto;
     max-width: 62.5rem;
     width: 100%;
-}
-
-.row::before, .row .row::after {
-    content: " ";
     display: table;
 }
-
-
-.large-3 {
-    width: 30%;
-    min-width: 250px;
-}
-
-.large-2 {
-    width: 45%;
-    min-width: 250px;
-}
-
-.break {
-    width: 100%;
-    height: 50px;
-}
-
 
 .columns {
     position: relative;
@@ -66,6 +45,20 @@ ul {
     float: left;
 }
 
+.break {
+    width: 100%;
+    height: 50px;
+}
+
+.large-2 {
+    width: 45%;
+    min-width: 250px;
+}
+
+.large-3 {
+    width: 30%;
+    min-width: 250px;
+}
 
 h1 {
     font-weight: bold;
@@ -145,9 +138,12 @@ form .required{font-weight:bold;}
     font-size: 0.8em;
 }
 
+.tcbl-status {
+    font-size: 1.2rem;
+    color: #ff4939;
+}
+
 .tcbl-footer {
     font-size: 0.7rem;
     color: #999;
-    position: relative;
-    bottom: 0;
 }
