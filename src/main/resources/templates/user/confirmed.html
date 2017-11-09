@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="/fragments :: head">
+<head th:replace="/fragments :: standard-head">
+</head>
 <body>
-
 <!-- if registration failed -->
 <div th:if="${message} != null">
-	<div th:replace="/fragments :: header( ~{::h1}, ~{::aside})">
+	<div th:replace="/fragments :: standard-body-div( ~{::h1}, ~{::aside})">
 		<h1>Registration failed</h1>
 		<aside>
 			<p><br>We are sorry to tell you that the registration process failed.
@@ -17,7 +17,7 @@
 
 <!-- if successful -->
 <div th:unless="${message} != null">
-	<div th:replace="/fragments :: header( ~{::h2}, ~{::main})">
+	<div th:replace="/fragments :: standard-body-div( ~{::h2}, ~{::main})">
 		<h2>Successfully registered!</h2>
 		<main>
 			<p><br>You are successfully registered. You can now log in to the following services
@@ -34,6 +34,5 @@
 		</main>
 	</div>
 </div>
-
 </body>
 </html>

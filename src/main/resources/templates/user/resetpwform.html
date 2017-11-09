@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="/fragments :: head">
+<head th:replace="/fragments :: standard-head">
 <body>
 
 <div th:if="${rpc} != null">
-	<div th:replace="/fragments :: header( ~{::h1}, ~{::main})">
+	<div th:replace="/fragments :: standard-body-div( ~{::h1}, ~{::main})">
 		<h1>Reset Password</h1>
 		<main><br>
 			<form action="#" th:action="@{/user/resetpwform}" method="post" name="regForm"

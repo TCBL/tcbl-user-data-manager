@@ -153,7 +153,7 @@ public class UserController {
 			sendResetMessage(user, baseUri);
 		} catch (Exception e) {
 			log.error("Cannot send reset pw mail for {} ", mail);
-			model.addAttribute("message", new Message("Reset Password failed", "Cannot reset password."));
+			model.addAttribute("message", new Message("Reset Password failed", "Cannot send mail."));
 		}
 		return "/user/pwmailsent";
 	}
@@ -180,7 +180,7 @@ public class UserController {
 			tcblUserRepository.save(user);
 		} catch (Exception e) {
 			log.error("Cannot reset password of {}", rpc, e);
-			model.addAttribute("message", new Message("Resetting password failed",
+			model.addAttribute("message", new Message("Reset Password failed",
 					e.getMessage()));
 		}
 		return "/user/passwordset";

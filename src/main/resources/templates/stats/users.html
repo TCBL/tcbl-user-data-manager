@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="/fragments :: head">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" xmlns="http://java.sun.com/jsf/html">
+<head th:replace="/fragments :: standard-head">
+</head>
 <body>
-
-<div th:replace="/fragments :: header( ~{::h1}, ~{::main})">
+<div th:replace="/fragments :: standard-body-div( ~{::h1}, ~{::main})">
     <h1>User numbers</h1>
     <main>
         <div th:if="${totalCount} != null">
@@ -92,6 +92,5 @@
         </script>
     </main>
 </div>
-
 </body>
 </html>

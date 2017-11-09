@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="/fragments :: head">
+<head th:replace="/fragments :: standard-head">
+</head>
 <body>
-
-<div th:replace="/fragments :: header( ~{::h1}, ~{::main})">
+<div th:replace="/fragments :: standard-body-div( ~{::h1}, ~{::main})">
 	<h1>Reset Password</h1>
 	<main>
 		<p>First time on the new website? Welcome in!<br>Forgot your password? No problem.</p>
@@ -18,6 +18,5 @@
 		</form>
 	</main>
 </div>
-
 </body>
 </html>
