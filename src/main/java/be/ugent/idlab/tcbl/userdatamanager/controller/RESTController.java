@@ -3,6 +3,8 @@ package be.ugent.idlab.tcbl.userdatamanager.controller;
 import be.ugent.idlab.tcbl.userdatamanager.model.Stats;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -14,7 +16,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 /**
  * <p>Copyright 2017 IDLab (Ghent University - imec)</p>
@@ -28,7 +29,7 @@ public class RESTController {
 	private final DateFormat sinceFormat = new SimpleDateFormat("yyyyMMdd");
 
 	@GetMapping("/new_users")
-	public List<String> newUsers(@RequestParam(name = "since", defaultValue = "20170831") String since) {
+	public ResponseEntity<?> newUsers(@RequestParam(name = "since", defaultValue = "20170831") String since) {
 		final ArrayList<String> newUsers = new ArrayList<>();
 		try {
 			final Date sinceDate = sinceFormat.parse(since);
@@ -40,17 +41,16 @@ public class RESTController {
 						.forEach(entry -> newUsers.addAll(entry.getValue()));
 			} else {
 				log.warn("Stats not calculated yet.");
-				// TODO: return decent error code
+				return new ResponseEntity<>("Stats not calculated yet. Try again later\n", HttpStatus.NOT_FOUND);
 			}
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
 			log.error("Error while getting stats or stats not calculated yet.", e);
-			// TODO: return decent error code
+			return new ResponseEntity<>("Stats not calculated yet. Try again later\n", HttpStatus.NOT_FOUND);
 		} catch (ParseException e) {
-			log.error("Invalid request: cannot parse date {}", since);
-			e.printStackTrace();
+			log.error("Invalid request: cannot parse date {}", since, e);
+			return new ResponseEntity<>("Invalid request: cannot parse date '" + since + "'\n", HttpStatus.BAD_REQUEST);
 		}
-		return newUsers;
+		return ResponseEntity.ok(newUsers);
 	}
 
 }
