@@ -22,6 +22,8 @@ public class Stats implements Serializable {
 	public int newUsers = 0;	// number of users that registered themselves
 	private Map<Long, Integer> activeAtTime = new TreeMap<>();
 
+	private Map<Long, List<String>> selfRegisteredUsers = new TreeMap<>();
+
 	
 	private final long now = new Date().getTime();
 	private transient final Calendar invitation_day = new GregorianCalendar(2017, Calendar.AUGUST, 31);
@@ -45,6 +47,7 @@ public class Stats implements Serializable {
 		} else if (createdCalendar.compareTo(invitation_day) > 0) {
 			newUsers++;
 			insertActive(createdCalendar);
+			insertSelfRegisteredUser(createdCalendar, user.getUserName());
 		}
 	}
 
@@ -60,6 +63,18 @@ public class Stats implements Serializable {
 
 	private void insertActive(final Calendar date) {
 		activeAtTime.compute(date.getTimeInMillis(), (existingDate, nrActive) -> (nrActive == null) ? 1 : ++nrActive);
+	}
+
+	private void insertSelfRegisteredUser(final Calendar date, final String user) {
+		long registerDate = date.getTimeInMillis();
+		List<String> userList;
+		if (selfRegisteredUsers.containsKey(registerDate)) {
+			userList = selfRegisteredUsers.get(registerDate);
+		} else {
+			userList = new ArrayList<>(1);
+			selfRegisteredUsers.put(registerDate, userList);
+		}
+		userList.add(user);
 	}
 
 	public void toFile() throws IOException {
