@@ -65,7 +65,8 @@ public class OAuth2LoginAutoConfiguration {
 							"/user/resetpwform",
 							"/user/resetpwform/*",
 							"/user/passwordset",
-							"/stats/users"
+							"/stats/users",
+							"/rest/*"
 							).permitAll()
 					.anyRequest().authenticated()
 					.and()
