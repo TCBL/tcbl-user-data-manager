@@ -20,8 +20,7 @@
 	<div th:replace="/fragments :: standard-body-div( ~{::h2}, ~{::main})">
 		<h2>Reset password mail sent</h2>
 		<main>
-			<p><br>An e-mail with a link to reset your password will be sent to you shortly.
-				The link is <b>only valid for one hour</b>, starting now.</p>
+			<p>An email with a link to reset your password will be sent to you shortly. The link is <b>only valid for one hour</b>, starting now.</p>
 			<p>If it doesn't arrive within a few minutes, please check your spam folder or <a class="normal" th:href="@{/user/resetpw}">try again</a>. </p>
 			<p>You can close this browser tab.</p>
 		</main>

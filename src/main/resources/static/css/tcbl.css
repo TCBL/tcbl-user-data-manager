@@ -40,7 +40,6 @@ ul {
 
 .columns {
     position: relative;
-    padding-left: 0.9375rem;
     padding-right: 0.9375rem;
     float: left;
 }
@@ -118,7 +117,6 @@ textarea { overflow: auto; }
 form .required{font-weight:bold;}
 
 .red-button {
-    margin: 2em;
     background-color: #F190A0;
     color: #000000;
     box-shadow: none !important;
@@ -134,12 +132,31 @@ form .required{font-weight:bold;}
     background-color: #e84c65;
 }
 
+.no-margin {
+    margin: 0;
+}
+
 .smallFont {
     font-size: 0.8em;
 }
 
 .tcbl-status {
+    /* nothing in here for the moment */
+}
+
+.tcbl-status-text {
     font-size: 1.2rem;
+}
+
+.tcbl-status-ok {
+    color: #12c257;
+}
+
+.tcbl-status-warning {
+    color: #eba92a;
+}
+
+.tcbl-status-error {
     color: #ff4939;
 }
 
@@ -147,3 +164,8 @@ form .required{font-weight:bold;}
     font-size: 0.7rem;
     color: #999;
 }
+
+.tcbl-links {
+    /* nothing in here for the moment */
+}
+

@@ -9,15 +9,12 @@
 	<main>
 		<div>
 			<p>Welcome to the TCBL User Management application!</p>
-			<p>If you want to change the information you share with TCBL services, sign in below.</p>
-			<p>This is still work in progress, more to come soon!</p>
+			<p>If you forgot your password, you can reset it.</p>
+			<p sec:authorize="hasRole('ROLE_ANONYMOUS')">If you want to change the information you share with TCBL services, first log in.</p>
 		</div>
-		<div>&nbsp;</div>
-		<div sec:authorize="hasRole('ROLE_ANONYMOUS')">
-			<a href="/oiclogin" th:href="@{/oiclogin}">Log in with TCBL</a>
-		</div>
-		<div sec:authorize="isAuthenticated()">
-			<a href="/user/index" th:href="@{/user/index}">Manage your info</a>
+
+		<!--/* links */-->
+		<div class="row tcbl-links" th:if="${links} != null" th:insert="/fragments :: links-buttons (${links})">
 		</div>
 	</main>
 </div>

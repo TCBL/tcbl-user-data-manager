@@ -16,10 +16,16 @@
  */
 package be.ugent.idlab.tcbl.userdatamanager.controller;
 
-import be.ugent.idlab.tcbl.userdatamanager.model.Message;
+import be.ugent.idlab.tcbl.userdatamanager.model.Link;
+import be.ugent.idlab.tcbl.userdatamanager.model.Status;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * <p>Copyright 2017 IDLab (Ghent University - imec)</p>
@@ -36,7 +42,12 @@ public class MainController {
 
 	@RequestMapping("/index")
 	public String index(Model model) {
-		model.addAttribute("message", new Message("The message is", "No message today."));
+		List<Link> links = new ArrayList<Link>();
+		links.add(new Link(Link.DisplayCondition.ALWAYS, "Reset password", "/user/resetpw"));
+		links.add(new Link(Link.DisplayCondition.ANONYMOUS, "Log in with TCBL", "/oiclogin"));
+		links.add(new Link(Link.DisplayCondition.AUTHENTICATED, "Manage your information", "/user/index"));
+		model.addAttribute("links", links);
+		model.addAttribute("status", new Status(Status.Value.WARNING, "This is work in progress, more to come soon!"));
 		return "/index";
 	}
 }

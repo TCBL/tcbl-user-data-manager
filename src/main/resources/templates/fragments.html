@@ -37,18 +37,12 @@ the other templates.
 		</div>
 	</div>
 
-	<!--/* main page contents here */-->
-	<div class="row">
-		<div class="columns">
-			<th:block th:replace="${main}"/>
-		</div>
+	<!--/* main page contents */-->
+	<div class="row" th:insert="${main}">
 	</div>
 
 	<!--/* common status */-->
-	<div class="row tcbl-status" th:if="${message} != null">
-		<div class="columns">
-			<p th:text="|${message.title}: ${message.message}|"></p>
-		</div>
+	<div class="row tcbl-status" th:if="${status} != null" th:insert=":: status-text (${status})">
 	</div>
 
 	<!--/* common footer */-->
@@ -62,7 +56,7 @@ the other templates.
 	</div>
 </div>
 
-<!-- a work-in-progress fragment, not OK for usage! -->
+<!-- A work-in-progress fragment, not OK for usage! -->
 <div th:fragment="logout" style="float: right" sec:authorize="isAuthenticated()">
 	<div style="float:left">
 		<span style="font-weight:bold">User: </span><span sec:authentication="name"></span>
@@ -75,6 +69,30 @@ the other templates.
 	</div>
 </div>
 
+<!-- A fragment to display a Status object as text in an appropriate color.
+	 Insert in a surrounding element (suggestion: with class="row tcbl-status"). -->
+<th:block th:fragment="status-text (status)" th:if="${status} != null">
+	<!--/* appended class example: tcbl-status-ok */-->
+	<span class="tcbl-status-text" th:classappend="|tcbl-status-${#strings.toLowerCase(status.value.name())}|"th:text="${status.text}" >Status text here</span>
+</th:block>
+
+<!-- A fragment to display one or more Link objects as a sequence of buttons.
+	 For each link, the display condition must match.
+	 Insert in a surrounding element (suggestion: with class="row tcbl-links"). -->
+<th:block th:fragment="links-buttons (links)" th:if="${links} != null">
+	<th:block th:each="link: ${links}">
+		<form class="columns" action="#" th:action="@{${link.location}}" th:if="${
+			(link.displayCondition eq T(be.ugent.idlab.tcbl.userdatamanager.model.Link.DisplayCondition).ALWAYS) or
+			((link.displayCondition eq T(be.ugent.idlab.tcbl.userdatamanager.model.Link.DisplayCondition).ANONYMOUS) and
+			 #authorization.expression('hasRole(''ROLE_ANONYMOUS'')')) or
+			((link.displayCondition eq T(be.ugent.idlab.tcbl.userdatamanager.model.Link.DisplayCondition).AUTHENTICATED) and
+			 #authorization.expression('isAuthenticated()'))}" href="#" th:href="@{${link.location}}">
+			<input type="submit" value="Link text here" class="red-button no-margin" th:value="${link.text}">
+		</form>
+	</th:block>
+</th:block>
+
+<!-- A script fragment that compares two passwords in a regForm -->
 <script th:fragment="validatePassword">
 	function validatePassword() {
 		var p1 = document.forms["regForm"]["password"].value;

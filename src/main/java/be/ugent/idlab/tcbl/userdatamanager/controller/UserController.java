@@ -1,7 +1,7 @@
 package be.ugent.idlab.tcbl.userdatamanager.controller;
 
 import be.ugent.idlab.tcbl.userdatamanager.background.Mail;
-import be.ugent.idlab.tcbl.userdatamanager.model.Message;
+import be.ugent.idlab.tcbl.userdatamanager.model.Status;
 import be.ugent.idlab.tcbl.userdatamanager.model.TCBLUser;
 import be.ugent.idlab.tcbl.userdatamanager.model.TCBLUserRepository;
 import org.slf4j.Logger;
@@ -81,7 +81,7 @@ public class UserController {
 			model.addAttribute("tcblUser", tcblUser);
 			return "/user/index";
 		} catch (Exception e) {
-			model.addAttribute("message", new Message("Error", "Cannot get your information."));
+			model.addAttribute("status", new Status(Status.Value.ERROR, "Your information could not found."));
 			log.error("Cannot get user info", e);
 			return "/index";
 		}
@@ -92,10 +92,10 @@ public class UserController {
 		try {
 			tcblUserRepository.save(user);
 			model.addAttribute("tcblUser", user);
-			/* activated: */ model.addAttribute("message", new Message("Update successful", "Your information is successfully updated."));
+			model.addAttribute("status", new Status(Status.Value.OK, "Your information is updated."));
 		} catch (Exception e) {
 			log.error("Cannot update user info", e);
-			model.addAttribute("message", new Message("Error", "Cannot update your information."));
+			model.addAttribute("status", new Status(Status.Value.ERROR, "Your information could not be updated."));
 		}
 		return "/user/index";
 	}
@@ -114,13 +114,14 @@ public class UserController {
 			String baseUri = getUriOneLevelUp(request);
 			sendRegisterMessage(newUser, baseUri);
 		} catch (Exception e) {
+			// TODO check if the reason for failure is that this user already exists --> suggest reset password
 			log.error("Cannot register user {}", user.getUserName(), e);
-			model.addAttribute("message", new Message("Registration failed",
-					e.getMessage()));
+			model.addAttribute("status", new Status(Status.Value.ERROR, "Registration failed."));
 		}
 		return "/user/registered";
 	}
 
+	// reached when the user clicked the link in the confirmation email
 	@GetMapping("/confirm/{id}")
 	public String confirmRegistration(Model model, @PathVariable String id) {
 		String inum = decodeBase64(id);
@@ -129,12 +130,11 @@ public class UserController {
 			if (!user.isActive()) {
 				user.setActive(true);
 				tcblUserRepository.save(user);
-				/* activated: */ model.addAttribute("message", new Message("Registration completed", "You can now log in."));
+				model.addAttribute("status", new Status(Status.Value.OK, "Registration completed."));
 			}
 		} catch (Exception e) {
 			log.error("Cannot confirm registration of {}", inum, e);
-			model.addAttribute("message", new Message("Registration failed",
-					e.getMessage()));
+			model.addAttribute("status", new Status(Status.Value.ERROR, "Confirmation of registration failed."));
 		}
 		return "/user/confirmed";
 	}
@@ -152,11 +152,12 @@ public class UserController {
 			sendResetMessage(user, baseUri);
 		} catch (Exception e) {
 			log.error("Cannot send reset pw mail for {} ", mail);
-			model.addAttribute("message", new Message("Reset Password failed", "Cannot send mail."));
+			model.addAttribute("status", new Status(Status.Value.ERROR, "Password reset failed: could not send mail."));
 		}
 		return "/user/pwmailsent";
 	}
 
+	// reached when the user clicked the link in the password reset email
 	@GetMapping("/resetpwform/{rpc}")
 	public String resetPasswordForm(Model model, @PathVariable String rpc) {
 		String userId = decodeIdForPassword(rpc, 3600000);
@@ -165,7 +166,7 @@ public class UserController {
 			model.addAttribute("rpc", encodedId);
 			return "/user/resetpwform";
 		} else {
-			model.addAttribute("message", new Message("Reset Password failed", "Link expired."));
+			model.addAttribute("status", new Status(Status.Value.ERROR, "Password reset failed: the link has expired."));
 			return "/user/pwmailsent";
 		}
 	}
@@ -179,8 +180,7 @@ public class UserController {
 			tcblUserRepository.save(user);
 		} catch (Exception e) {
 			log.error("Cannot reset password of {}", rpc, e);
-			model.addAttribute("message", new Message("Reset Password failed",
-					e.getMessage()));
+			model.addAttribute("status", new Status(Status.Value.ERROR, "Password reset failed."));
 		}
 		return "/user/passwordset";
 	}
