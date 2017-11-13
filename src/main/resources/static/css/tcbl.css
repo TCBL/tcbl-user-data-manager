@@ -39,16 +39,23 @@ ul {
     display: table;
 }
 
-/* class for any column inside an element of class 'row' */
+/* class for a general column inside an element of class 'row' */
 .columns {
     padding-right: 0.9375rem;
     float: left;
 }
 
-/* class to add to an element of class 'columns', for a column floating to the right side */
-.column-right {
+/* class for a specific column inside an element of class 'row' */
+.column-left-70 {
+    float: left;
+    width: 65%; /* not 70 because of padding */
+}
+
+/* class for a specific column inside an element of class 'row' */
+.column-right-30 {
     padding-right: 0;
     float: right;
+    width: 30%;
 }
 
 .break {

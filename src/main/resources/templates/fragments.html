@@ -40,17 +40,17 @@ the other templates.
 	<!--/* contents area */-->
 	<div class="row tcbl-contents">
 		<!--/* main */-->
-		<div class="columns tcbl-main" tcbl-main th:insert="${main}">
+		<div class="column-left-70 tcbl-main" th:insert="${main}">
 		</div>
 		<!--/* links */-->
-		<div class="columns column-right tcbl-links" th:if="${links} != null">
+		<div class="column-right-30 tcbl-links" th:if="${links} != null">
 			<th:block th:each="link: ${links}">
 				<form action="#" th:action="@{${link.location}}" th:if="${
 					(link.displayCondition eq T(be.ugent.idlab.tcbl.userdatamanager.model.Link.DisplayCondition).ALWAYS) or
 					((link.displayCondition eq T(be.ugent.idlab.tcbl.userdatamanager.model.Link.DisplayCondition).ANONYMOUS) and
 					 #authorization.expression('hasRole(''ROLE_ANONYMOUS'')')) or
 					((link.displayCondition eq T(be.ugent.idlab.tcbl.userdatamanager.model.Link.DisplayCondition).AUTHENTICATED) and
-					 #authorization.expression('isAuthenticated()'))}" href="#" th:href="@{${link.location}}">
+					 #authorization.expression('isAuthenticated()'))}">
 					<input type="submit" value="Link text here" class="red-button" th:value="${link.text}">
 				</form>
 			</th:block>
