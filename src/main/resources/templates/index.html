@@ -7,14 +7,10 @@
 	<h1>TCBL User  Manager</h1>
 
 	<main>
-		<div>
+		<div class="columns">
 			<p>Welcome to the TCBL User Management application!</p>
 			<p>If you forgot your password, you can reset it.</p>
 			<p sec:authorize="hasRole('ROLE_ANONYMOUS')">If you want to change the information you share with TCBL services, first log in.</p>
-		</div>
-
-		<!--/* links */-->
-		<div class="row tcbl-links" th:if="${links} != null" th:insert="/fragments :: links-buttons (${links})">
 		</div>
 	</main>
 </div>

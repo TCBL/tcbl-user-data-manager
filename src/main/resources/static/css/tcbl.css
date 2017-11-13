@@ -30,6 +30,7 @@ ul {
     list-style-type: none;
 }
 
+/* class for parent element of elements having class 'columns' */
 .row {
     padding-top: 10px;
     margin: 0 auto;
@@ -38,10 +39,16 @@ ul {
     display: table;
 }
 
+/* class for any column inside an element of class 'row' */
 .columns {
-    position: relative;
     padding-right: 0.9375rem;
     float: left;
+}
+
+/* class to add to an element of class 'columns', for a column floating to the right side */
+.column-right {
+    padding-right: 0;
+    float: right;
 }
 
 .break {
@@ -132,16 +139,28 @@ form .required{font-weight:bold;}
     background-color: #e84c65;
 }
 
-.no-margin {
-    margin: 0;
-}
-
 .smallFont {
     font-size: 0.8em;
 }
 
+.tcbl-header {
+    background-color: #ffffff; /* don't delete (testing) */
+}
+
+.tcbl-contents {
+    background-color: #ffffff; /* don't delete (testing) */
+}
+
+.tcbl-main {
+    background-color: #ffffff; /* don't delete (testing) */
+}
+
+.tcbl-links {
+    background-color: #ffffff; /* don't delete (testing) */
+}
+
 .tcbl-status {
-    /* nothing in here for the moment */
+    background-color: #ffffff; /* don't delete (testing) */
 }
 
 .tcbl-status-text {
@@ -161,11 +180,8 @@ form .required{font-weight:bold;}
 }
 
 .tcbl-footer {
+    background-color: #ffffff; /* don't delete (testing) */
     font-size: 0.7rem;
     color: #999;
-}
-
-.tcbl-links {
-    /* nothing in here for the moment */
 }
 
