@@ -34,7 +34,7 @@ public class StatController {
 				model.addAttribute("totalActive", stats.getTotalActiveValues());
 				//model.addAttribute("invitedActive", stats.getInvitedActive());
 			} else {
-				log.error("Stats not calculated yet.");
+				log.warn("Stats not calculated yet.");
 				model.addAttribute("totalCount", null);
 			}
 		} catch (IOException e) {

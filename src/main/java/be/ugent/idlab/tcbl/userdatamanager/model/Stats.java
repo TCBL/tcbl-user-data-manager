@@ -22,9 +22,11 @@ public class Stats implements Serializable {
 	public int newUsers = 0;	// number of users that registered themselves
 	private Map<Long, Integer> activeAtTime = new TreeMap<>();
 
+	private Map<Long, List<String>> selfRegisteredUsers = new TreeMap<>();
+
 	
 	private final long now = new Date().getTime();
-	private transient final Calendar invitation_day = new GregorianCalendar(2017, Calendar.AUGUST, 31);
+	public transient static final Calendar invitationDay = new GregorianCalendar(2017, Calendar.AUGUST, 31);
 	private transient static Gson gson = new GsonBuilder().setDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz").create();
 	private transient static DateFormat dateFormat = new SimpleDateFormat("YYYY-LL-dd");
 
@@ -36,15 +38,16 @@ public class Stats implements Serializable {
 		Date modified = meta.getLastModified();
 		Calendar createdCalendar = toCalendarPerDay(created);
 		Calendar modifiedCalendar = toCalendarPerDay(modified);
-		if (createdCalendar.equals(invitation_day)) {
+		if (createdCalendar.equals(invitationDay)) {
 			invited++;
 			if (!created.equals(modified)) {
 				invitedActive++;
 				insertActive(modifiedCalendar);
 			}
-		} else if (createdCalendar.compareTo(invitation_day) > 0) {
+		} else if (createdCalendar.compareTo(invitationDay) > 0) {
 			newUsers++;
 			insertActive(createdCalendar);
+			insertSelfRegisteredUser(createdCalendar, user.getUserName());
 		}
 	}
 
@@ -60,6 +63,18 @@ public class Stats implements Serializable {
 
 	private void insertActive(final Calendar date) {
 		activeAtTime.compute(date.getTimeInMillis(), (existingDate, nrActive) -> (nrActive == null) ? 1 : ++nrActive);
+	}
+
+	private void insertSelfRegisteredUser(final Calendar date, final String user) {
+		long registerDate = date.getTimeInMillis();
+		List<String> userList;
+		if (selfRegisteredUsers.containsKey(registerDate)) {
+			userList = selfRegisteredUsers.get(registerDate);
+		} else {
+			userList = new ArrayList<>(1);
+			selfRegisteredUsers.put(registerDate, userList);
+		}
+		userList.add(user);
 	}
 
 	public void toFile() throws IOException {
@@ -87,6 +102,10 @@ public class Stats implements Serializable {
 			}
 		}
 		return null;
+	}
+
+	public Map<Long, List<String>> getSelfRegisteredUsers() {
+		return selfRegisteredUsers;
 	}
 
 	////// methods to ease drawing of charts: prepare data labels, values, etc
