@@ -26,21 +26,21 @@ the other templates.
 <body>
 
 <!-- This is the standard body/div element. -->
-<div th:fragment="standard-body-div(title, main)">
+<div th:fragment="standard-body-div(standardBodyTitle, standardBodyMain)">
 	<!--/* common header */-->
 	<div class="row tcbl-header">
 		<div class="columns">
 			<img th:src="@{/assets/TCBLAltsm.png}" alt="TCBL logo">
 		</div>
 		<div class="columns">
-			<h1 th:replace="${title}">Hello</h1>
+			<h1 th:replace="${standardBodyTitle ?: 'TCBL User Manager'}">Hello</h1>
 		</div>
 	</div>
 
 	<!--/* contents area */-->
 	<div class="row tcbl-contents">
 		<!--/* main */-->
-		<div class="column-left-70 tcbl-main" th:insert="${main}">
+		<div class="column-left-70 tcbl-main" th:insert="${standardBodyMain}">
 		</div>
 		<!--/* links */-->
 		<div class="column-right-30 tcbl-links" th:if="${links} != null">

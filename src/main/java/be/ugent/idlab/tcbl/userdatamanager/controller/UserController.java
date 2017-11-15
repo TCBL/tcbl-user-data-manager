@@ -1,6 +1,8 @@
 package be.ugent.idlab.tcbl.userdatamanager.controller;
 
 import be.ugent.idlab.tcbl.userdatamanager.background.Mail;
+import be.ugent.idlab.tcbl.userdatamanager.controller.support.TemplateHelper;
+import be.ugent.idlab.tcbl.userdatamanager.model.Link;
 import be.ugent.idlab.tcbl.userdatamanager.model.Status;
 import be.ugent.idlab.tcbl.userdatamanager.model.TCBLUser;
 import be.ugent.idlab.tcbl.userdatamanager.model.TCBLUserRepository;
@@ -21,9 +23,7 @@ import reactor.core.publisher.Mono;
 
 import javax.servlet.http.HttpServletRequest;
 import java.nio.charset.StandardCharsets;
-import java.util.Base64;
-import java.util.Date;
-import java.util.Map;
+import java.util.*;
 
 /**
  * <p>Copyright 2017 IDLab (Ghent University - imec)</p>
@@ -109,34 +109,86 @@ public class UserController {
 
 	@PostMapping("/register")
 	public String postRegister(HttpServletRequest request, Model model, TCBLUser user) {
+		String utext = null;
+		List<Link> links = new ArrayList<Link>();
+		links.add(new Link(Link.DisplayCondition.ALWAYS, "Home", "/index"));
+		Status status = null;
+
+		boolean oldActive = false;
 		try {
+			TCBLUser oldUser;
+			try {
+				oldUser = tcblUserRepository.findByName(user.getUserName());
+			} catch (Exception e) {
+				oldUser = null;
+			}
+			if (oldUser != null) {
+				if (oldUser.isActive()) {
+					oldActive = true;
+					throw new Exception("User already exists.");
+				} else {
+					// a previous registration attempt on this username was not completed...
+					// let's delete this old entry.
+					tcblUserRepository.deleteTCBLUser(oldUser);
+				}
+			}
 			TCBLUser newUser = tcblUserRepository.create(user);
 			String baseUri = getUriOneLevelUp(request);
 			sendRegisterMessage(newUser, baseUri);
+			utext = "<p>Registration of '" + user.getUserName() + "' is almost complete.</p>" +
+					"<p>We've sent you an email containing a link to activate your account. Please check your mailbox.</p>" +
+					"<p>If you don't find the email within a few minutes, check your spam folder too before retrying.</p>" +
+					"<p>You may close this browser tab.";
+			links.add(new Link(Link.DisplayCondition.ALWAYS, "Try again", "/user/register"));
+			status = new Status(Status.Value.OK, "Email sent.");
 		} catch (Exception e) {
-			// TODO check if the reason for failure is that this user already exists --> suggest reset password
 			log.error("Cannot register user {}", user.getUserName(), e);
-			model.addAttribute("status", new Status(Status.Value.ERROR, "Registration failed."));
+			if (oldActive) {
+				utext = "<p>User '" + user.getUserName() + "' was signed up earlier.</p>" +
+						"<p>You may use it as-is, reset your password, or try again with a different email address.</p>";
+				links.add(new Link(Link.DisplayCondition.ALWAYS, "Recover password", "/user/resetpw"));
+				links.add(new Link(Link.DisplayCondition.ALWAYS, "Try again", "/user/register"));
+				status = new Status(Status.Value.WARNING, "User signed up earlier.");
+			} else {
+				utext = "<p>We could not send you an email to complete sign up at this moment.</p>" +
+						"<p>Please try again.</p>";
+				links.add(new Link(Link.DisplayCondition.ALWAYS, "Try again", "/user/register"));
+				status = new Status(Status.Value.ERROR, "Could not send email.");
+			}
 		}
-		return "/user/registered";
+
+		return TemplateHelper.getPreparedConfirmationTemplate(model, "Sign up", utext, links, status);
 	}
 
 	// reached when the user clicked the link in the confirmation email
 	@GetMapping("/confirm/{id}")
 	public String confirmRegistration(Model model, @PathVariable String id) {
-		String inum = decodeBase64(id);
+		String utext = null;
+		List<Link> links = new ArrayList<Link>();
+		links.add(new Link(Link.DisplayCondition.ALWAYS, "Home", "/index"));
+		Status status = null;
+
 		try {
+			String inum = decodeBase64(id);
 			TCBLUser user = tcblUserRepository.find(inum);
 			if (!user.isActive()) {
 				user.setActive(true);
 				tcblUserRepository.save(user);
-				model.addAttribute("status", new Status(Status.Value.OK, "Registration completed."));
 			}
+			utext = "<p>You're successfully signed up! You can now use your new account to log in at TCBL related sites.</p>" +
+					"<p>See our home page for more options...</p>";
+			status = new Status(Status.Value.OK, "Sign up completed.");
 		} catch (Exception e) {
-			log.error("Cannot confirm registration of {}", inum, e);
-			model.addAttribute("status", new Status(Status.Value.ERROR, "Confirmation of registration failed."));
+			// reached when the url was maniplulated or when the user was deleted in the mean time...
+			log.error("Cannot confirm registration of {} ", id, e);
+			utext = "<p>We are sorry to tell you that the sign up process failed.</p>" +
+					"<p>Are you sure you used the appropriate link?</p>" +
+					"<p>Please try again.</p>";
+			links.add(new Link(Link.DisplayCondition.ALWAYS, "Try again", "/user/register"));
+			status = new Status(Status.Value.ERROR, "Sign up failed.");
 		}
-		return "/user/confirmed";
+
+		return TemplateHelper.getPreparedConfirmationTemplate(model, "Sign up completion", utext, links, status);
 	}
 
 	@GetMapping("/resetpw")
@@ -146,43 +198,104 @@ public class UserController {
 
 	@PostMapping("/resetpw")
 	public String postResetPassword(HttpServletRequest request, Model model, String mail) {
+		String utext = null;
+		List<Link> links = new ArrayList<Link>();
+		links.add(new Link(Link.DisplayCondition.ALWAYS, "Home", "/index"));
+		Status status = null;
+
+		boolean userExists = false;
 		try {
 			TCBLUser user = tcblUserRepository.findByName(mail);
+			userExists = true;
 			String baseUri = getUriOneLevelUp(request);
 			sendResetMessage(user, baseUri);
+			utext = "<p>We've sent an email containing a link to reset your password to '" + mail +
+					"'. The link is <b>only valid for one hour</b>, starting now. Please check your mailbox.</p>" +
+					"<p>If you don't find the email within a few minutes, check your spam folder too before retrying.</p>" +
+					"<p>You may close this browser tab.";
+			links.add(new Link(Link.DisplayCondition.ALWAYS, "Try again", "/user/resetpw"));
+			status = new Status(Status.Value.OK, "Email sent.");
 		} catch (Exception e) {
-			log.error("Cannot send reset pw mail for {} ", mail);
-			model.addAttribute("status", new Status(Status.Value.ERROR, "Password reset failed: could not send mail."));
+			log.error("Cannot send reset pw mail for {}", mail, e);
+			if (userExists) {
+				utext = "<p>We could not send you an email to complete resetting your password at this moment.</p>" +
+						"<p>Please try again.</p>";
+				links.add(new Link(Link.DisplayCondition.ALWAYS, "Try again", "/user/resetpw"));
+				status = new Status(Status.Value.ERROR, "Could not send email.");
+			} else {
+				utext = "<p>We could not find a user with the given email address '" + mail + "'.</p>" +
+						"<p>Please try again.</p>";
+				links.add(new Link(Link.DisplayCondition.ALWAYS, "Try again", "/user/resetpw"));
+				status = new Status(Status.Value.ERROR, "User not found.");
+			}
 		}
-		return "/user/pwmailsent";
+
+		return TemplateHelper.getPreparedConfirmationTemplate(model, "Reset password", utext, links, status);
 	}
 
 	// reached when the user clicked the link in the password reset email
 	@GetMapping("/resetpwform/{rpc}")
 	public String resetPasswordForm(Model model, @PathVariable String rpc) {
-		String userId = decodeIdForPassword(rpc, 3600000);
-		if (userId != null) {
+		boolean expired = false;
+		try {
+			String userId = decodeIdForPassword(rpc, 3600000);
+			if (userId == null) {
+				expired = true;
+				throw new Exception("Link expired.");
+			}
 			String encodedId = encodeBase64(userId);
 			model.addAttribute("rpc", encodedId);
+
 			return "/user/resetpwform";
-		} else {
-			model.addAttribute("status", new Status(Status.Value.ERROR, "Password reset failed: the link has expired."));
-			return "/user/pwmailsent";
+		} catch (Exception e) {
+			String utext = null;
+			List<Link> links = new ArrayList<Link>();
+			links.add(new Link(Link.DisplayCondition.ALWAYS, "Home", "/index"));
+			Status status = null;
+
+			if (expired) {
+				utext = "<p>We are sorry to tell you that the reset password process failed.</p>" +
+						"<p>The link has expired.</p>" +
+						"<p>Please try again and use the link within one hour.</p>";
+				links.add(new Link(Link.DisplayCondition.ALWAYS, "Try again", "/user/resetpw"));
+				status = new Status(Status.Value.ERROR, "Link expired.");
+			} else {
+				// reached when the url was maniplulated...
+				utext = "<p>We are sorry to tell you that the reset password process failed.</p>" +
+						"<p>Please try again.</p>";
+				links.add(new Link(Link.DisplayCondition.ALWAYS, "Try again", "/user/resetpw"));
+				status = new Status(Status.Value.ERROR, "Reset password failed.");
+			}
+
+			return TemplateHelper.getPreparedConfirmationTemplate(model,"Reset password", utext, links, status);
 		}
 	}
 
 	@PostMapping("/resetpwform")
 	public String resetPasswordForm(Model model, String password, String rpc) {
-		String inum = decodeBase64(rpc);
+		String utext = null;
+		List<Link> links = new ArrayList<Link>();
+		links.add(new Link(Link.DisplayCondition.ALWAYS, "Home", "/index"));
+		Status status = null;
+
 		try {
+			String inum = decodeBase64(rpc);
 			TCBLUser user = tcblUserRepository.find(inum);
 			user.setPassword(password);
 			tcblUserRepository.save(user);
+			utext = "<p>You've successfully updated your password! You can now use your account again to log in at TCBL related sites.</p>" +
+					"<p>See our home page for more options...</p>";
+			status = new Status(Status.Value.OK, "Password updated.");
 		} catch (Exception e) {
+			// reached when the user was deleted in the mean time...
 			log.error("Cannot reset password of {}", rpc, e);
-			model.addAttribute("status", new Status(Status.Value.ERROR, "Password reset failed."));
+			utext = "<p>The new password couldn't be saved.</p>" +
+					"<p>Please try again.</p>";
+			links.add(new Link(Link.DisplayCondition.ALWAYS, "Try again", "/user/resetpw"));
+			status = new Status(Status.Value.ERROR, "Could not save the new password.");
 		}
-		return "/user/passwordset";
+
+		return TemplateHelper.getPreparedConfirmationTemplate(model, "Reset password", utext, links, status);
 	}
 
 	private ExchangeFilterFunction oauth2Credentials(OAuth2AuthenticationToken authentication) {

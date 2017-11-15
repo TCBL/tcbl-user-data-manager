@@ -30,7 +30,7 @@ public class MainController {
 		links.add(new Link(Link.DisplayCondition.ANONYMOUS, "Sign up", "/user/register"));
 		links.add(new Link(Link.DisplayCondition.ANONYMOUS, "Log in with TCBL", "/oiclogin"));
 		//TODO links.add(new Link(Link.DisplayCondition.AUTHENTICATED, "Manage my profile info", "/user/index"));
-		links.add(new Link(Link.DisplayCondition.ALWAYS, "Recover password", "/user/resetpw"));
+		links.add(new Link(Link.DisplayCondition.ALWAYS, "Reset password", "/user/resetpw"));
 		links.add(new Link(Link.DisplayCondition.AUTHENTICATED, "TCBL applications", "/applications"));
 		model.addAttribute("links", links);
 		model.addAttribute("status", new Status(Status.Value.WARNING, "This is work in progress, more to come soon!"));

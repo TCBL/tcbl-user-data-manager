@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="/fragments :: standard-head">
+</head>
+<body>
+<div th:replace="/fragments :: standard-body-div( ~{::h1}, ~{::main})">
+	<h1 th:text="${title}">Confirmation title</h1>
+
+	<main>
+		<div th:utext="${utext}">Confirmation text</div>
+	</main>
+</div>
+</body>
+</html>
