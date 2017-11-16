@@ -1,6 +1,7 @@
 package be.ugent.idlab.tcbl.userdatamanager.controller;
 
 import be.ugent.idlab.tcbl.userdatamanager.background.Mail;
+import be.ugent.idlab.tcbl.userdatamanager.controller.support.ConfirmationTemplate;
 import be.ugent.idlab.tcbl.userdatamanager.model.Link;
 import be.ugent.idlab.tcbl.userdatamanager.model.Status;
 import be.ugent.idlab.tcbl.userdatamanager.model.TCBLUser;
@@ -107,10 +108,8 @@ public class UserController {
 
 	@PostMapping("/register")
 	public String postRegister(HttpServletRequest request, Model model, TCBLUser user) {
-		String utext = null;
-		List<Link> links = new ArrayList<Link>();
-		links.add(new Link(Link.DisplayCondition.ALWAYS, "Home", "/index"));
-		Status status = null;
+		ConfirmationTemplate ct = new ConfirmationTemplate("Sign up");
+		ct.addLink(new Link(Link.DisplayCondition.ALWAYS, "Home", "/index"));
 
 		boolean oldActive = false;
 		try {
@@ -133,37 +132,35 @@ public class UserController {
 			TCBLUser newUser = tcblUserRepository.create(user);
 			String baseUri = getUriOneLevelUp(request);
 			sendRegisterMessage(newUser, baseUri);
-			utext = "<p>Registration of '" + user.getUserName() + "' is almost complete.</p>" +
+			ct.setUtext("<p>Registration of '" + user.getUserName() + "' is almost complete.</p>" +
 					"<p>We've sent you an email containing a link to activate your account. Please check your mailbox.</p>" +
-					"<p>If you don't find the email within a few minutes, check your spam folder too before retrying.</p>";
-			links.add(new Link(Link.DisplayCondition.ALWAYS, "Try again", "/user/register"));
-			status = new Status(Status.Value.OK, "Email sent. You can close this browser tab.");
+					"<p>If you don't find the email within a few minutes, check your spam folder too before retrying.</p>");
+			ct.addLink(new Link(Link.DisplayCondition.ALWAYS, "Try again", "/user/register"));
+			ct.setStatus(new Status(Status.Value.OK, "Email sent. You can close this browser tab."));
 		} catch (Exception e) {
 			log.error("Cannot register user {}", user.getUserName(), e);
 			if (oldActive) {
-				utext = "<p>User '" + user.getUserName() + "' was signed up earlier.</p>" +
-						"<p>You may use it as-is, reset your password, or try again with a different email address.</p>";
-				links.add(new Link(Link.DisplayCondition.ALWAYS, "Recover password", "/user/resetpw"));
-				links.add(new Link(Link.DisplayCondition.ALWAYS, "Try again", "/user/register"));
-				status = new Status(Status.Value.WARNING, "User signed up earlier.");
+				ct.setUtext("<p>User '" + user.getUserName() + "' was signed up earlier.</p>" +
+						"<p>You may use it as-is, reset your password, or try again with a different email address.</p>");
+				ct.addLink(new Link(Link.DisplayCondition.ALWAYS, "Reset password", "/user/resetpw"));
+				ct.addLink(new Link(Link.DisplayCondition.ALWAYS, "Try again", "/user/register"));
+				ct.setStatus(new Status(Status.Value.WARNING, "User signed up earlier."));
 			} else {
-				utext = "<p>We could not send you an email to complete sign up at this moment.</p>" +
-						"<p>Please try again.</p>";
-				links.add(new Link(Link.DisplayCondition.ALWAYS, "Try again", "/user/register"));
-				status = new Status(Status.Value.ERROR, "Could not send email.");
+				ct.setUtext("<p>We could not send you an email to complete sign up at this moment.</p>" +
+						"<p>Please try again.</p>");
+				ct.addLink(new Link(Link.DisplayCondition.ALWAYS, "Try again", "/user/register"));
+				ct.setStatus(new Status(Status.Value.ERROR, "Could not send email."));
 			}
 		}
 
-		return ControllerSupport.preparedConfirmationTemplate(model, "Sign up", utext, links, status);
+		return ct.getPreparedPath(model);
 	}
 
 	// reached when the user clicked the link in the confirmation email
 	@GetMapping("/confirm/{id}")
 	public String confirmRegistration(Model model, @PathVariable String id) {
-		String utext = null;
-		List<Link> links = new ArrayList<Link>();
-		links.add(new Link(Link.DisplayCondition.ALWAYS, "Home", "/index"));
-		Status status = null;
+		ConfirmationTemplate ct = new ConfirmationTemplate("Sign up completion");
+		ct.addLink(new Link(Link.DisplayCondition.ALWAYS, "Home", "/index"));
 
 		try {
 			String inum = decodeBase64(id);
@@ -172,20 +169,20 @@ public class UserController {
 				user.setActive(true);
 				tcblUserRepository.save(user);
 			}
-			utext = "<p>You're successfully signed up! You can now use your new account to log in at TCBL related sites.</p>" +
-					"<p>See our home page for more options...</p>";
-			status = new Status(Status.Value.OK, "Sign up completed.");
+			ct.setUtext("<p>You're successfully signed up! You can now use your new account to log in at TCBL related sites.</p>" +
+					"<p>See our home page for more options...</p>");
+			ct.setStatus(new Status(Status.Value.OK, "Sign up completed."));
 		} catch (Exception e) {
 			// reached when the url was maniplulated or when the user was deleted in the mean time...
 			log.error("Cannot confirm registration of {} ", id, e);
-			utext = "<p>We are sorry to tell you that the sign up process failed.</p>" +
+			ct.setUtext("<p>We are sorry to tell you that the sign up process failed.</p>" +
 					"<p>Are you sure you used the appropriate link?</p>" +
-					"<p>Please try again.</p>";
-			links.add(new Link(Link.DisplayCondition.ALWAYS, "Try again", "/user/register"));
-			status = new Status(Status.Value.ERROR, "Sign up failed.");
+					"<p>Please try again.</p>");
+			ct.addLink(new Link(Link.DisplayCondition.ALWAYS, "Try again", "/user/register"));
+			ct.setStatus(new Status(Status.Value.ERROR, "Sign up failed."));
 		}
 
-		return ControllerSupport.preparedConfirmationTemplate(model, "Sign up completion", utext, links, status);
+		return ct.getPreparedPath(model);
 	}
 
 	@GetMapping("/resetpw")
@@ -195,10 +192,8 @@ public class UserController {
 
 	@PostMapping("/resetpw")
 	public String postResetPassword(HttpServletRequest request, Model model, String mail) {
-		String utext = null;
-		List<Link> links = new ArrayList<Link>();
-		links.add(new Link(Link.DisplayCondition.ALWAYS, "Home", "/index"));
-		Status status = null;
+		ConfirmationTemplate ct = new ConfirmationTemplate("Reset password");
+		ct.addLink(new Link(Link.DisplayCondition.ALWAYS, "Home", "/index"));
 
 		boolean userExists = false;
 		try {
@@ -206,27 +201,27 @@ public class UserController {
 			userExists = true;
 			String baseUri = getUriOneLevelUp(request);
 			sendResetMessage(user, baseUri);
-			utext = "<p>We've sent an email containing a link to reset your password to '" + mail +
+			ct.setUtext("<p>We've sent an email containing a link to reset your password to '" + mail +
 					"'. The link is <b>only valid for one hour</b>, starting now. Please check your mailbox.</p>" +
-					"<p>If you don't find the email within a few minutes, check your spam folder too before retrying.</p>";
-			links.add(new Link(Link.DisplayCondition.ALWAYS, "Try again", "/user/resetpw"));
-			status = new Status(Status.Value.OK, "Email sent. You can close this browser tab.");
+					"<p>If you don't find the email within a few minutes, check your spam folder too before retrying.</p>");
+			ct.addLink(new Link(Link.DisplayCondition.ALWAYS, "Try again", "/user/resetpw"));
+			ct.setStatus(new Status(Status.Value.OK, "Email sent. You can close this browser tab."));
 		} catch (Exception e) {
 			log.error("Cannot send reset pw mail for {}", mail, e);
 			if (userExists) {
-				utext = "<p>We could not send you an email to complete resetting your password at this moment.</p>" +
-						"<p>Please try again.</p>";
-				links.add(new Link(Link.DisplayCondition.ALWAYS, "Try again", "/user/resetpw"));
-				status = new Status(Status.Value.ERROR, "Could not send email.");
+				ct.setUtext("<p>We could not send you an email to complete resetting your password at this moment.</p>" +
+						"<p>Please try again.</p>");
+				ct.addLink(new Link(Link.DisplayCondition.ALWAYS, "Try again", "/user/resetpw"));
+				ct.setStatus(new Status(Status.Value.ERROR, "Could not send email."));
 			} else {
-				utext = "<p>We could not find a user with the given email address '" + mail + "'.</p>" +
-						"<p>Please try again.</p>";
-				links.add(new Link(Link.DisplayCondition.ALWAYS, "Try again", "/user/resetpw"));
-				status = new Status(Status.Value.ERROR, "User not found.");
+				ct.setUtext("<p>We could not find a user with the given email address '" + mail + "'.</p>" +
+						"<p>Please try again.</p>");
+				ct.addLink(new Link(Link.DisplayCondition.ALWAYS, "Try again", "/user/resetpw"));
+				ct.setStatus(new Status(Status.Value.ERROR, "User not found."));
 			}
 		}
 
-		return ControllerSupport.preparedConfirmationTemplate(model, "Reset password", utext, links, status);
+		return ct.getPreparedPath(model);
 	}
 
 	// reached when the user clicked the link in the password reset email
@@ -244,54 +239,51 @@ public class UserController {
 
 			return "/user/resetpwform";
 		} catch (Exception e) {
-			String utext = null;
-			List<Link> links = new ArrayList<Link>();
-			links.add(new Link(Link.DisplayCondition.ALWAYS, "Home", "/index"));
-			Status status = null;
+			ConfirmationTemplate ct = new ConfirmationTemplate("Reset password");
+			ct.addLink(new Link(Link.DisplayCondition.ALWAYS, "Home", "/index"));
 
 			if (expired) {
-				utext = "<p>We are sorry to tell you that the reset password process failed.</p>" +
+				ct.setUtext("<p>We are sorry to tell you that the reset password process failed.</p>" +
 						"<p>The link has expired.</p>" +
-						"<p>Please try again and use the link within one hour.</p>";
-				links.add(new Link(Link.DisplayCondition.ALWAYS, "Try again", "/user/resetpw"));
-				status = new Status(Status.Value.ERROR, "Link expired.");
+						"<p>Please try again and use the link within one hour.</p>");
+				ct.addLink(new Link(Link.DisplayCondition.ALWAYS, "Try again", "/user/resetpw"));
+				ct.setStatus(new Status(Status.Value.ERROR, "Link expired."));
 			} else {
 				// reached when the url was maniplulated...
-				utext = "<p>We are sorry to tell you that the reset password process failed.</p>" +
-						"<p>Please try again.</p>";
-				links.add(new Link(Link.DisplayCondition.ALWAYS, "Try again", "/user/resetpw"));
-				status = new Status(Status.Value.ERROR, "Reset password failed.");
+				ct.setUtext("<p>We are sorry to tell you that the reset password process failed.</p>" +
+						"<p>Are you sure you used the appropriate link?</p>" +
+						"<p>Please try again.</p>");
+				ct.addLink(new Link(Link.DisplayCondition.ALWAYS, "Try again", "/user/resetpw"));
+				ct.setStatus(new Status(Status.Value.ERROR, "Reset password failed."));
 			}
 
-			return ControllerSupport.preparedConfirmationTemplate(model,"Reset password", utext, links, status);
+			return ct.getPreparedPath(model);
 		}
 	}
 
 	@PostMapping("/resetpwform")
 	public String resetPasswordForm(Model model, String password, String rpc) {
-		String utext = null;
-		List<Link> links = new ArrayList<Link>();
-		links.add(new Link(Link.DisplayCondition.ALWAYS, "Home", "/index"));
-		Status status = null;
+		ConfirmationTemplate ct = new ConfirmationTemplate("Reset password");
+		ct.addLink(new Link(Link.DisplayCondition.ALWAYS, "Home", "/index"));
 
 		try {
 			String inum = decodeBase64(rpc);
 			TCBLUser user = tcblUserRepository.find(inum);
 			user.setPassword(password);
 			tcblUserRepository.save(user);
-			utext = "<p>You've successfully updated your password! You can now use your account again to log in at TCBL related sites.</p>" +
-					"<p>See our home page for more options...</p>";
-			status = new Status(Status.Value.OK, "Password updated.");
+			ct.setUtext("<p>You've successfully updated your password! You can now use your account again to log in at TCBL related sites.</p>" +
+					"<p>See our home page for more options...</p>");
+			ct.setStatus(new Status(Status.Value.OK, "Password updated."));
 		} catch (Exception e) {
 			// reached when the user was deleted in the mean time...
 			log.error("Cannot reset password of {}", rpc, e);
-			utext = "<p>The new password couldn't be saved.</p>" +
-					"<p>Please try again.</p>";
-			links.add(new Link(Link.DisplayCondition.ALWAYS, "Try again", "/user/resetpw"));
-			status = new Status(Status.Value.ERROR, "Could not save the new password.");
+			ct.setUtext("<p>The new password couldn't be saved.</p>" +
+					"<p>Please try again.</p>");
+			ct.addLink(new Link(Link.DisplayCondition.ALWAYS, "Try again", "/user/resetpw"));
+			ct.setStatus(new Status(Status.Value.ERROR, "Could not save the new password."));
 		}
 
-		return ControllerSupport.preparedConfirmationTemplate(model, "Reset password", utext, links, status);
+		return ct.getPreparedPath(model);
 	}
 
 	private ExchangeFilterFunction oauth2Credentials(OAuth2AuthenticationToken authentication) {

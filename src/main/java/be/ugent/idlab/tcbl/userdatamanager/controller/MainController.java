@@ -33,7 +33,6 @@ public class MainController {
 		links.add(new Link(Link.DisplayCondition.ALWAYS, "Reset password", "/user/resetpw"));
 		links.add(new Link(Link.DisplayCondition.AUTHENTICATED, "TCBL applications", "/applications"));
 		model.addAttribute("links", links);
-		model.addAttribute("status", new Status(Status.Value.WARNING, "This is work in progress, more to come soon!"));
 		return "/index";
 	}
 }
