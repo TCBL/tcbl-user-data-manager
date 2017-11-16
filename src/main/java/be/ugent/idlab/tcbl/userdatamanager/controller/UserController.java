@@ -38,7 +38,6 @@ import java.util.Map;
 @RequestMapping("user")
 public class UserController {
 	private final Logger log = LoggerFactory.getLogger(this.getClass());
-	private WebClient webClient = WebClient.create();
 	private final TCBLUserRepository tcblUserRepository;
 	private final Mail mail;
 	private final static Base64.Encoder encoder = Base64.getUrlEncoder();
@@ -65,10 +64,10 @@ public class UserController {
 	 */
 	@GetMapping("/index")
 	public String userinfo(Model model, OAuth2AuthenticationToken authentication) {
-		Map userAttributes = this.webClient
+		WebClient webClient = WebClient.create(authentication.getClientRegistration().getProviderDetails().getUserInfoUri());
+		Map userAttributes = webClient
 				.mutate().filter(oauth2Credentials(authentication)).build()
 				.get()
-				.uri(authentication.getClientRegistration().getProviderDetails().getUserInfoUri())
 				.retrieve()
 				.bodyToMono(Map.class)
 				.block();
@@ -79,7 +78,6 @@ public class UserController {
 				tcblUser = new TCBLUser();
 				tcblUser.setId(id);
 			}
-			//model.addAttribute("userAttributes", userAttributes);
 			model.addAttribute("tcblUser", tcblUser);
 		} catch (Exception e) {
 			log.error("Cannot get user info", e);
