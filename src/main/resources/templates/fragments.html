@@ -46,10 +46,10 @@ the other templates.
 		<div class="column-right-30 tcbl-links" th:if="${links} != null">
 			<th:block th:each="link: ${links}">
 				<form action="#" th:action="@{${link.location}}" th:if="${
-					(link.displayCondition eq T(be.ugent.idlab.tcbl.userdatamanager.model.Link.DisplayCondition).ALWAYS) or
-					((link.displayCondition eq T(be.ugent.idlab.tcbl.userdatamanager.model.Link.DisplayCondition).ANONYMOUS) and
+					(link.displayCondition eq T(be.ugent.idlab.tcbl.userdatamanager.controller.support.Link.DisplayCondition).ALWAYS) or
+					((link.displayCondition eq T(be.ugent.idlab.tcbl.userdatamanager.controller.support.Link.DisplayCondition).ANONYMOUS) and
 					 #authorization.expression('hasRole(''ROLE_ANONYMOUS'')')) or
-					((link.displayCondition eq T(be.ugent.idlab.tcbl.userdatamanager.model.Link.DisplayCondition).AUTHENTICATED) and
+					((link.displayCondition eq T(be.ugent.idlab.tcbl.userdatamanager.controller.support.Link.DisplayCondition).AUTHENTICATED) and
 					 #authorization.expression('isAuthenticated()'))}">
 					<input type="submit" value="Link text here" class="red-button" th:value="${link.text}">
 				</form>

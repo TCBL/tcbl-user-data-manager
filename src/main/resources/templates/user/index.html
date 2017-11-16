@@ -4,12 +4,12 @@
 </head>
 <body>
 <div th:replace="/fragments :: standard-body-div( ~{::h1}, ~{::main})">
-	<h1>Manage your information</h1>
+	<h1>Manage your profile</h1>
 	<main>
 		<th:block th:if="${tcblUser} != null">
 			<form action="#" th:action="@{/user/update}" th:object="${tcblUser}" method="post">
 				<fieldset>
-					<legend>Your information</legend>
+					<legend>Your profile information</legend>
 					<div class="row">
 						<div class="columns large-2">
 							<label for="firstName">First name</label>
