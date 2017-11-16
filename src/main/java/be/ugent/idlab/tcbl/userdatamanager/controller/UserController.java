@@ -1,7 +1,6 @@
 package be.ugent.idlab.tcbl.userdatamanager.controller;
 
 import be.ugent.idlab.tcbl.userdatamanager.background.Mail;
-import be.ugent.idlab.tcbl.userdatamanager.controller.support.TemplateHelper;
 import be.ugent.idlab.tcbl.userdatamanager.model.Link;
 import be.ugent.idlab.tcbl.userdatamanager.model.Status;
 import be.ugent.idlab.tcbl.userdatamanager.model.TCBLUser;
@@ -77,14 +76,13 @@ public class UserController {
 				tcblUser = new TCBLUser();
 				tcblUser.setId(id);
 			}
-			model.addAttribute("userAttributes", userAttributes);
+			//model.addAttribute("userAttributes", userAttributes);
 			model.addAttribute("tcblUser", tcblUser);
-			return "/user/index";
 		} catch (Exception e) {
-			model.addAttribute("status", new Status(Status.Value.ERROR, "Your information could not found."));
 			log.error("Cannot get user info", e);
-			return "/index";
+			model.addAttribute("status", new Status(Status.Value.ERROR, "Your information could not be found."));
 		}
+		return "/user/index";
 	}
 
 	@PostMapping("/update")
@@ -137,10 +135,9 @@ public class UserController {
 			sendRegisterMessage(newUser, baseUri);
 			utext = "<p>Registration of '" + user.getUserName() + "' is almost complete.</p>" +
 					"<p>We've sent you an email containing a link to activate your account. Please check your mailbox.</p>" +
-					"<p>If you don't find the email within a few minutes, check your spam folder too before retrying.</p>" +
-					"<p>You may close this browser tab.";
+					"<p>If you don't find the email within a few minutes, check your spam folder too before retrying.</p>";
 			links.add(new Link(Link.DisplayCondition.ALWAYS, "Try again", "/user/register"));
-			status = new Status(Status.Value.OK, "Email sent.");
+			status = new Status(Status.Value.OK, "Email sent. You can close this browser tab.");
 		} catch (Exception e) {
 			log.error("Cannot register user {}", user.getUserName(), e);
 			if (oldActive) {
@@ -157,7 +154,7 @@ public class UserController {
 			}
 		}
 
-		return TemplateHelper.getPreparedConfirmationTemplate(model, "Sign up", utext, links, status);
+		return ControllerSupport.preparedConfirmationTemplate(model, "Sign up", utext, links, status);
 	}
 
 	// reached when the user clicked the link in the confirmation email
@@ -188,7 +185,7 @@ public class UserController {
 			status = new Status(Status.Value.ERROR, "Sign up failed.");
 		}
 
-		return TemplateHelper.getPreparedConfirmationTemplate(model, "Sign up completion", utext, links, status);
+		return ControllerSupport.preparedConfirmationTemplate(model, "Sign up completion", utext, links, status);
 	}
 
 	@GetMapping("/resetpw")
@@ -211,10 +208,9 @@ public class UserController {
 			sendResetMessage(user, baseUri);
 			utext = "<p>We've sent an email containing a link to reset your password to '" + mail +
 					"'. The link is <b>only valid for one hour</b>, starting now. Please check your mailbox.</p>" +
-					"<p>If you don't find the email within a few minutes, check your spam folder too before retrying.</p>" +
-					"<p>You may close this browser tab.";
+					"<p>If you don't find the email within a few minutes, check your spam folder too before retrying.</p>";
 			links.add(new Link(Link.DisplayCondition.ALWAYS, "Try again", "/user/resetpw"));
-			status = new Status(Status.Value.OK, "Email sent.");
+			status = new Status(Status.Value.OK, "Email sent. You can close this browser tab.");
 		} catch (Exception e) {
 			log.error("Cannot send reset pw mail for {}", mail, e);
 			if (userExists) {
@@ -230,7 +226,7 @@ public class UserController {
 			}
 		}
 
-		return TemplateHelper.getPreparedConfirmationTemplate(model, "Reset password", utext, links, status);
+		return ControllerSupport.preparedConfirmationTemplate(model, "Reset password", utext, links, status);
 	}
 
 	// reached when the user clicked the link in the password reset email
@@ -267,7 +263,7 @@ public class UserController {
 				status = new Status(Status.Value.ERROR, "Reset password failed.");
 			}
 
-			return TemplateHelper.getPreparedConfirmationTemplate(model,"Reset password", utext, links, status);
+			return ControllerSupport.preparedConfirmationTemplate(model,"Reset password", utext, links, status);
 		}
 	}
 
@@ -295,7 +291,7 @@ public class UserController {
 			status = new Status(Status.Value.ERROR, "Could not save the new password.");
 		}
 
-		return TemplateHelper.getPreparedConfirmationTemplate(model, "Reset password", utext, links, status);
+		return ControllerSupport.preparedConfirmationTemplate(model, "Reset password", utext, links, status);
 	}
 
 	private ExchangeFilterFunction oauth2Credentials(OAuth2AuthenticationToken authentication) {

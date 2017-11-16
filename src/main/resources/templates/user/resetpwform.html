@@ -6,7 +6,7 @@
 <div th:if="${rpc} != null">
 	<div th:replace="/fragments :: standard-body-div( ~{::h1}, ~{::main})">
 		<h1>Reset Password</h1>
-		<main><br>
+		<main>
 			<form action="#" th:action="@{/user/resetpwform}" method="post" name="regForm"
 				  onsubmit="return validatePassword()">
 				<div class="row">
