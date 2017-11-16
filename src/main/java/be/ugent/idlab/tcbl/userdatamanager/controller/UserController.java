@@ -83,6 +83,7 @@ public class UserController {
 			log.error("Cannot get user info", e);
 			model.addAttribute("status", new Status(Status.Value.ERROR, "Your information could not be found."));
 		}
+		model.addAttribute("links", new Link(Link.DisplayCondition.ALWAYS, "Home", "/index"));
 		return "/user/info";
 	}
 
@@ -96,6 +97,7 @@ public class UserController {
 			log.error("Cannot update user info", e);
 			model.addAttribute("status", new Status(Status.Value.ERROR, "Your information could not be updated."));
 		}
+		model.addAttribute("links", new Link(Link.DisplayCondition.ALWAYS, "Home", "/index"));
 		return "/user/info";
 	}
 
@@ -103,6 +105,7 @@ public class UserController {
 	public String getRegister(Model model) {
 		TCBLUser user = new TCBLUser();
 		model.addAttribute("tcblUser", user);
+		model.addAttribute("links", new Link(Link.DisplayCondition.ALWAYS, "Home", "/index"));
 		return "/user/register";
 	}
 
@@ -186,7 +189,8 @@ public class UserController {
 	}
 
 	@GetMapping("/resetpw")
-	public String getResetPassword() {
+	public String getResetPassword(Model model) {
+		model.addAttribute("links", new Link(Link.DisplayCondition.ALWAYS, "Home", "/index"));
 		return "/user/resetpw";
 	}
 
@@ -236,6 +240,7 @@ public class UserController {
 			}
 			String encodedId = encodeBase64(userId);
 			model.addAttribute("rpc", encodedId);
+			model.addAttribute("links", new Link(Link.DisplayCondition.ALWAYS, "Home", "/index"));
 
 			return "/user/resetpwform";
 		} catch (Exception e) {

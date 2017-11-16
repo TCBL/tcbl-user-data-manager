@@ -7,15 +7,17 @@
 	<h1>Reset Password</h1>
 	<main>
 		<p>Forgot your password? No problem. </p>
-		<p>Enter your email address below to receive a mail that will enable you to reset your password.</p>
+		<p>We can send you an email containing a link that will enable you to reset your password.</p>
 		<form action="#" th:action="@{/user/resetpw}" method="post" name="resetPwForm">
-			<div class="row">
-				<div class="columns large-3">
-					<label for="mail">Email</label>
-					<input type="email" name="mail" id="mail" required/>
+			<fieldset>
+				<legend>Your email address</legend>
+				<div class="row">
+					<div class="columns large-3">
+						<input type="email" name="mail" id="mail" required/>
+					</div>
 				</div>
-			</div>
-			<input type="submit" value="Send me that mail now" class="red-button"/>
+				<input type="submit" value="Send me that email" class="red-button"/>
+			</fieldset>
 		</form>
 	</main>
 </div>
