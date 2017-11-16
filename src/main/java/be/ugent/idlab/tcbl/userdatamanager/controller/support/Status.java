@@ -1,6 +1,4 @@
-package be.ugent.idlab.tcbl.userdatamanager.model;
-
-import java.util.Map;
+package be.ugent.idlab.tcbl.userdatamanager.controller.support;
 
 /**
  * <p>Copyright 2017 IDLab (Ghent University - imec)</p>

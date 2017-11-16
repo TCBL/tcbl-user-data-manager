@@ -1,7 +1,5 @@
 package be.ugent.idlab.tcbl.userdatamanager.controller.support;
 
-import be.ugent.idlab.tcbl.userdatamanager.model.Link;
-import be.ugent.idlab.tcbl.userdatamanager.model.Status;
 import org.springframework.ui.Model;
 
 import java.util.ArrayList;
@@ -16,10 +14,10 @@ import java.util.List;
  */
 public class ConfirmationTemplate {
 
-	String title;
-	String utext;
-	List<Link> links;
-	Status status;
+	private String title;
+	private String utext;
+	private List<Link> links;
+	private Status status;
 
 	public ConfirmationTemplate() {
 		// the template is safe with the following defaults
@@ -66,7 +64,7 @@ public class ConfirmationTemplate {
 
 	public void addLink(Link link) {
 		if (links == null) {
-			links = new ArrayList<Link>();
+			links = new ArrayList<>();
 		}
 		links.add(link);
 	}
@@ -74,7 +72,7 @@ public class ConfirmationTemplate {
 	/**
 	 * Prepare a model for this template and return the template path
 	 *
-	 * @param model
+	 * @param model the model to be prepared
 	 * @return template path
 	 */
 	public String getPreparedPath(Model model) {

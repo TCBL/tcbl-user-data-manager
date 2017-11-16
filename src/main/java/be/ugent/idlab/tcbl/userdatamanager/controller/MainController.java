@@ -1,15 +1,12 @@
 package be.ugent.idlab.tcbl.userdatamanager.controller;
 
-import be.ugent.idlab.tcbl.userdatamanager.model.Link;
-import be.ugent.idlab.tcbl.userdatamanager.model.Status;
+import be.ugent.idlab.tcbl.userdatamanager.controller.support.Link;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * <p>Copyright 2017 IDLab (Ghent University - imec)</p>
@@ -26,7 +23,7 @@ public class MainController {
 
 	@RequestMapping("/index")
 	public String index(Model model) {
-		List<Link> links = new ArrayList<Link>();
+		List<Link> links = new ArrayList<>();
 		links.add(new Link(Link.DisplayCondition.ANONYMOUS, "Sign up", "/user/register"));
 		links.add(new Link(Link.DisplayCondition.ANONYMOUS, "Log in with TCBL", "/oiclogin"));
 		//TODO links.add(new Link(Link.DisplayCondition.AUTHENTICATED, "Manage my profile info", "/user/index"));

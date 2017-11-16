@@ -2,8 +2,8 @@ package be.ugent.idlab.tcbl.userdatamanager.controller;
 
 import be.ugent.idlab.tcbl.userdatamanager.background.Mail;
 import be.ugent.idlab.tcbl.userdatamanager.controller.support.ConfirmationTemplate;
-import be.ugent.idlab.tcbl.userdatamanager.model.Link;
-import be.ugent.idlab.tcbl.userdatamanager.model.Status;
+import be.ugent.idlab.tcbl.userdatamanager.controller.support.Link;
+import be.ugent.idlab.tcbl.userdatamanager.controller.support.Status;
 import be.ugent.idlab.tcbl.userdatamanager.model.TCBLUser;
 import be.ugent.idlab.tcbl.userdatamanager.model.TCBLUserRepository;
 import org.slf4j.Logger;
@@ -23,7 +23,9 @@ import reactor.core.publisher.Mono;
 
 import javax.servlet.http.HttpServletRequest;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.Base64;
+import java.util.Date;
+import java.util.Map;
 
 /**
  * <p>Copyright 2017 IDLab (Ghent University - imec)</p>
@@ -70,8 +72,8 @@ public class UserController {
 				.retrieve()
 				.bodyToMono(Map.class)
 				.block();
-		String id = userAttributes.get("inum").toString();
 		try {
+			String id = userAttributes.get("inum").toString();
 			TCBLUser tcblUser = tcblUserRepository.find(id);
 			if (tcblUser == null) {
 				tcblUser = new TCBLUser();
