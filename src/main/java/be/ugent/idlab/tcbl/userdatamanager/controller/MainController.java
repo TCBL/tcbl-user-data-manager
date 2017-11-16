@@ -26,7 +26,7 @@ public class MainController {
 		List<Link> links = new ArrayList<>();
 		links.add(new Link(Link.DisplayCondition.ANONYMOUS, "Sign up", "/user/register"));
 		links.add(new Link(Link.DisplayCondition.ANONYMOUS, "Log in with TCBL", "/oiclogin"));
-		links.add(new Link(Link.DisplayCondition.AUTHENTICATED, "Manage your information", "/user/index"));
+		links.add(new Link(Link.DisplayCondition.AUTHENTICATED, "Manage your information", "/user/info"));
 		links.add(new Link(Link.DisplayCondition.ALWAYS, "Reset password", "/user/resetpw"));
 		links.add(new Link(Link.DisplayCondition.AUTHENTICATED, "TCBL applications", "/applications"));
 		model.addAttribute("links", links);

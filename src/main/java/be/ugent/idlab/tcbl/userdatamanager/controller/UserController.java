@@ -62,7 +62,7 @@ public class UserController {
 	 * @param authentication	Required to perform a UserInfo request.
 	 * @return					The path of the view to be rendered.
 	 */
-	@GetMapping("/index")
+	@GetMapping("/info")
 	public String userinfo(Model model, OAuth2AuthenticationToken authentication) {
 		WebClient webClient = WebClient.create(authentication.getClientRegistration().getProviderDetails().getUserInfoUri());
 		Map userAttributes = webClient
@@ -83,7 +83,7 @@ public class UserController {
 			log.error("Cannot get user info", e);
 			model.addAttribute("status", new Status(Status.Value.ERROR, "Your information could not be found."));
 		}
-		return "/user/index";
+		return "/user/info";
 	}
 
 	@PostMapping("/update")
@@ -96,7 +96,7 @@ public class UserController {
 			log.error("Cannot update user info", e);
 			model.addAttribute("status", new Status(Status.Value.ERROR, "Your information could not be updated."));
 		}
-		return "/user/index";
+		return "/user/info";
 	}
 
 	@GetMapping("/register")
