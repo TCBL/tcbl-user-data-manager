@@ -2,7 +2,7 @@ package be.ugent.idlab.tcbl.userdatamanager.controller;
 
 import be.ugent.idlab.tcbl.userdatamanager.background.Mail;
 import be.ugent.idlab.tcbl.userdatamanager.controller.support.ConfirmationTemplate;
-import be.ugent.idlab.tcbl.userdatamanager.controller.support.Link;
+import be.ugent.idlab.tcbl.userdatamanager.controller.support.NavLink;
 import be.ugent.idlab.tcbl.userdatamanager.controller.support.Status;
 import be.ugent.idlab.tcbl.userdatamanager.model.TCBLUser;
 import be.ugent.idlab.tcbl.userdatamanager.model.TCBLUserRepository;
@@ -83,7 +83,7 @@ public class UserController {
 			log.error("Cannot get user info", e);
 			model.addAttribute("status", new Status(Status.Value.ERROR, "Your information could not be found."));
 		}
-		model.addAttribute("navLinks", new Link(Link.DisplayCondition.ALWAYS, "Home", "/index"));
+		model.addAttribute("navLinks", new NavLink(NavLink.DisplayCondition.ALWAYS, "Home", "/index"));
 		return "/user/info";
 	}
 
@@ -97,7 +97,7 @@ public class UserController {
 			log.error("Cannot update user info", e);
 			model.addAttribute("status", new Status(Status.Value.ERROR, "Your information could not be updated."));
 		}
-		model.addAttribute("navLinks", new Link(Link.DisplayCondition.ALWAYS, "Home", "/index"));
+		model.addAttribute("navLinks", new NavLink(NavLink.DisplayCondition.ALWAYS, "Home", "/index"));
 		return "/user/info";
 	}
 
@@ -105,14 +105,14 @@ public class UserController {
 	public String getRegister(Model model) {
 		TCBLUser user = new TCBLUser();
 		model.addAttribute("tcblUser", user);
-		model.addAttribute("navLinks", new Link(Link.DisplayCondition.ALWAYS, "Home", "/index"));
+		model.addAttribute("navLinks", new NavLink(NavLink.DisplayCondition.ALWAYS, "Home", "/index"));
 		return "/user/register";
 	}
 
 	@PostMapping("/register")
 	public String postRegister(HttpServletRequest request, Model model, TCBLUser user) {
 		ConfirmationTemplate ct = new ConfirmationTemplate("Sign up for TCBL");
-		ct.addNavLink(new Link(Link.DisplayCondition.ALWAYS, "Home", "/index"));
+		ct.addNavLink(new NavLink(NavLink.DisplayCondition.ALWAYS, "Home", "/index"));
 
 		boolean oldActive = false;
 		try {
@@ -138,20 +138,20 @@ public class UserController {
 			ct.setUtext("<p>Registration of '" + user.getUserName() + "' is almost complete.</p>" +
 					"<p>We've sent you an email containing a link to activate your account. Please check your mailbox.</p>" +
 					"<p>If you don't find the email within a few minutes, check your spam folder too before retrying.</p>");
-			ct.addNavLink(new Link(Link.DisplayCondition.ALWAYS, "Try again", "/user/register"));
+			ct.addNavLink(new NavLink(NavLink.DisplayCondition.ALWAYS, "Try again", "/user/register"));
 			ct.setStatus(new Status(Status.Value.OK, "Email sent. You can close this browser tab."));
 		} catch (Exception e) {
 			log.error("Cannot register user {}", user.getUserName(), e);
 			if (oldActive) {
 				ct.setUtext("<p>User '" + user.getUserName() + "' was signed up earlier.</p>" +
 						"<p>You may use it as-is, reset your password, or try again with a different email address.</p>");
-				ct.addNavLink(new Link(Link.DisplayCondition.ALWAYS, "Reset password", "/user/resetpw"));
-				ct.addNavLink(new Link(Link.DisplayCondition.ALWAYS, "Try again", "/user/register"));
+				ct.addNavLink(new NavLink(NavLink.DisplayCondition.ALWAYS, "Reset password", "/user/resetpw"));
+				ct.addNavLink(new NavLink(NavLink.DisplayCondition.ALWAYS, "Try again", "/user/register"));
 				ct.setStatus(new Status(Status.Value.WARNING, "User signed up earlier."));
 			} else {
 				ct.setUtext("<p>We could not send you an email to complete sign up for TCBL at this moment.</p>" +
 						"<p>Please try again.</p>");
-				ct.addNavLink(new Link(Link.DisplayCondition.ALWAYS, "Try again", "/user/register"));
+				ct.addNavLink(new NavLink(NavLink.DisplayCondition.ALWAYS, "Try again", "/user/register"));
 				ct.setStatus(new Status(Status.Value.ERROR, "Could not send email."));
 			}
 		}
@@ -163,7 +163,7 @@ public class UserController {
 	@GetMapping("/confirm/{id}")
 	public String confirmRegistration(Model model, @PathVariable String id) {
 		ConfirmationTemplate ct = new ConfirmationTemplate("Sign up for TCBL completion");
-		ct.addNavLink(new Link(Link.DisplayCondition.ALWAYS, "Home", "/index"));
+		ct.addNavLink(new NavLink(NavLink.DisplayCondition.ALWAYS, "Home", "/index"));
 
 		try {
 			String inum = decodeBase64(id);
@@ -181,7 +181,7 @@ public class UserController {
 			ct.setUtext("<p>We are sorry to tell you that the sign up for TCBL process failed.</p>" +
 					"<p>Are you sure you used the appropriate link?</p>" +
 					"<p>Please try again.</p>");
-			ct.addNavLink(new Link(Link.DisplayCondition.ALWAYS, "Try again", "/user/register"));
+			ct.addNavLink(new NavLink(NavLink.DisplayCondition.ALWAYS, "Try again", "/user/register"));
 			ct.setStatus(new Status(Status.Value.ERROR, "Sign up for TCBL failed."));
 		}
 
@@ -190,14 +190,14 @@ public class UserController {
 
 	@GetMapping("/resetpw")
 	public String getResetPassword(Model model) {
-		model.addAttribute("navLinks", new Link(Link.DisplayCondition.ALWAYS, "Home", "/index"));
+		model.addAttribute("navLinks", new NavLink(NavLink.DisplayCondition.ALWAYS, "Home", "/index"));
 		return "/user/resetpw";
 	}
 
 	@PostMapping("/resetpw")
 	public String postResetPassword(HttpServletRequest request, Model model, String mail) {
 		ConfirmationTemplate ct = new ConfirmationTemplate("Reset password");
-		ct.addNavLink(new Link(Link.DisplayCondition.ALWAYS, "Home", "/index"));
+		ct.addNavLink(new NavLink(NavLink.DisplayCondition.ALWAYS, "Home", "/index"));
 
 		boolean userExists = false;
 		try {
@@ -208,19 +208,19 @@ public class UserController {
 			ct.setUtext("<p>We've sent an email containing a link to reset your password to '" + mail +
 					"'. The link is <b>only valid for one hour</b>, starting now. Please check your mailbox.</p>" +
 					"<p>If you don't find the email within a few minutes, check your spam folder too before retrying.</p>");
-			ct.addNavLink(new Link(Link.DisplayCondition.ALWAYS, "Try again", "/user/resetpw"));
+			ct.addNavLink(new NavLink(NavLink.DisplayCondition.ALWAYS, "Try again", "/user/resetpw"));
 			ct.setStatus(new Status(Status.Value.OK, "Email sent. You can close this browser tab."));
 		} catch (Exception e) {
 			log.error("Cannot send reset pw mail for {}", mail, e);
 			if (userExists) {
 				ct.setUtext("<p>We could not send you an email to complete resetting your password at this moment.</p>" +
 						"<p>Please try again.</p>");
-				ct.addNavLink(new Link(Link.DisplayCondition.ALWAYS, "Try again", "/user/resetpw"));
+				ct.addNavLink(new NavLink(NavLink.DisplayCondition.ALWAYS, "Try again", "/user/resetpw"));
 				ct.setStatus(new Status(Status.Value.ERROR, "Could not send email."));
 			} else {
 				ct.setUtext("<p>We could not find a user with the given email address '" + mail + "'.</p>" +
 						"<p>Please try again.</p>");
-				ct.addNavLink(new Link(Link.DisplayCondition.ALWAYS, "Try again", "/user/resetpw"));
+				ct.addNavLink(new NavLink(NavLink.DisplayCondition.ALWAYS, "Try again", "/user/resetpw"));
 				ct.setStatus(new Status(Status.Value.ERROR, "User not found."));
 			}
 		}
@@ -236,29 +236,29 @@ public class UserController {
 			String userId = decodeIdForPassword(rpc, 3600000);
 			if (userId == null) {
 				expired = true;
-				throw new Exception("Link expired.");
+				throw new Exception("NavLink expired.");
 			}
 			String encodedId = encodeBase64(userId);
 			model.addAttribute("rpc", encodedId);
-			model.addAttribute("navLinks", new Link(Link.DisplayCondition.ALWAYS, "Home", "/index"));
+			model.addAttribute("navLinks", new NavLink(NavLink.DisplayCondition.ALWAYS, "Home", "/index"));
 
 			return "/user/resetpwform";
 		} catch (Exception e) {
 			ConfirmationTemplate ct = new ConfirmationTemplate("Reset password");
-			ct.addNavLink(new Link(Link.DisplayCondition.ALWAYS, "Home", "/index"));
+			ct.addNavLink(new NavLink(NavLink.DisplayCondition.ALWAYS, "Home", "/index"));
 
 			if (expired) {
 				ct.setUtext("<p>We are sorry to tell you that the reset password process failed.</p>" +
 						"<p>The link has expired.</p>" +
 						"<p>Please try again and use the link within one hour.</p>");
-				ct.addNavLink(new Link(Link.DisplayCondition.ALWAYS, "Try again", "/user/resetpw"));
-				ct.setStatus(new Status(Status.Value.ERROR, "Link expired."));
+				ct.addNavLink(new NavLink(NavLink.DisplayCondition.ALWAYS, "Try again", "/user/resetpw"));
+				ct.setStatus(new Status(Status.Value.ERROR, "NavLink expired."));
 			} else {
 				// reached when the url was maniplulated...
 				ct.setUtext("<p>We are sorry to tell you that the reset password process failed.</p>" +
 						"<p>Are you sure you used the appropriate link?</p>" +
 						"<p>Please try again.</p>");
-				ct.addNavLink(new Link(Link.DisplayCondition.ALWAYS, "Try again", "/user/resetpw"));
+				ct.addNavLink(new NavLink(NavLink.DisplayCondition.ALWAYS, "Try again", "/user/resetpw"));
 				ct.setStatus(new Status(Status.Value.ERROR, "Reset password failed."));
 			}
 
@@ -269,7 +269,7 @@ public class UserController {
 	@PostMapping("/resetpwform")
 	public String resetPasswordForm(Model model, String password, String rpc) {
 		ConfirmationTemplate ct = new ConfirmationTemplate("Reset password");
-		ct.addNavLink(new Link(Link.DisplayCondition.ALWAYS, "Home", "/index"));
+		ct.addNavLink(new NavLink(NavLink.DisplayCondition.ALWAYS, "Home", "/index"));
 
 		try {
 			String inum = decodeBase64(rpc);
@@ -284,7 +284,7 @@ public class UserController {
 			log.error("Cannot reset password of {}", rpc, e);
 			ct.setUtext("<p>The new password couldn't be saved.</p>" +
 					"<p>Please try again.</p>");
-			ct.addNavLink(new Link(Link.DisplayCondition.ALWAYS, "Try again", "/user/resetpw"));
+			ct.addNavLink(new NavLink(NavLink.DisplayCondition.ALWAYS, "Try again", "/user/resetpw"));
 			ct.setStatus(new Status(Status.Value.ERROR, "Could not save the new password."));
 		}
 

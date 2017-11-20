@@ -5,8 +5,9 @@ package be.ugent.idlab.tcbl.userdatamanager.controller.support;
  *
  * @author Martin Vanbrabant
  */
-public class Link {
+public class NavLink {
 	public enum DisplayCondition {
+		// enum names are used in ThymeLeaf, don't change
 		ALWAYS,
 		ANONYMOUS,
 		AUTHENTICATED
@@ -16,7 +17,7 @@ public class Link {
 	private final String text;
 	private final String location;
 
-	public Link(DisplayCondition displayCondition, String text, String location) {
+	public NavLink(DisplayCondition displayCondition, String text, String location) {
 		this.displayCondition = displayCondition;
 		this.text = text;
 		this.location = location;

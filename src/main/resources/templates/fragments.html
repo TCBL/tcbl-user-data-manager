@@ -42,10 +42,10 @@ the other templates.
 		<th:block th:each="link: ${navLinks}">
 			<div class="columns no-padding-right">
 				<form action="#" th:action="@{${link.location}}" th:if="${
-						(link.displayCondition eq T(be.ugent.idlab.tcbl.userdatamanager.controller.support.Link.DisplayCondition).ALWAYS) or
-						((link.displayCondition eq T(be.ugent.idlab.tcbl.userdatamanager.controller.support.Link.DisplayCondition).ANONYMOUS) and
+						(link.displayCondition.name() eq 'ALWAYS') or
+						((link.displayCondition.name() eq 'ANONYMOUS') and
 						 #authorization.expression('hasRole(''ROLE_ANONYMOUS'')')) or
-						((link.displayCondition eq T(be.ugent.idlab.tcbl.userdatamanager.controller.support.Link.DisplayCondition).AUTHENTICATED) and
+						((link.displayCondition.name() eq 'AUTHENTICATED') and
 						 #authorization.expression('isAuthenticated()'))}">
 					<input type="submit" value="Link text here" class="button button--pink" th:value="${link.text}">
 				</form>

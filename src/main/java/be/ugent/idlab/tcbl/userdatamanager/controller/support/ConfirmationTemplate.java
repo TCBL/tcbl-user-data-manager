@@ -16,7 +16,7 @@ public class ConfirmationTemplate {
 
 	private String title;
 	private String utext;
-	private List<Link> navLinks;
+	private List<NavLink> navLinks;
 	private Status status;
 
 	public ConfirmationTemplate() {
@@ -58,11 +58,11 @@ public class ConfirmationTemplate {
 		this.status = status;
 	}
 
-	public List<Link> getNavLinks() {
+	public List<NavLink> getNavLinks() {
 		return navLinks;
 	}
 
-	public void addNavLink(Link link) {
+	public void addNavLink(NavLink link) {
 		if (navLinks == null) {
 			navLinks = new ArrayList<>();
 		}
