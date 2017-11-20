@@ -23,13 +23,13 @@ public class MainController {
 
 	@RequestMapping("/index")
 	public String index(Model model) {
-		List<Link> links = new ArrayList<>();
-		links.add(new Link(Link.DisplayCondition.ANONYMOUS, "Sign up for TCBL", "/user/register"));
-		links.add(new Link(Link.DisplayCondition.ANONYMOUS, "Log in with TCBL", "/oiclogin"));
-		links.add(new Link(Link.DisplayCondition.AUTHENTICATED, "Manage your information", "/user/info"));
-		links.add(new Link(Link.DisplayCondition.ALWAYS, "Reset password", "/user/resetpw"));
-		links.add(new Link(Link.DisplayCondition.AUTHENTICATED, "TCBL applications", "/applications"));
-		model.addAttribute("links", links);
+		List<Link> navLinks = new ArrayList<>();
+		navLinks.add(new Link(Link.DisplayCondition.ANONYMOUS, "Sign up for TCBL", "/user/register"));
+		navLinks.add(new Link(Link.DisplayCondition.ANONYMOUS, "Log in with TCBL", "/oiclogin"));
+		navLinks.add(new Link(Link.DisplayCondition.AUTHENTICATED, "Manage your information", "/user/info"));
+		navLinks.add(new Link(Link.DisplayCondition.ALWAYS, "Reset password", "/user/resetpw"));
+		navLinks.add(new Link(Link.DisplayCondition.AUTHENTICATED, "TCBL applications", "/applications"));
+		model.addAttribute("navLinks", navLinks);
 		return "/index";
 	}
 }

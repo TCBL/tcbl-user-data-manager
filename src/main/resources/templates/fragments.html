@@ -37,9 +37,9 @@ the other templates.
 		</div>
 	</div>
 
-	<!--/* links */-->
-	<div class="row tcbl-links" th:if="${links} != null">
-		<th:block th:each="link: ${links}">
+	<!--/* navigation links */-->
+	<div class="row tcbl-nav-links" th:if="${navLinks} != null">
+		<th:block th:each="link: ${navLinks}">
 			<div class="columns no-padding-right">
 				<form action="#" th:action="@{${link.location}}" th:if="${
 						(link.displayCondition eq T(be.ugent.idlab.tcbl.userdatamanager.controller.support.Link.DisplayCondition).ALWAYS) or

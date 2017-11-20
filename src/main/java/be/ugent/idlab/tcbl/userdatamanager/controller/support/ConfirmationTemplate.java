@@ -16,21 +16,21 @@ public class ConfirmationTemplate {
 
 	private String title;
 	private String utext;
-	private List<Link> links;
+	private List<Link> navLinks;
 	private Status status;
 
 	public ConfirmationTemplate() {
 		// the template is safe with the following defaults
 		title = "";
 		utext = "";
-		links = null;
+		navLinks = null;
 		status = null;
 	}
 
 	public ConfirmationTemplate(String title) {
 		this.title = title;
 		utext = "";
-		links = null;
+		navLinks = null;
 		status = null;
 	}
 
@@ -58,15 +58,15 @@ public class ConfirmationTemplate {
 		this.status = status;
 	}
 
-	public List<Link> getLinks() {
-		return links;
+	public List<Link> getNavLinks() {
+		return navLinks;
 	}
 
-	public void addLink(Link link) {
-		if (links == null) {
-			links = new ArrayList<>();
+	public void addNavLink(Link link) {
+		if (navLinks == null) {
+			navLinks = new ArrayList<>();
 		}
-		links.add(link);
+		navLinks.add(link);
 	}
 
 	/**
@@ -82,8 +82,8 @@ public class ConfirmationTemplate {
 		if (!model.containsAttribute("utext")) {
 			model.addAttribute("utext", utext);
 		}
-		if (!model.containsAttribute("links")) {
-			model.addAttribute("links", links);
+		if (!model.containsAttribute("navLinks")) {
+			model.addAttribute("navLinks", navLinks);
 		}
 		if (!model.containsAttribute("status")) {
 			model.addAttribute("status", status);

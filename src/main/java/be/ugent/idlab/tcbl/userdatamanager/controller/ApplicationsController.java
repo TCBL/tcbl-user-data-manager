@@ -18,9 +18,9 @@ public class ApplicationsController {
 
 	@RequestMapping("/applications")
 	public String applications(Model model) {
-		List<Link> links = new ArrayList<>();
-		links.add(new Link(Link.DisplayCondition.ALWAYS, "Home", "/index"));
-		model.addAttribute("links", links);
+		List<Link> navLinks = new ArrayList<>();
+		navLinks.add(new Link(Link.DisplayCondition.ALWAYS, "Home", "/index"));
+		model.addAttribute("navLinks", navLinks);
 		return "/applications";
 	}
 }
