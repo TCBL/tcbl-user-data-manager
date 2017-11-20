@@ -111,7 +111,7 @@ public class UserController {
 
 	@PostMapping("/register")
 	public String postRegister(HttpServletRequest request, Model model, TCBLUser user) {
-		ConfirmationTemplate ct = new ConfirmationTemplate("Sign up");
+		ConfirmationTemplate ct = new ConfirmationTemplate("Sign up for TCBL");
 		ct.addLink(new Link(Link.DisplayCondition.ALWAYS, "Home", "/index"));
 
 		boolean oldActive = false;
@@ -149,7 +149,7 @@ public class UserController {
 				ct.addLink(new Link(Link.DisplayCondition.ALWAYS, "Try again", "/user/register"));
 				ct.setStatus(new Status(Status.Value.WARNING, "User signed up earlier."));
 			} else {
-				ct.setUtext("<p>We could not send you an email to complete sign up at this moment.</p>" +
+				ct.setUtext("<p>We could not send you an email to complete sign up for TCBL at this moment.</p>" +
 						"<p>Please try again.</p>");
 				ct.addLink(new Link(Link.DisplayCondition.ALWAYS, "Try again", "/user/register"));
 				ct.setStatus(new Status(Status.Value.ERROR, "Could not send email."));
@@ -162,7 +162,7 @@ public class UserController {
 	// reached when the user clicked the link in the confirmation email
 	@GetMapping("/confirm/{id}")
 	public String confirmRegistration(Model model, @PathVariable String id) {
-		ConfirmationTemplate ct = new ConfirmationTemplate("Sign up completion");
+		ConfirmationTemplate ct = new ConfirmationTemplate("Sign up for TCBL completion");
 		ct.addLink(new Link(Link.DisplayCondition.ALWAYS, "Home", "/index"));
 
 		try {
@@ -174,15 +174,15 @@ public class UserController {
 			}
 			ct.setUtext("<p>You're successfully signed up! You can now use your new account to log in at TCBL related sites.</p>" +
 					"<p>See our home page for more options...</p>");
-			ct.setStatus(new Status(Status.Value.OK, "Sign up completed."));
+			ct.setStatus(new Status(Status.Value.OK, "Sign up for TCBL completed."));
 		} catch (Exception e) {
 			// reached when the url was maniplulated or when the user was deleted in the mean time...
 			log.error("Cannot confirm registration of {} ", id, e);
-			ct.setUtext("<p>We are sorry to tell you that the sign up process failed.</p>" +
+			ct.setUtext("<p>We are sorry to tell you that the sign up for TCBL process failed.</p>" +
 					"<p>Are you sure you used the appropriate link?</p>" +
 					"<p>Please try again.</p>");
 			ct.addLink(new Link(Link.DisplayCondition.ALWAYS, "Try again", "/user/register"));
-			ct.setStatus(new Status(Status.Value.ERROR, "Sign up failed."));
+			ct.setStatus(new Status(Status.Value.ERROR, "Sign up for TCBL failed."));
 		}
 
 		return ct.getPreparedPath(model);

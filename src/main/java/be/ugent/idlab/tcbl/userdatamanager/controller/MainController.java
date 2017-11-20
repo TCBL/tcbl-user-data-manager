@@ -24,7 +24,7 @@ public class MainController {
 	@RequestMapping("/index")
 	public String index(Model model) {
 		List<Link> links = new ArrayList<>();
-		links.add(new Link(Link.DisplayCondition.ANONYMOUS, "Sign up", "/user/register"));
+		links.add(new Link(Link.DisplayCondition.ANONYMOUS, "Sign up for TCBL", "/user/register"));
 		links.add(new Link(Link.DisplayCondition.ANONYMOUS, "Log in with TCBL", "/oiclogin"));
 		links.add(new Link(Link.DisplayCondition.AUTHENTICATED, "Manage your information", "/user/info"));
 		links.add(new Link(Link.DisplayCondition.ALWAYS, "Reset password", "/user/resetpw"));

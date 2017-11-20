@@ -10,7 +10,7 @@ a {
 }
 
 a:hover {
-    color: #24A8E0;
+    color: #24a8e0;
 }
 
 a.normal {
@@ -30,32 +30,21 @@ ul {
     list-style-type: none;
 }
 
-/* class for parent element of elements having class 'columns' */
 .row {
-    padding-top: 10px;
+    padding-top: 0.625rem;
     margin: 0 auto;
     max-width: 62.5rem;
     width: 100%;
     display: table;
 }
 
-/* class for a general column inside an element of class 'row' */
 .columns {
-    padding-right: 0.9375rem;
+    padding-right: 1rem;
     float: left;
 }
 
-/* class for a specific column inside an element of class 'row' */
-.column-left-70 {
-    float: left;
-    width: 65%; /* not 70 because of padding */
-}
-
-/* class for a specific column inside an element of class 'row' */
-.column-right-30 {
+.no-padding-right {
     padding-right: 0;
-    float: right;
-    width: 30%;
 }
 
 .break {
@@ -75,25 +64,25 @@ ul {
 
 h1 {
     font-weight: bold;
-    font-size: 1.5em !important;
+    font-size: 1.5rem !important;
     line-height: 1.2 !important;
     color: #222222;
 }
 
 form fieldset {
-    border-color: #DDDDDD;
+    border-color: #dddddd;
     border-width: 1px;
     border-style: solid;
-    padding: 20px;
-    margin: 20px;
+    padding: 1.25rem;
+    margin: 1.25rem;
 }
 
 form fieldset legend {
-    font-size:1.1em;
+    font-size:1.1rem;
 }
 
 form label {
-    padding-bottom: 10px;
+    padding-bottom: 0.625rem;
     color: #4d4d4d;
     cursor: pointer;
     display: block;
@@ -103,10 +92,10 @@ form label {
 }
 
 form input, form textarea {
-    margin-bottom: 1em;
-    margin-right: 1em;
+    margin-bottom: 1rem;
+    margin-right: 1rem;
     border-radius: 0;
-    background-color: #FFFFFF;
+    background-color: #ffffff;
     border-style: solid;
     border-width: 1px;
     border-color: #cccccc;
@@ -126,51 +115,62 @@ form input#reset {
     margin-left: 0;
 }
 
-textarea { overflow: auto; }
+textarea {
+    overflow: auto;
+}
 
-form .required{font-weight:bold;}
+form .required{
+    font-weight:bold;
+}
 
-.red-button {
-    background-color: #F190A0;
+.button {
     color: #000000;
+    background-color: #c0c0c0;
+    margin-bottom: 0.5rem;
+    margin-right: 0.5rem;
     box-shadow: none !important;
     font-weight: bold;
     border: none;
-    border-radius: 4px;
+    border-radius: 0.25rem;
     display: inline-block;
     width: auto;
 }
 
-.red-button:hover, .red-button:focus {
-    color: #FFFFFF;
+.button:hover, .button:focus {
+    color: #ffffff;
+    background-color: #404040;
+}
+
+.button--red {
+    background-color: #e00000;
+}
+
+.button--red:hover, .button--red:focus {
+    background-color: #ff0000;
+}
+
+.button--pink {
+    background-color: #f190a0;
+}
+
+.button--pink:hover, .button--pink:focus {
     background-color: #e84c65;
 }
 
-.smallFont {
-    font-size: 0.8em;
-}
-
 .tcbl-header {
-    background-color: #ffffff; /* don't delete (testing) */
-}
-
-.tcbl-contents {
-    background-color: #ffffff; /* don't delete (testing) */
-}
-
-.tcbl-main {
-    background-color: #ffffff; /* don't delete (testing) */
+    /*background-color: #cacaca;*/ /* don't delete these comments (layout testing) */
 }
 
 .tcbl-links {
-    background-color: #ffffff; /* don't delete (testing) */
+    /*background-color: #cacaca;*/ /* don't delete these comments (layout testing) */
+}
+
+.tcbl-main {
+    /*background-color: #cacaca;*/ /* don't delete these comments (layout testing) */
 }
 
 .tcbl-status {
-    background-color: #ffffff; /* don't delete (testing) */
-}
-
-.tcbl-status-text {
+    /*background-color: #cacaca;*/ /* don't delete these comments (layout testing) */
     font-size: 1.2rem;
 }
 
@@ -187,7 +187,7 @@ form .required{font-weight:bold;}
 }
 
 .tcbl-footer {
-    background-color: #ffffff; /* don't delete (testing) */
+    /*background-color: #cacaca;*/ /* don't delete these comments (layout testing) */
     font-size: 0.7rem;
     color: #999;
 }

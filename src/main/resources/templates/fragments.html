@@ -37,30 +37,30 @@ the other templates.
 		</div>
 	</div>
 
-	<!--/* contents area */-->
-	<div class="row tcbl-contents">
-		<!--/* main */-->
-		<div class="column-left-70 tcbl-main" th:insert="${standardBodyMain}">
-		</div>
-		<!--/* links */-->
-		<div class="column-right-30 tcbl-links" th:if="${links} != null">
-			<th:block th:each="link: ${links}">
+	<!--/* links */-->
+	<div class="row tcbl-links" th:if="${links} != null">
+		<th:block th:each="link: ${links}">
+			<div class="columns no-padding-right">
 				<form action="#" th:action="@{${link.location}}" th:if="${
-					(link.displayCondition eq T(be.ugent.idlab.tcbl.userdatamanager.controller.support.Link.DisplayCondition).ALWAYS) or
-					((link.displayCondition eq T(be.ugent.idlab.tcbl.userdatamanager.controller.support.Link.DisplayCondition).ANONYMOUS) and
-					 #authorization.expression('hasRole(''ROLE_ANONYMOUS'')')) or
-					((link.displayCondition eq T(be.ugent.idlab.tcbl.userdatamanager.controller.support.Link.DisplayCondition).AUTHENTICATED) and
-					 #authorization.expression('isAuthenticated()'))}">
-					<input type="submit" value="Link text here" class="red-button" th:value="${link.text}">
+						(link.displayCondition eq T(be.ugent.idlab.tcbl.userdatamanager.controller.support.Link.DisplayCondition).ALWAYS) or
+						((link.displayCondition eq T(be.ugent.idlab.tcbl.userdatamanager.controller.support.Link.DisplayCondition).ANONYMOUS) and
+						 #authorization.expression('hasRole(''ROLE_ANONYMOUS'')')) or
+						((link.displayCondition eq T(be.ugent.idlab.tcbl.userdatamanager.controller.support.Link.DisplayCondition).AUTHENTICATED) and
+						 #authorization.expression('isAuthenticated()'))}">
+					<input type="submit" value="Link text here" class="button button--pink" th:value="${link.text}">
 				</form>
-			</th:block>
-		</div>
+			</div>
+		</th:block>
+	</div>
+
+	<!--/* main contents */-->
+	<div class="row tcbl-main" th:insert="${standardBodyMain}">
 	</div>
 
 	<!--/* common status */-->
 	<div class="row tcbl-status" th:if="${status} != null">
 		<!--/* appended class examples: tcbl-status-ok, tcbl-status-warning, tcbl-status-error */-->
-		<span class="tcbl-status-text" th:classappend="|tcbl-status-${#strings.toLowerCase(status.value.name())}|"th:text="${status.text}" >Status text here</span>
+		<span th:classappend="|tcbl-status-${#strings.toLowerCase(status.value.name())}|"th:text="${status.text}" >Status text here</span>
 	</div>
 
 	<!--/* common footer */-->

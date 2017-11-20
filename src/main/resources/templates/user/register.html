@@ -4,7 +4,7 @@
 </head>
 <body>
 <div th:replace="/fragments :: standard-body-div( ~{::h1}, ~{::main})">
-	<h1>Sign up to TCBL</h1>
+	<h1>Sign up for TCBL</h1>
     <main>
         <th:block th:if="${tcblUser} != null">
 			<form action="#" th:action="@{/user/register}" th:object="${tcblUser}" method="post" name="regForm"
@@ -41,7 +41,7 @@
 					</div>
 				</fieldset>
 
-				<input type="submit" value="Sign up to TCBL now" class="red-button"/>
+				<input type="submit" value="Sign up for TCBL now" class="button button--red"/>
 			</form>
         </th:block>
     </main>
