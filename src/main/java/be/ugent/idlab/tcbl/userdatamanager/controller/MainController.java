@@ -25,8 +25,8 @@ public class MainController {
 	public String index(Model model) {
 		List<Link> navLinks = new ArrayList<>();
 		navLinks.add(new Link(Link.DisplayCondition.ANONYMOUS, "Sign up for TCBL", "/user/register"));
-		navLinks.add(new Link(Link.DisplayCondition.ANONYMOUS, "Log in with TCBL", "/oiclogin"));
-		navLinks.add(new Link(Link.DisplayCondition.AUTHENTICATED, "Manage your information", "/user/info"));
+		navLinks.add(new Link(Link.DisplayCondition.ANONYMOUS, "Login with TCBL", "/oiclogin"));
+		navLinks.add(new Link(Link.DisplayCondition.AUTHENTICATED, "Manage your profile", "/user/info"));
 		navLinks.add(new Link(Link.DisplayCondition.ALWAYS, "Reset password", "/user/resetpw"));
 		navLinks.add(new Link(Link.DisplayCondition.AUTHENTICATED, "TCBL applications", "/applications"));
 		model.addAttribute("navLinks", navLinks);

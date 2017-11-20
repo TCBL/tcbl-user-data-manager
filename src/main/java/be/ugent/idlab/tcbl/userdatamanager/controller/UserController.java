@@ -172,7 +172,7 @@ public class UserController {
 				user.setActive(true);
 				tcblUserRepository.save(user);
 			}
-			ct.setUtext("<p>You're successfully signed up! You can now use your new account to log in at TCBL related sites.</p>" +
+			ct.setUtext("<p>You're successfully signed up! You can now use your new account to login at TCBL related sites.</p>" +
 					"<p>See our home page for more options...</p>");
 			ct.setStatus(new Status(Status.Value.OK, "Sign up for TCBL completed."));
 		} catch (Exception e) {
@@ -276,7 +276,7 @@ public class UserController {
 			TCBLUser user = tcblUserRepository.find(inum);
 			user.setPassword(password);
 			tcblUserRepository.save(user);
-			ct.setUtext("<p>You've successfully updated your password! You can now use your account again to log in at TCBL related sites.</p>" +
+			ct.setUtext("<p>You've successfully updated your password! You can now use your account again to login at TCBL related sites.</p>" +
 					"<p>See our home page for more options...</p>");
 			ct.setStatus(new Status(Status.Value.OK, "Password updated."));
 		} catch (Exception e) {
