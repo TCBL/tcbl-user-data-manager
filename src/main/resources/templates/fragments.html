@@ -39,17 +39,7 @@ the other templates.
 
 	<!--/* navigation links */-->
 	<div class="row tcbl-nav-links" th:if="${navLinks} != null">
-		<th:block th:each="link: ${navLinks}">
-			<div class="columns no-padding-right">
-				<form action="#" th:action="@{${link.location}}" th:if="${
-						(link.displayCondition.name() eq 'ALWAYS') or
-						((link.displayCondition.name() eq 'ANONYMOUS') and
-						 #authorization.expression('hasRole(''ROLE_ANONYMOUS'')')) or
-						((link.displayCondition.name() eq 'AUTHENTICATED') and
-						 #authorization.expression('isAuthenticated()'))}">
-					<input type="submit" value="Link text here" class="button button--pink" th:value="${link.text}">
-				</form>
-			</div>
+		<th:block th:replace="::navlinks(${navLinks})">
 		</th:block>
 	</div>
 
@@ -86,6 +76,34 @@ the other templates.
 		</form>
 	</div>
 </div>
+
+<!-- A fragment that displays navigation links (parameter links not null) -->
+<th:block th:fragment="navlinks(links)">
+	<th:block th:each="link: ${links}">
+		<div class="columns no-padding-right">
+			<form action="#" th:action="@{${link.location}}" th:if="${
+						(link.displayCondition.name() eq 'ALWAYS') or
+						((link.displayCondition.name() eq 'ANONYMOUS') and
+						 #authorization.expression('hasRole(''ROLE_ANONYMOUS'')')) or
+						((link.displayCondition.name() eq 'AUTHENTICATED') and
+						 #authorization.expression('isAuthenticated()'))}">
+				<input type="submit" value="Link text here" class="button button--nav" th:value="${link.text}">
+			</form>
+		</div>
+	</th:block>
+</th:block>
+
+<!-- A fragment that displays service links (parameter links not null) -->
+<th:block th:fragment="srvlinks(links)">
+	<th:block th:each="link: ${links}">
+		<div>
+			<form action="#" th:action="@{${link.url}}">
+				<input type="submit" value="Link text here" class="button button--srvlink" th:classappend="${link.cssClass}" th:value="${link.text}">
+			</form>
+		</div>
+	</th:block>
+</th:block>
+
 
 <!-- A script fragment that compares two passwords in a regForm -->
 <script th:fragment="validatePassword">

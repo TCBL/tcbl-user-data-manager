@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="/fragments :: standard-head">
+</head>
+<body>
+<div th:replace="/fragments :: standard-body-div( ~{::h1}, ~{::main})">
+	<h1>TCBL Services</h1>
+
+	<main>
+		<div sec:authorize="isAuthenticated()">
+			<p>From here, you may go to:</p>
+			<ul>
+			<li th:if="${srvLinksTCBL} != null">
+				<p>a service brought to you by the TCBL consortium:</p>
+				<th:block th:replace="/fragments::srvlinks(${srvLinksTCBL})">
+				</th:block>
+			</li>
+			<li th:if="${srvLinksASP} != null">
+				<p>a service provided by our Associated Service Providers:</p>
+				<th:block th:replace="/fragments::srvlinks(${srvLinksASP})">
+				</th:block>
+			</li>
+			</ul>
+		</div>
+	</main>
+</div>
+</body>
+</html>

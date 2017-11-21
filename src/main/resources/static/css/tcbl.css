@@ -124,8 +124,6 @@ form .required{
 }
 
 .button {
-    color: #000000;
-    background-color: #c0c0c0;
     margin-bottom: 0.5rem;
     margin-right: 0.5rem;
     box-shadow: none !important;
@@ -136,41 +134,83 @@ form .required{
     width: auto;
 }
 
-.button:hover, .button:focus {
-    color: #ffffff;
+.button--nav {
+    color: #000000;
+    background-color: #c0c0c0;
+}
+
+.button--nav:hover, .button--nav:focus {
     background-color: #404040;
 }
 
 .button--red {
+    color: #000000;
     background-color: #e00000;
 }
 
 .button--red:hover, .button--red:focus {
+    color: #ffffff;
     background-color: #ff0000;
 }
 
-.button--pink {
-    background-color: #f190a0;
+.button--srvlink {
+    width: 15rem;
 }
 
-.button--pink:hover, .button--pink:focus {
-    background-color: #e84c65;
+.button--srvlink--main {
+    color: #000000;
+    background-color: #ff7d8f;
 }
+
+.button--srvlink--main:hover, .button--srvlink--main:focus {
+    color: #ffffff;
+    background-color: #ff4d67;
+}
+
+.button--srvlink--zine {
+    color: #000000;
+    background-color: #afdbb5;
+}
+
+.button--srvlink--zine:hover, .button--srvlink--zine:focus {
+    color: #ffffff;
+    background-color: #82d98e;
+}
+
+.srvlink--labs {
+    color: #000000;
+    background-color: #24a8e0;
+}
+
+.srvlink--labs:hover, .srvlink--labs:focus {
+    color: #ffffff;
+    background-color: #009fde;
+}
+
+.button--srvlink--asp {
+    color: #000000;
+    background-color: #fa4c25;
+}
+.button--srvlink--asp:hover, .button--srvlink--asp:focus {
+    color: #ffffff;
+    background-color: #fa2a00;
+}
+
+
 
 .tcbl-header {
-    /*background-color: #cacaca;*/ /* don't delete these comments (layout testing) */
+    /* currently empty */
 }
 
 .tcbl-nav-links {
-    /*background-color: #cacaca;*/ /* don't delete these comments (layout testing) */
+    /* currently empty */
 }
 
 .tcbl-main {
-    /*background-color: #cacaca;*/ /* don't delete these comments (layout testing) */
+    /* currently empty */
 }
 
 .tcbl-status {
-    /*background-color: #cacaca;*/ /* don't delete these comments (layout testing) */
     font-size: 1.2rem;
 }
 
@@ -187,7 +227,6 @@ form .required{
 }
 
 .tcbl-footer {
-    /*background-color: #cacaca;*/ /* don't delete these comments (layout testing) */
     font-size: 0.7rem;
     color: #999;
 }

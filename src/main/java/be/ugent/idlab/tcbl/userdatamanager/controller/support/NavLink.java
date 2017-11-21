@@ -15,7 +15,7 @@ public class NavLink {
 
 	private final DisplayCondition displayCondition;
 	private final String text;
-	private final String location;
+	private final String location; // to be interpreted by ThymeLeaf's @{}
 
 	public NavLink(DisplayCondition displayCondition, String text, String location) {
 		this.displayCondition = displayCondition;

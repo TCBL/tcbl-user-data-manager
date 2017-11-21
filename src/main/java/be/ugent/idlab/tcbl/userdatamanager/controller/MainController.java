@@ -28,7 +28,7 @@ public class MainController {
 		navLinks.add(new NavLink(NavLink.DisplayCondition.ANONYMOUS, "Login with TCBL", "/oiclogin"));
 		navLinks.add(new NavLink(NavLink.DisplayCondition.AUTHENTICATED, "Manage your profile", "/user/info"));
 		navLinks.add(new NavLink(NavLink.DisplayCondition.ALWAYS, "Reset password", "/user/resetpw"));
-		navLinks.add(new NavLink(NavLink.DisplayCondition.AUTHENTICATED, "TCBL applications", "/applications"));
+		navLinks.add(new NavLink(NavLink.DisplayCondition.AUTHENTICATED, "TCBL Services", "/services"));
 		model.addAttribute("navLinks", navLinks);
 		return "/index";
 	}

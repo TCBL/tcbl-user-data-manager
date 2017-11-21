@@ -58,7 +58,7 @@ public class OAuth2LoginAutoConfiguration {
 							"/oiclogin",
 							"/",
 							"/index",
-							"/applications",
+							"/services",
 							"/user/register",
 							"/user/registered",
 							"/user/confirm/*",
