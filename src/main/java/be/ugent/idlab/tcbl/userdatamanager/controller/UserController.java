@@ -64,14 +64,14 @@ public class UserController {
 	 */
 	@GetMapping("/info")
 	public String userinfo(Model model, OAuth2AuthenticationToken authentication) {
-		WebClient webClient = WebClient.create(authentication.getClientRegistration().getProviderDetails().getUserInfoUri());
-		Map userAttributes = webClient
-				.mutate().filter(oauth2Credentials(authentication)).build()
-				.get()
-				.retrieve()
-				.bodyToMono(Map.class)
-				.block();
 		try {
+			WebClient webClient = WebClient.create(authentication.getClientRegistration().getProviderDetails().getUserInfoUri());
+			Map userAttributes = webClient
+					.mutate().filter(oauth2Credentials(authentication)).build()
+					.get()
+					.retrieve()
+					.bodyToMono(Map.class)
+					.block();
 			String id = userAttributes.get("inum").toString();
 			TCBLUser tcblUser = tcblUserRepository.find(id);
 			// note: if no user found, tcblUser is null, and this is covered nicely by the view
