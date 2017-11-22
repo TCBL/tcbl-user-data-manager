@@ -23,6 +23,9 @@
 					<input type="submit" value="Update" class="button button--red"/>
 				</fieldset>
 				<input type="hidden" th:field="*{id}"/>
+				<!--/* post all other tcblUser's properties in the returned TCBLUser object as well! */-->
+				<input type="hidden" th:field="*{userName}"/>
+				<input type="hidden" th:field="*{active}"/>
 			</form>
 		</th:block>
 	</main>
