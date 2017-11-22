@@ -74,10 +74,7 @@ public class UserController {
 		try {
 			String id = userAttributes.get("inum").toString();
 			TCBLUser tcblUser = tcblUserRepository.find(id);
-			if (tcblUser == null) {
-				tcblUser = new TCBLUser();
-				tcblUser.setId(id);
-			}
+			// note: if no user found, tcblUser is null, and this is covered nicely by the view
 			model.addAttribute("tcblUser", tcblUser);
 		} catch (Exception e) {
 			log.error("Cannot get user info", e);
