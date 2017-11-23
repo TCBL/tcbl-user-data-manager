@@ -6,26 +6,35 @@ package be.ugent.idlab.tcbl.userdatamanager.controller.support;
  * @author Martin Vanbrabant
  */
 public class SrvLink {
-	private final String text;
-	private final String url;
+	private String text;
+	private String url;
+	private String style; // appended to "button--srvlink--" to define a css class for display purposes
 
-	private final String cssClass; // a specific css class that specifies the layout of the SrvLink
-
-	public SrvLink(String text, String url, String cssClass) {
-		this.text = text;
-		this.url = url;
-		this.cssClass = cssClass;
+	public SrvLink() {
+		this.style = "asp";
 	}
 
 	public String getText() {
 		return text;
 	}
 
+	public void setText(String text) {
+		this.text = text;
+	}
+
 	public String getUrl() {
 		return url;
 	}
 
-	public String getCssClass() {
-		return cssClass;
+	public void setUrl(String url) {
+		this.url = url;
+	}
+
+	public String getStyle() {
+		return style;
+	}
+
+	public void setStyle(String style) {
+		this.style = style;
 	}
 }

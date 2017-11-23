@@ -98,7 +98,7 @@ the other templates.
 	<th:block th:each="link: ${links}">
 		<div>
 			<form action="#" th:action="@{${link.url}}">
-				<input type="submit" value="Link text here" class="button button--srvlink" th:classappend="${link.cssClass}" th:value="${link.text}">
+				<input type="submit" value="Link text here" class="button button--srvlink" th:classappend="|button--srvlink--${link.style}|" th:value="${link.text}">
 			</form>
 		</div>
 	</th:block>

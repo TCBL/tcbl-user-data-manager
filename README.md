@@ -245,7 +245,43 @@ security:
     aat-client-key-id:
 ```
 
-### 4. Configure the application
+### 4. TCBL User Data Manager application specific settings
+
+The TCBL User Data Manager application specific settings are grouped under `tudm`.
+
+A configuration snippet (example):
+
+```yaml
+##
+# TCBL User Data Manager application specific settings
+##
+tudm:
+  tcbl-services:
+    # srvLinks* entries below are lists; per list element:
+    #   text:  text to display
+    #   url:   destination url
+    #   style: display style: main|zine|labs|asp(=default)
+
+    # services from the TCBL consortium
+    srvLinksTCBL:
+      - text: "Main TCBL website"
+        url: https://tcbl.eu/
+        style: main
+      - text: "_ZINE, the TCBL magazine"
+        url: https://zine.tcbl.eu/
+        style: zine
+      - text: "TCBL Labs platform"
+        url: "https://labs.tcbl.eu/"
+        style: labs
+    # services from the Associated Service Providers
+    srvLinksASP:
+      - text: "Thela"
+        url: "https://thela.cleviria.it/"
+
+```
+ 
+
+### 5. Putting it all together: the complete application configuration
 
 **Putting it all together**, your client configuration file `application.yml` should look like `tcbl-user-data-manager/src/main/resources/application.yml.dist`.
 
@@ -372,6 +408,33 @@ security:
     aat-client-jks-path: /home/ghaesen/projects/TCBL/config/scim-rp-honegger.jks
     aat-client-jks-password: secret
     aat-client-key-id:
+
+##
+# TCBL User Data Manager application specific settings
+##
+tudm:
+  tcbl-services:
+    # srvLinks* entries below are lists; per list element:
+    #   text:  text to display
+    #   url:   destination url
+    #   style: display style: main|zine|labs|asp(=default)
+
+    # services from the TCBL consortium
+    srvLinksTCBL:
+      - text: "Main TCBL website"
+        url: https://tcbl.eu/
+        style: main
+      - text: "_ZINE, the TCBL magazine"
+        url: https://zine.tcbl.eu/
+        style: zine
+      - text: "TCBL Labs platform"
+        url: "https://labs.tcbl.eu/"
+        style: labs
+    # services from the Associated Service Providers
+    srvLinksASP:
+      - text: "Thela"
+        url: "https://thela.cleviria.it/"
+
 ```
 
 ## Running

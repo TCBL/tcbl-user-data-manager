@@ -2,6 +2,7 @@ package be.ugent.idlab.tcbl.userdatamanager.controller;
 
 import be.ugent.idlab.tcbl.userdatamanager.controller.support.SrvLink;
 import be.ugent.idlab.tcbl.userdatamanager.controller.support.NavLink;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,7 +16,19 @@ import java.util.List;
  * @author Martin Vanbrabant
  */
 @Controller
+@ConfigurationProperties(prefix="tudm.tcbl-services")
 public class ServicesController {
+
+	private List<SrvLink> srvLinksTCBL;
+	private List<SrvLink> srvLinksASP;
+
+	public void setSrvLinksTCBL(List<SrvLink> srvLinksTCBL) {
+		this.srvLinksTCBL = srvLinksTCBL;
+	}
+
+	public void setSrvLinksASP(List<SrvLink> srvLinksASP) {
+		this.srvLinksASP = srvLinksASP;
+	}
 
 	@RequestMapping("/services")
 	public String services(Model model) {
@@ -23,14 +36,8 @@ public class ServicesController {
 		navLinks.add(new NavLink(NavLink.DisplayCondition.ALWAYS, "Home", "/index"));
 		model.addAttribute("navLinks", navLinks);
 
-		List<SrvLink> srvLinksTCBL = new ArrayList<>();
-		srvLinksTCBL.add(new SrvLink("Main TCBL website", "https://tcbl.eu/", "button--srvlink--main"));
-		srvLinksTCBL.add(new SrvLink("_ZINE, the TCBL magazine", "https://zine.tcbl.eu/", "button--srvlink--zine"));
-		srvLinksTCBL.add(new SrvLink("TCBL Labs platform", "https://labs.tcbl.eu/", "srvlink--labs"));
 		model.addAttribute("srvLinksTCBL", srvLinksTCBL);
 
-		List<SrvLink> srvLinksASP = new ArrayList<>();
-		srvLinksASP.add(new SrvLink("Thela", "https://thela.cleviria.it/", "button--srvlink--asp"));
 		model.addAttribute("srvLinksASP", srvLinksASP);
 
 		return "/services";

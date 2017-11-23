@@ -177,12 +177,12 @@ form .required{
     background-color: #82d98e;
 }
 
-.srvlink--labs {
+.button--srvlink--labs {
     color: #000000;
     background-color: #24a8e0;
 }
 
-.srvlink--labs:hover, .srvlink--labs:focus {
+.button--srvlink--labs:hover, .button--srvlink--labs:focus {
     color: #ffffff;
     background-color: #009fde;
 }
