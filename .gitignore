@@ -4,3 +4,4 @@ logs
 *.iml
 .idea
 **/application.yml
+**/services*.json

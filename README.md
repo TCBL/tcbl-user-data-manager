@@ -249,6 +249,20 @@ security:
 
 The TCBL User Data Manager application specific settings are grouped under `tudm`.
 
+##### TCBL services
+
+The TCBL services are maintained in a file outside the main configuration file,
+but the name of that file is defined in the main configuration file.
+
+An example of such a TCBL services file can be found at `tcbl-user-data-manager/src/main/resources/services.json.dist`.
+
+Note that the published TCBL services can be refreshed after an update to the TCBL services file
+without restarting the application by navigating to the application's TCBL Services endpoint,
+with an additional refresh parameter set to true:
+```
+/usermanager/services?refresh=true
+``` 
+ 
 A configuration snippet (example):
 
 ```yaml
@@ -257,27 +271,8 @@ A configuration snippet (example):
 ##
 tudm:
   tcbl-services:
-    # srvLinks* entries below are lists; per list element:
-    #   text:  text to display
-    #   url:   destination url
-    #   style: display style: main|zine|labs|asp(=default)
-
-    # services from the TCBL consortium
-    srvLinksTCBL:
-      - text: "Main TCBL website"
-        url: https://tcbl.eu/
-        style: main
-      - text: "_ZINE, the TCBL magazine"
-        url: https://zine.tcbl.eu/
-        style: zine
-      - text: "TCBL Labs platform"
-        url: "https://labs.tcbl.eu/"
-        style: labs
-    # services from the Associated Service Providers
-    srvLinksASP:
-      - text: "Thela"
-        url: "https://thela.cleviria.it/"
-
+    # name of the json file containing the descriptions of the TCBL services
+    filename: services.json
 ```
  
 
@@ -414,27 +409,8 @@ security:
 ##
 tudm:
   tcbl-services:
-    # srvLinks* entries below are lists; per list element:
-    #   text:  text to display
-    #   url:   destination url
-    #   style: display style: main|zine|labs|asp(=default)
-
-    # services from the TCBL consortium
-    srvLinksTCBL:
-      - text: "Main TCBL website"
-        url: https://tcbl.eu/
-        style: main
-      - text: "_ZINE, the TCBL magazine"
-        url: https://zine.tcbl.eu/
-        style: zine
-      - text: "TCBL Labs platform"
-        url: "https://labs.tcbl.eu/"
-        style: labs
-    # services from the Associated Service Providers
-    srvLinksASP:
-      - text: "Thela"
-        url: "https://thela.cleviria.it/"
-
+    # name of the json file containing the descriptions of the TCBL services
+    filename: services.json
 ```
 
 ## Running

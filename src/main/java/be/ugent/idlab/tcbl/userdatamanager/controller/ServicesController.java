@@ -1,11 +1,11 @@
 package be.ugent.idlab.tcbl.userdatamanager.controller;
 
-import be.ugent.idlab.tcbl.userdatamanager.controller.support.SrvLink;
 import be.ugent.idlab.tcbl.userdatamanager.controller.support.NavLink;
-import org.springframework.boot.context.properties.ConfigurationProperties;
+import be.ugent.idlab.tcbl.userdatamanager.controller.support.ServicesLoader;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,30 +16,47 @@ import java.util.List;
  * @author Martin Vanbrabant
  */
 @Controller
-@ConfigurationProperties(prefix="tudm.tcbl-services")
 public class ServicesController {
 
-	private List<SrvLink> srvLinksTCBL;
-	private List<SrvLink> srvLinksASP;
+	private final ServicesLoader servicesLoader;
 
-	public void setSrvLinksTCBL(List<SrvLink> srvLinksTCBL) {
-		this.srvLinksTCBL = srvLinksTCBL;
-	}
-
-	public void setSrvLinksASP(List<SrvLink> srvLinksASP) {
-		this.srvLinksASP = srvLinksASP;
+	public ServicesController(ServicesLoader servicesLoader) {
+		this.servicesLoader = servicesLoader;
 	}
 
 	@RequestMapping("/services")
-	public String services(Model model) {
+	public String services(Model model,
+						   @RequestParam(value = "refresh", required = false) boolean refresh) {
+
+	 	// Admins can append ?refresh=true to install and immediately view the result
+		// of an update to the services json file.
+		// This is better than having to restart the application...
+		if (refresh) {
+			servicesLoader.refresh();
+		}
+
 		List<NavLink> navLinks = new ArrayList<>();
 		navLinks.add(new NavLink(NavLink.DisplayCondition.ALWAYS, "Home", "/index"));
 		model.addAttribute("navLinks", navLinks);
 
-		model.addAttribute("srvLinksTCBL", srvLinksTCBL);
+		model.addAttribute("srvLinksTCBL", servicesLoader.getSrvLinksTCBL());
 
-		model.addAttribute("srvLinksASP", srvLinksASP);
+		model.addAttribute("srvLinksASP", servicesLoader.getSrvLinksASP());
 
 		return "/services";
 	}
+
+	/**
+	 * This endpoint triggers the refresh of the ServicesLoader.
+	 *
+	 * It is not reachable using the normal navigation controls.
+	 * Admins can use it to install and immediately view the result of an update to the services json file.
+	 * This is better than having to restart the application...
+	 */
+	@RequestMapping("/services/refresh")
+	public String refresh() {
+
+		return "redirect:/services";
+	}
+
 }

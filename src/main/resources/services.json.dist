@@ -1,0 +1,25 @@
+{
+  "srvLinksTCBL": [
+    {
+      "text": "Main TCBL website",
+      "url": "https://tcbl.eu/",
+      "style": "main"
+    },
+    {
+      "text": "_ZINE, the TCBL magazine",
+      "url": "https://zine.tcbl.eu/",
+      "style": "zine"
+    },
+    {
+      "text": "TCBL Labs platform",
+      "url": "https://labs.tcbl.eu/",
+      "style": "labs"
+    }
+  ],
+  "srvLinksASP": [
+    {
+      "text": "Thela",
+      "url": "https://thela.cleviria.it"
+    }
+  ]
+}
