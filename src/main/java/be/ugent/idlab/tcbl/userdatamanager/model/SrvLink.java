@@ -1,4 +1,4 @@
-package be.ugent.idlab.tcbl.userdatamanager.controller.support;
+package be.ugent.idlab.tcbl.userdatamanager.model;
 
 /**
  * <p>Copyright 2017 IDLab (Ghent University - imec)</p>

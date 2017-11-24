@@ -2,8 +2,8 @@ package be.ugent.idlab.tcbl.userdatamanager.controller;
 
 import be.ugent.idlab.tcbl.userdatamanager.background.Mail;
 import be.ugent.idlab.tcbl.userdatamanager.controller.support.ConfirmationTemplate;
-import be.ugent.idlab.tcbl.userdatamanager.controller.support.NavLink;
-import be.ugent.idlab.tcbl.userdatamanager.controller.support.Status;
+import be.ugent.idlab.tcbl.userdatamanager.model.NavLink;
+import be.ugent.idlab.tcbl.userdatamanager.model.Status;
 import be.ugent.idlab.tcbl.userdatamanager.model.TCBLUser;
 import be.ugent.idlab.tcbl.userdatamanager.model.TCBLUserRepository;
 import org.slf4j.Logger;

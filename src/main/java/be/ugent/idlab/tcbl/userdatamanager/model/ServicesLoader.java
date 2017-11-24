@@ -1,4 +1,4 @@
-package be.ugent.idlab.tcbl.userdatamanager.controller.support;
+package be.ugent.idlab.tcbl.userdatamanager.model;
 
 import com.google.gson.Gson;
 import org.slf4j.Logger;

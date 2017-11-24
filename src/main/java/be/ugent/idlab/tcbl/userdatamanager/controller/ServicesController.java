@@ -1,7 +1,7 @@
 package be.ugent.idlab.tcbl.userdatamanager.controller;
 
-import be.ugent.idlab.tcbl.userdatamanager.controller.support.NavLink;
-import be.ugent.idlab.tcbl.userdatamanager.controller.support.ServicesLoader;
+import be.ugent.idlab.tcbl.userdatamanager.model.NavLink;
+import be.ugent.idlab.tcbl.userdatamanager.model.ServicesLoader;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;

@@ -1,5 +1,7 @@
 package be.ugent.idlab.tcbl.userdatamanager.controller.support;
 
+import be.ugent.idlab.tcbl.userdatamanager.model.NavLink;
+import be.ugent.idlab.tcbl.userdatamanager.model.Status;
 import org.springframework.ui.Model;
 
 import java.util.ArrayList;
