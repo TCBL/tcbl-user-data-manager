@@ -90,6 +90,6 @@ public class ConfirmationTemplate {
 		if (!model.containsAttribute("status")) {
 			model.addAttribute("status", status);
 		}
-		return "/confirmation";
+		return "confirmation";
 	}
 }

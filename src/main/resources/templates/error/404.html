@@ -3,11 +3,13 @@
 <head th:replace="fragments :: standard-head">
 </head>
 <body>
-<div th:replace="fragments :: standard-body-div( ~{::h1}, ~{::main})">
-	<h1 th:text="${title}">Confirmation title</h1>
+<div th:replace="fragments :: error-body-div( ~{::h1}, ~{::p})">
+	<h1>TCBL User Manager - Not found</h1>
 
 	<main>
-		<div th:utext="${utext}">Confirmation text</div>
+		<div>
+			<p>The page you were looking for does not exist on this site...</p>
+		</div>
 	</main>
 </div>
 </body>

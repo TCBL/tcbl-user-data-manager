@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="fragments :: standard-head">
+</head>
+<body>
+<div th:replace="fragments :: error-body-div( ~{::h1}, ~{::main})">
+	<h1>TCBL User Manager - Error</h1>
+
+	<main>
+		<div>
+			<p>We're sorry to inform you that an unexpected error occurred here.</p>
+			<p th:text="|${status?:''} ${error?:''}|"></p>
+			<th:block th:if="${message} != null">
+				<p th:text="|Message: ${message}|"></p>
+			</th:block>
+		</div>
+	</main>
+</div>
+</body>
+</html>

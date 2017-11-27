@@ -352,8 +352,6 @@ spring:
   thymeleaf:
     # --- cache: false for test environment; true for production environment
     cache: false
-    # this prefix setting has to do with https://github.com/spring-projects/spring-boot/issues/1744 !
-    prefix: classpath:/templates
 
   # SMTP settings, necessary to send mails. See https://docs.spring.io/spring-boot/docs/current/reference/html/boot-features-email.html
   mail:

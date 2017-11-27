@@ -41,7 +41,7 @@ public class StatController {
 			log.error("Error while getting stats or stats not calculated yet.", e);
 			model.addAttribute("totalCount", null);
 		}
-		return "/stats/users";
+		return "stats/users";
 	}
 
 }

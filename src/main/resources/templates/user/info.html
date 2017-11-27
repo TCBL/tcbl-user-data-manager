@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="/fragments :: standard-head">
+<head th:replace="fragments :: standard-head">
 </head>
 <body>
-<div th:replace="/fragments :: standard-body-div( ~{::h1}, ~{::main})">
+<div th:replace="fragments :: standard-body-div( ~{::h1}, ~{::main})">
 	<h1>Manage your profile</h1>
 	<main>
 		<th:block th:if="${tcblUser} != null">

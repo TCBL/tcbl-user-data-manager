@@ -50,7 +50,34 @@ the other templates.
 	<!--/* common status */-->
 	<div class="row tcbl-status" th:if="${status} != null">
 		<!--/* appended class examples: tcbl-status-ok, tcbl-status-warning, tcbl-status-error */-->
-		<span th:classappend="|tcbl-status-${#strings.toLowerCase(status.value.name())}|"th:text="${status.text}" >Status text here</span>
+		<span th:classappend="|tcbl-status-${#strings.toLowerCase(status.value.name())}|" th:text="${status.text}" >Status text here</span>
+	</div>
+
+	<!--/* common footer */-->
+	<div class="row tcbl-footer">
+		<div class="columns">
+			<p>This project has received funding from the European Union's Horizon 2020 Programme for research, technology development, and innovation under grant Agreement n.646133</p>
+		</div>
+		<div class="columns">
+			<img th:src="@{/assets/euh2020.png}" alt="European Commission logo">
+		</div>
+	</div>
+</div>
+
+<!-- This is a reduced body/div element for use in error pages. -->
+<div th:fragment="error-body-div(errorBodyTitle, errorBodyMain)">
+	<!--/* common header */-->
+	<div class="row tcbl-header">
+		<div class="columns">
+			<img th:src="@{/assets/TCBLAltsm.png}" alt="TCBL logo">
+		</div>
+		<div class="columns">
+			<h1 th:replace="${errorBodyTitle ?: 'TCBL User Manager - Error'}">Hello</h1>
+		</div>
+	</div>
+
+	<!--/* error description (rendered as 'common status' in standard-body-div */-->
+	<div class="row tcbl-status tcbl-status-error" th:insert="${errorBodyMain}">
 	</div>
 
 	<!--/* common footer */-->

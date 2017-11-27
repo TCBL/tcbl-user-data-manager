@@ -43,7 +43,7 @@ public class ServicesController {
 
 		model.addAttribute("srvLinksASP", servicesLoader.getSrvLinksASP());
 
-		return "/services";
+		return "services";
 	}
 
 	/**

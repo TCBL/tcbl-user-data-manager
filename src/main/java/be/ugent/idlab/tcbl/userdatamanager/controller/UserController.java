@@ -8,6 +8,7 @@ import be.ugent.idlab.tcbl.userdatamanager.model.TCBLUser;
 import be.ugent.idlab.tcbl.userdatamanager.model.TCBLUserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.autoconfigure.web.servlet.error.BasicErrorController;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.stereotype.Controller;
@@ -81,7 +82,7 @@ public class UserController {
 			model.addAttribute("status", new Status(Status.Value.ERROR, "Your information could not be found."));
 		}
 		model.addAttribute("navLinks", new NavLink(NavLink.DisplayCondition.ALWAYS, "Home", "/index"));
-		return "/user/info";
+		return "user/info";
 	}
 
 	@PostMapping("/update")
@@ -95,7 +96,7 @@ public class UserController {
 			model.addAttribute("status", new Status(Status.Value.ERROR, "Your information could not be updated."));
 		}
 		model.addAttribute("navLinks", new NavLink(NavLink.DisplayCondition.ALWAYS, "Home", "/index"));
-		return "/user/info";
+		return "user/info";
 	}
 
 	@GetMapping("/register")
@@ -103,7 +104,7 @@ public class UserController {
 		TCBLUser user = new TCBLUser();
 		model.addAttribute("tcblUser", user);
 		model.addAttribute("navLinks", new NavLink(NavLink.DisplayCondition.ALWAYS, "Home", "/index"));
-		return "/user/register";
+		return "user/register";
 	}
 
 	@PostMapping("/register")
@@ -188,7 +189,7 @@ public class UserController {
 	@GetMapping("/resetpw")
 	public String getResetPassword(Model model) {
 		model.addAttribute("navLinks", new NavLink(NavLink.DisplayCondition.ALWAYS, "Home", "/index"));
-		return "/user/resetpw";
+		return "user/resetpw";
 	}
 
 	@PostMapping("/resetpw")
@@ -239,7 +240,7 @@ public class UserController {
 			model.addAttribute("rpc", encodedId);
 			model.addAttribute("navLinks", new NavLink(NavLink.DisplayCondition.ALWAYS, "Home", "/index"));
 
-			return "/user/resetpwform";
+			return "user/resetpwform";
 		} catch (Exception e) {
 			ConfirmationTemplate ct = new ConfirmationTemplate("Reset password");
 			ct.addNavLink(new NavLink(NavLink.DisplayCondition.ALWAYS, "Home", "/index"));
