@@ -81,7 +81,6 @@ public class UserController {
 			log.error("Cannot get user info", e);
 			model.addAttribute("status", new Status(Status.Value.ERROR, "Your information could not be found."));
 		}
-		model.addAttribute("navLinks", new NavLink(NavLink.DisplayCondition.ALWAYS, "Home", "/index"));
 		return "user/info";
 	}
 
@@ -95,7 +94,6 @@ public class UserController {
 			log.error("Cannot update user info", e);
 			model.addAttribute("status", new Status(Status.Value.ERROR, "Your information could not be updated."));
 		}
-		model.addAttribute("navLinks", new NavLink(NavLink.DisplayCondition.ALWAYS, "Home", "/index"));
 		return "user/info";
 	}
 
@@ -103,14 +101,12 @@ public class UserController {
 	public String getRegister(Model model) {
 		TCBLUser user = new TCBLUser();
 		model.addAttribute("tcblUser", user);
-		model.addAttribute("navLinks", new NavLink(NavLink.DisplayCondition.ALWAYS, "Home", "/index"));
 		return "user/register";
 	}
 
 	@PostMapping("/register")
 	public String postRegister(HttpServletRequest request, Model model, TCBLUser user) {
 		ConfirmationTemplate ct = new ConfirmationTemplate("Sign up for TCBL");
-		ct.addNavLink(new NavLink(NavLink.DisplayCondition.ALWAYS, "Home", "/index"));
 
 		boolean oldActive = false;
 		try {
@@ -161,7 +157,6 @@ public class UserController {
 	@GetMapping("/confirm/{id}")
 	public String confirmRegistration(Model model, @PathVariable String id) {
 		ConfirmationTemplate ct = new ConfirmationTemplate("Sign up for TCBL completion");
-		ct.addNavLink(new NavLink(NavLink.DisplayCondition.ALWAYS, "Home", "/index"));
 
 		try {
 			String inum = decodeBase64(id);
@@ -188,14 +183,12 @@ public class UserController {
 
 	@GetMapping("/resetpw")
 	public String getResetPassword(Model model) {
-		model.addAttribute("navLinks", new NavLink(NavLink.DisplayCondition.ALWAYS, "Home", "/index"));
 		return "user/resetpw";
 	}
 
 	@PostMapping("/resetpw")
 	public String postResetPassword(HttpServletRequest request, Model model, String mail) {
 		ConfirmationTemplate ct = new ConfirmationTemplate("Reset password");
-		ct.addNavLink(new NavLink(NavLink.DisplayCondition.ALWAYS, "Home", "/index"));
 
 		boolean userExists = false;
 		try {
@@ -238,12 +231,10 @@ public class UserController {
 			}
 			String encodedId = encodeBase64(userId);
 			model.addAttribute("rpc", encodedId);
-			model.addAttribute("navLinks", new NavLink(NavLink.DisplayCondition.ALWAYS, "Home", "/index"));
 
 			return "user/resetpwform";
 		} catch (Exception e) {
 			ConfirmationTemplate ct = new ConfirmationTemplate("Reset password");
-			ct.addNavLink(new NavLink(NavLink.DisplayCondition.ALWAYS, "Home", "/index"));
 
 			if (expired) {
 				ct.setUtext("<p>We are sorry to tell you that the reset password process failed.</p>" +
@@ -267,7 +258,6 @@ public class UserController {
 	@PostMapping("/resetpwform")
 	public String resetPasswordForm(Model model, String password, String rpc) {
 		ConfirmationTemplate ct = new ConfirmationTemplate("Reset password");
-		ct.addNavLink(new NavLink(NavLink.DisplayCondition.ALWAYS, "Home", "/index"));
 
 		try {
 			String inum = decodeBase64(rpc);

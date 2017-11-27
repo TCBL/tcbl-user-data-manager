@@ -35,10 +35,6 @@ public class ServicesController {
 			servicesLoader.refresh();
 		}
 
-		List<NavLink> navLinks = new ArrayList<>();
-		navLinks.add(new NavLink(NavLink.DisplayCondition.ALWAYS, "Home", "/index"));
-		model.addAttribute("navLinks", navLinks);
-
 		model.addAttribute("srvLinksTCBL", servicesLoader.getSrvLinksTCBL());
 
 		model.addAttribute("srvLinksASP", servicesLoader.getSrvLinksASP());

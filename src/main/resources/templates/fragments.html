@@ -30,7 +30,7 @@ the other templates.
 	<!--/* common header */-->
 	<div class="row tcbl-header">
 		<div class="columns">
-			<img th:src="@{/assets/TCBLAltsm.png}" alt="TCBL logo">
+			<a title="Home" th:href="@{'/'}"><img th:src="@{/assets/TCBLAltsm.png}" alt="TCBL logo"></a>
 		</div>
 		<div class="columns">
 			<h1 th:replace="${standardBodyTitle ?: 'TCBL User Manager'}">Hello</h1>
@@ -69,7 +69,7 @@ the other templates.
 	<!--/* common header */-->
 	<div class="row tcbl-header">
 		<div class="columns">
-			<img th:src="@{/assets/TCBLAltsm.png}" alt="TCBL logo">
+			<a title="Home" th:href="@{'/'}"><img th:src="@{/assets/TCBLAltsm.png}" alt="TCBL logo"></a>
 		</div>
 		<div class="columns">
 			<h1 th:replace="${errorBodyTitle ?: 'TCBL User Manager - Error'}">Hello</h1>
