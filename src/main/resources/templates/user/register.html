@@ -3,7 +3,7 @@
 <head th:replace="fragments :: standard-head">
 </head>
 <body>
-<div th:replace="fragments :: standard-body-div( ~{::h1}, ~{::main})">
+<div th:replace="fragments :: standard-body-div( ~{::h1}, ~{::main}, 0)">
 	<h1>Sign up for TCBL</h1>
     <main>
         <th:block th:if="${tcblUser} != null">
@@ -14,15 +14,15 @@
 					<div class="row">
 						<div class="columns large-3">
 							<label for="userName">E-mail</label>
-							<input type="email" th:field="*{userName}" required/>
+							<input type="email" name="userName" id="userName" th:field="*{userName}" required/>
 						</div>
 						<div class="columns large-3">
 							<label for="password">Password</label>
-							<input type="password" th:field="*{password}" autocomplete="off" required/>
+							<input type="password" name="password" id="password" th:field="*{password}" autocomplete="off" required/>
 						</div>
 						<div class="columns large-3">
 							<label for="cpassword">Confirm Password</label>
-							<input type="password" id="cpassword" name="cpassword" autocomplete="off" value="" required/>
+							<input type="password" name="cpassword" id="cpassword" autocomplete="off" value="" required/>
 						</div>
 					</div>
 				</fieldset>
@@ -32,11 +32,11 @@
 					<div class="row">
 						<div class="columns large-2">
 							<label for="firstName">First name</label>
-							<input type="text" th:field="*{firstName}" required/>
+							<input type="text" name="firstName" id="firstName" th:field="*{firstName}" required/>
 						</div>
 						<div class="columns large-2">
 							<label for="lastName">Last name</label>
-							<input type="text" th:field="*{lastName}" required/>
+							<input type="text" name="lastName" id="lastName" th:field="*{lastName}" required/>
 						</div>
 					</div>
 				</fieldset>

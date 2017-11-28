@@ -3,7 +3,7 @@
 <head th:replace="fragments :: standard-head">
 </head>
 <body>
-<div th:replace="fragments :: standard-body-div( ~{::h1}, ~{::main})">
+<div th:replace="fragments :: standard-body-div( ~{::h1}, ~{::main}, 0)">
     <h1>User numbers</h1>
     <main>
         <div th:if="${totalCount} != null">

@@ -3,17 +3,17 @@
 <head th:replace="fragments :: standard-head">
 </head>
 <body>
-<div th:replace="fragments :: standard-body-div( ~{::h1}, ~{::main})">
+<div th:replace="fragments :: standard-body-div( ~{::h1}, ~{::main}, 0)">
 	<h1>TCBL User Manager</h1>
 
 	<main>
 		<div>
 			<p>TCBL login uses the OpenID Connect technology for Single Sign On to access participating TCBL Services.</p>
 			<p>When you navigate between TCBL services, your TCBL account is recognized and as far as you agree, the profile information you added to it is passed on.</p>
-			<p>You have full control over your profile information. and how it is used by other services.</p>
+			<p>You have full control over your profile information and how it is used by other services.</p>
 			<th:block sec:authorize="hasRole('ROLE_ANONYMOUS')">
-				<p>If you do not have a TCBL Single Sign On account yet, this is a good time to <a href="#" th:href="@{/user/register}">sign up for TCBL</a>.</p>
-				<p>If you have an account, you may want to <a href="#" th:href="@{/oiclogin}">login with TCBL</a> now.</p>
+				<p>If you do not have a TCBL Single Sign On account yet, this is a good time to sign up for TCBL.</p>
+				<p>If you have an account, you may want to login with TCBL now.</p>
 			</th:block>
 		</div>
 	</main>

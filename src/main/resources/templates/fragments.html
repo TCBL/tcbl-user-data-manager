@@ -25,12 +25,15 @@ the other templates.
 
 <body>
 
-<!-- This is the standard body/div element. -->
-<div th:fragment="standard-body-div(standardBodyTitle, standardBodyMain)">
+<!-- This is the standard body/div element.
+       standardBodyVariant == 0 : normal page
+       standardBodyVariant == 1 : error page
+-->
+<div th:fragment="standard-body-div(standardBodyTitle, standardBodyMain, standardBodyVariant)">
 	<!--/* common header */-->
 	<div class="row tcbl-header">
 		<div class="columns">
-			<a title="Home" th:href="@{'/'}"><img th:src="@{/assets/TCBLAltsm.png}" alt="TCBL logo"></a>
+			<a title="Back to the home page of TCBL User Manager" th:href="@{'/'}"><img src="euh2020.png" th:src="@{/assets/TCBLAltsm.png}" alt="TCBL logo"></a>
 		</div>
 		<div class="columns">
 			<h1 th:replace="${standardBodyTitle ?: 'TCBL User Manager'}">Hello</h1>
@@ -43,42 +46,23 @@ the other templates.
 		</th:block>
 	</div>
 
-	<!--/* main contents */-->
-	<div class="row tcbl-main" th:insert="${standardBodyMain}">
-	</div>
-
-	<!--/* common status */-->
-	<div class="row tcbl-status" th:if="${status} != null">
-		<!--/* appended class examples: tcbl-status-ok, tcbl-status-warning, tcbl-status-error */-->
-		<span th:classappend="|tcbl-status-${#strings.toLowerCase(status.value.name())}|" th:text="${status.text}" >Status text here</span>
-	</div>
-
-	<!--/* common footer */-->
-	<div class="row tcbl-footer">
-		<div class="columns">
-			<p>This project has received funding from the European Union's Horizon 2020 Programme for research, technology development, and innovation under grant Agreement n.646133</p>
+	<th:block th:if="${standardBodyVariant} == 0">
+		<!--/* main contents */-->
+		<div class="row tcbl-main" th:insert="${standardBodyMain}">
 		</div>
-		<div class="columns">
-			<img th:src="@{/assets/euh2020.png}" alt="European Commission logo">
-		</div>
-	</div>
-</div>
 
-<!-- This is a reduced body/div element for use in error pages. -->
-<div th:fragment="error-body-div(errorBodyTitle, errorBodyMain)">
-	<!--/* common header */-->
-	<div class="row tcbl-header">
-		<div class="columns">
-			<a title="Home" th:href="@{'/'}"><img th:src="@{/assets/TCBLAltsm.png}" alt="TCBL logo"></a>
+		<!--/* common status */-->
+		<div class="row tcbl-status" th:if="${status} != null">
+			<!--/* appended class examples: tcbl-status-ok, tcbl-status-warning, tcbl-status-error */-->
+			<span th:classappend="|tcbl-status-${#strings.toLowerCase(status.value.name())}|" th:text="${status.text}" >Status text here</span>
 		</div>
-		<div class="columns">
-			<h1 th:replace="${errorBodyTitle ?: 'TCBL User Manager - Error'}">Hello</h1>
-		</div>
-	</div>
+	</th:block>
 
-	<!--/* error description (rendered as 'common status' in standard-body-div */-->
-	<div class="row tcbl-status tcbl-status-error" th:insert="${errorBodyMain}">
-	</div>
+	<th:block th:if="${standardBodyVariant} == 1">
+		<!--/* render the error as a common status */-->
+		<div class="row tcbl-status tcbl-status-error" th:insert="${standardBodyMain}">
+		</div>
+	</th:block>
 
 	<!--/* common footer */-->
 	<div class="row tcbl-footer">
@@ -86,7 +70,7 @@ the other templates.
 			<p>This project has received funding from the European Union's Horizon 2020 Programme for research, technology development, and innovation under grant Agreement n.646133</p>
 		</div>
 		<div class="columns">
-			<img th:src="@{/assets/euh2020.png}" alt="European Commission logo">
+			<img src="euh2020.png" th:src="@{/assets/euh2020.png}" alt="European Commission logo">
 		</div>
 	</div>
 </div>

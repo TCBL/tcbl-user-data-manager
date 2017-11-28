@@ -165,8 +165,8 @@ public class UserController {
 				user.setActive(true);
 				tcblUserRepository.save(user);
 			}
-			ct.setUtext("<p>You're successfully signed up! You can now use your new account to login at TCBL related sites.</p>" +
-					"<p>See our home page for more options...</p>");
+			ct.setUtext("<p>You're successfully signed up! You can now use your new account to login here and at TCBL related sites.</p>" +
+					"<p>See the home page for more options...</p>");
 			ct.setStatus(new Status(Status.Value.OK, "Sign up for TCBL completed."));
 		} catch (Exception e) {
 			// reached when the url was maniplulated or when the user was deleted in the mean time...
@@ -264,8 +264,8 @@ public class UserController {
 			TCBLUser user = tcblUserRepository.find(inum);
 			user.setPassword(password);
 			tcblUserRepository.save(user);
-			ct.setUtext("<p>You've successfully updated your password! You can now use your account again to login at TCBL related sites.</p>" +
-					"<p>See our home page for more options...</p>");
+			ct.setUtext("<p>You've successfully updated your password! You can now use your account again to login here and at TCBL related sites.</p>" +
+					"<p>See the home page for more options...</p>");
 			ct.setStatus(new Status(Status.Value.OK, "Password updated."));
 		} catch (Exception e) {
 			// reached when the user was deleted in the mean time...

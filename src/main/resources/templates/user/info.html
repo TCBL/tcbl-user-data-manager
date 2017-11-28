@@ -3,7 +3,7 @@
 <head th:replace="fragments :: standard-head">
 </head>
 <body>
-<div th:replace="fragments :: standard-body-div( ~{::h1}, ~{::main})">
+<div th:replace="fragments :: standard-body-div( ~{::h1}, ~{::main}, 0)">
 	<h1>Manage your profile</h1>
 	<main>
 		<th:block th:if="${tcblUser} != null">
@@ -13,11 +13,11 @@
 					<div class="row">
 						<div class="columns large-2">
 							<label for="firstName">First name</label>
-							<input type="text" th:field="*{firstName}" required/><br>
+							<input type="text" name="firstName" id="firstName" th:field="*{firstName}" required/><br>
 						</div>
 						<div class="columns large-2">
 							<label for="lastName">Last name</label>
-							<input type="text" th:field="*{lastName}" required/><br>
+							<input type="text" name="lastName" id="lastName" th:field="*{lastName}" required/><br>
 						</div>
 					</div>
 					<input type="submit" value="Update" class="button button--red"/>
