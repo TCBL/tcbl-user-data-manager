@@ -1,8 +1,11 @@
 package be.ugent.idlab.tcbl.userdatamanager.controller;
 
+import be.ugent.idlab.tcbl.userdatamanager.model.NavLink;
+import be.ugent.idlab.tcbl.userdatamanager.model.Status;
 import org.springframework.boot.autoconfigure.security.oauth2.client.ClientRegistrationAutoConfiguration;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.Set;
@@ -42,5 +45,12 @@ public class LoginController {
 	@RequestMapping("/oiclogin")
 	public String login() {
 		return redirectDirective;
+	}
+
+	@RequestMapping("/loginrequired")
+	public String loginPlease(Model model) {
+		model.addAttribute("navLinks", new NavLink(NavLink.DisplayCondition.ALWAYS, "Login with TCBL", "/oiclogin"));
+		model.addAttribute("status", new Status(Status.Value.ERROR, "Login required."));
+		return "loginrequired";
 	}
 }

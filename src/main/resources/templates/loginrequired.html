@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="fragments :: standard-head">
+</head>
+<body>
+<div th:replace="fragments :: standard-body-div( ~{::h1}, ~{::main})">
+	<h1>TCBL User Manager - Login Required</h1>
+
+	<main>
+		<div>
+			<p>The page you're trying to access requires you to <a href="#" th:href="@{/oiclogin}">login with TCBL</a> first.</p>
+		</div>
+	</main>
+</div>
+</body>
+</html>

@@ -15,6 +15,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.annotation.web.configurers.oauth2.client.OAuth2LoginConfigurer;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
+import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 
 import java.net.URI;
 import java.util.Set;
@@ -56,6 +57,7 @@ public class OAuth2LoginAutoConfiguration {
 							"/css/*",
 							"/assets/*",
 							"/oiclogin",
+							"/loginrequired",
 							"/",
 							"/index",
 							"/user/register",
@@ -70,7 +72,11 @@ public class OAuth2LoginAutoConfiguration {
 							).permitAll()
 					.anyRequest().authenticated()
 					.and()
-					.oauth2Login();
+					// next exceptionHandling replaces .oauth2Login()
+					// see also https://spring.io/guides/tutorials/spring-boot-oauth2/, "Unauthenticated users are re-directed to the home page"
+					// see also https://github.com/spring-projects/spring-security-oauth/issues/786
+					.exceptionHandling().authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/loginrequired"))
+			;
 
 			this.registerUserNameAttributeNames(http.oauth2Login());
 		}
