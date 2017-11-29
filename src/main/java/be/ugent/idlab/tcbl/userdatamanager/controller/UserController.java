@@ -8,7 +8,6 @@ import be.ugent.idlab.tcbl.userdatamanager.model.TCBLUser;
 import be.ugent.idlab.tcbl.userdatamanager.model.TCBLUserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.autoconfigure.web.servlet.error.BasicErrorController;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.stereotype.Controller;
@@ -129,11 +128,9 @@ public class UserController {
 			TCBLUser newUser = tcblUserRepository.create(user);
 			String baseUri = getUriOneLevelUp(request);
 			sendRegisterMessage(newUser, baseUri);
-			ct.setUtext("<p>Registration of '" + user.getUserName() + "' is almost complete.</p>" +
-					"<p>We've sent you an email containing a link to activate your account. Please check your mailbox.</p>" +
-					"<p>If you don't find the email within a few minutes, check your spam folder too before retrying.</p>");
+			ct.setUtext(getEmailInformationText(user.getUserName()));
 			ct.addNavLink(new NavLink(NavLink.DisplayCondition.ALWAYS, "Try again", "/user/register"));
-			ct.setStatus(new Status(Status.Value.OK, "Email sent. You can close this browser tab."));
+			ct.setStatus(new Status(Status.Value.OK, "Please check your mailbox."));
 		} catch (Exception e) {
 			log.error("Cannot register user {}", user.getUserName(), e);
 			if (oldActive) {
@@ -165,11 +162,12 @@ public class UserController {
 				user.setActive(true);
 				tcblUserRepository.save(user);
 			}
-			ct.setUtext("<p>You're successfully signed up! You can now use your new account to login here and at TCBL related sites.</p>" +
-					"<p>See the home page for more options...</p>");
+			ct.setUtext("<p>You're successfully signed up!</p>" +
+					"<p>You can now use your new account to login.</p>" +
+					"<p>See our home page for more options...");
 			ct.setStatus(new Status(Status.Value.OK, "Sign up for TCBL completed."));
 		} catch (Exception e) {
-			// reached when the url was maniplulated or when the user was deleted in the mean time...
+			// reached when the url was manipulated or when the user was deleted in the mean time...
 			log.error("Cannot confirm registration of {} ", id, e);
 			ct.setUtext("<p>We are sorry to tell you that the sign up for TCBL process failed.</p>" +
 					"<p>Are you sure you used the appropriate link?</p>" +
@@ -196,11 +194,10 @@ public class UserController {
 			userExists = true;
 			String baseUri = getUriOneLevelUp(request);
 			sendResetMessage(user, baseUri);
-			ct.setUtext("<p>We've sent an email containing a link to reset your password to '" + mail +
-					"'. The link is <b>only valid for one hour</b>, starting now. Please check your mailbox.</p>" +
-					"<p>If you don't find the email within a few minutes, check your spam folder too before retrying.</p>");
+			ct.setUtext(getEmailInformationText(mail) +
+					"<p>The link is only valid for <b>one hour</b>, starting now.</p>");
 			ct.addNavLink(new NavLink(NavLink.DisplayCondition.ALWAYS, "Try again", "/user/resetpw"));
-			ct.setStatus(new Status(Status.Value.OK, "Email sent. You can close this browser tab."));
+			ct.setStatus(new Status(Status.Value.OK, "Please check your mailbox."));
 		} catch (Exception e) {
 			log.error("Cannot send reset pw mail for {}", mail, e);
 			if (userExists) {
@@ -264,8 +261,7 @@ public class UserController {
 			TCBLUser user = tcblUserRepository.find(inum);
 			user.setPassword(password);
 			tcblUserRepository.save(user);
-			ct.setUtext("<p>You've successfully updated your password! You can now use your account again to login here and at TCBL related sites.</p>" +
-					"<p>See the home page for more options...</p>");
+			ct.setUtext("<p>You've successfully updated your password!</p>");
 			ct.setStatus(new Status(Status.Value.OK, "Password updated."));
 		} catch (Exception e) {
 			// reached when the user was deleted in the mean time...
@@ -342,6 +338,12 @@ public class UserController {
 	private String getUriOneLevelUp(final HttpServletRequest request) {
 		String reqUri = request.getRequestURL().toString();
 		return reqUri.substring(0, reqUri.lastIndexOf('/'));
+	}
+
+	private String getEmailInformationText(String addressee) {
+		return	String.format("<p>We've sent an email with further instructions to <b>%s</b>'.</p>", addressee) +
+				"<p>If you don't find the email within a few minutes, check your spam folder too before retrying.</p>" +
+				"<p>When you follow the link in the email, a new browser tab will open. You can close this browser tab at that time.</p>";
 	}
 
 }
