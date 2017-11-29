@@ -42,7 +42,9 @@ the other templates.
 
 	<!--/* navigation links */-->
 	<div class="row tcbl-nav-links">
-		<th:block th:replace="::navlink('Home', '/index')"> </th:block>
+		<th:block th:unless="${nohomelink}">
+			<th:block th:replace="::navlink('Home', '/index')"> </th:block>
+		</th:block>
 		<th:block th:if="${navLinks} != null">
 			<th:block th:replace="::navlinks(${navLinks})"> </th:block>
 		</th:block>

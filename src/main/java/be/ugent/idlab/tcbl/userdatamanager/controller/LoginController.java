@@ -8,6 +8,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -49,7 +51,11 @@ public class LoginController {
 
 	@RequestMapping("/loginrequired")
 	public String loginPlease(Model model) {
-		model.addAttribute("navLinks", new NavLink(NavLink.DisplayCondition.ALWAYS, "Login with TCBL", "/oiclogin"));
+		model.addAttribute("nohomelink", true);
+		List<NavLink> navLinks = new ArrayList<>();
+		navLinks.add(new NavLink(NavLink.DisplayCondition.ALWAYS, "Login with TCBL", "/oiclogin"));
+		navLinks.add(new NavLink(NavLink.DisplayCondition.ALWAYS, "Sign up for TCBL", "/user/register"));
+		model.addAttribute("navLinks", navLinks);
 		model.addAttribute("status", new Status(Status.Value.ERROR, "Login required."));
 		return "loginrequired";
 	}
