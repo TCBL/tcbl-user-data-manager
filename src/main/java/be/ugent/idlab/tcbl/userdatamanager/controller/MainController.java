@@ -23,12 +23,12 @@ public class MainController {
 
 	@RequestMapping("/index")
 	public String index(Model model) {
+		model.addAttribute("nohomelink", true);
 		List<NavLink> navLinks = new ArrayList<>();
 		navLinks.add(new NavLink(NavLink.DisplayCondition.ANONYMOUS, "Sign up for TCBL", "/user/register"));
-		navLinks.add(new NavLink(NavLink.DisplayCondition.ANONYMOUS, "Login with TCBL", "/oiclogin"));
-		navLinks.add(new NavLink(NavLink.DisplayCondition.AUTHENTICATED, "Manage your profile", "/user/info"));
+		navLinks.add(new NavLink(NavLink.DisplayCondition.ALWAYS, "Manage your profile", "/user/info"));
 		navLinks.add(new NavLink(NavLink.DisplayCondition.ALWAYS, "Reset password", "/user/resetpw"));
-		navLinks.add(new NavLink(NavLink.DisplayCondition.AUTHENTICATED, "TCBL Services", "/services"));
+		navLinks.add(new NavLink(NavLink.DisplayCondition.ALWAYS, "TCBL Services", "/services"));
 		model.addAttribute("navLinks", navLinks);
 		return "index";
 	}

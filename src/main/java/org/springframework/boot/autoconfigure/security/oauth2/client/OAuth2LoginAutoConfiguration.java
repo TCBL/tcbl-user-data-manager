@@ -48,13 +48,17 @@ public class OAuth2LoginAutoConfiguration {
 			http
 					.authorizeRequests()
 					.antMatchers(
+							// static contents:
 							"/favicon.ico",
 							"/css/*",
 							"/assets/*",
 							"/oiclogin",
-							"/loginrequired",
+							// mappings under /
 							"/",
 							"/index",
+							"/loginrequired",
+							"/services",
+							// mappings under /user
 							"/user/register",
 							"/user/registered",
 							"/user/confirm/*",
@@ -62,8 +66,10 @@ public class OAuth2LoginAutoConfiguration {
 							"/user/resetpwform",
 							"/user/resetpwform/*",
 							"/user/passwordset",
-							"/stats/users",
-							"/rest/*"
+							// mappings under /stats
+							"/stats/users"
+							// mappings under /stats
+							//not at this time: "/rest/*"
 							).permitAll()
 					.anyRequest().authenticated()
 					.and()

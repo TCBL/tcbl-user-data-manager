@@ -33,7 +33,7 @@ the other templates.
 	<!--/* common header */-->
 	<div class="row tcbl-header">
 		<div class="columns">
-			<a title="Back to the home page of TCBL User Manager" th:href="@{'/'}"><img src="euh2020.png" th:src="@{/assets/TCBLAltsm.png}" alt="TCBL logo"></a>
+			<img src="TCBLAltsm.png" th:src="@{/assets/TCBLAltsm.png}" alt="TCBL logo">
 		</div>
 		<div class="columns">
 			<h1 th:replace="${standardBodyTitle ?: 'TCBL User Manager'}">Hello</h1>
@@ -41,8 +41,12 @@ the other templates.
 	</div>
 
 	<!--/* navigation links */-->
-	<div class="row tcbl-nav-links" th:if="${navLinks} != null">
-		<th:block th:replace="::navlinks(${navLinks})">
+	<div class="row tcbl-nav-links">
+		<th:block th:unless="${nohomelink}">
+			<th:block th:replace="::navlink('Home', '/index')"> </th:block>
+		</th:block>
+		<th:block th:if="${navLinks} != null">
+			<th:block th:replace="::navlinks(${navLinks})"> </th:block>
 		</th:block>
 	</div>
 
@@ -98,10 +102,20 @@ the other templates.
 						 #authorization.expression('hasRole(''ROLE_ANONYMOUS'')')) or
 						((link.displayCondition.name() eq 'AUTHENTICATED') and
 						 #authorization.expression('isAuthenticated()'))}">
-				<input type="submit" value="Link text here" class="button button--nav" th:value="${link.text}">
+				<th:block th:replace="::navlink(${link.text}, ${link.location})">
+				</th:block>
 			</form>
 		</div>
 	</th:block>
+</th:block>
+
+<!-- A fragment that displays one navigation link -->
+<th:block th:fragment="navlink(text, location)">
+	<div class="columns no-padding-right">
+		<form action="#" th:action="@{${location}}">
+			<input type="submit" value="Link text here" class="button button--nav" th:value="${text}" >
+		</form>
+	</div>
 </th:block>
 
 <!-- A fragment that displays service links (parameter links not null) -->
