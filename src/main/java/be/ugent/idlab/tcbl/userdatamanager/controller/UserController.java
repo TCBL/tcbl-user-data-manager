@@ -341,7 +341,7 @@ public class UserController {
 	}
 
 	private String getEmailInformationText(String addressee) {
-		return	String.format("<p>We've sent an email with further instructions to <b>%s</b>'.</p>", addressee) +
+		return	String.format("<p>We've sent an email with further instructions to <b>%s</b>.</p>", addressee) +
 				"<p>If you don't find the email within a few minutes, check your spam folder too before retrying.</p>" +
 				"<p>When you follow the link in the email, a new browser tab will open. You can close this browser tab at that time.</p>";
 	}
