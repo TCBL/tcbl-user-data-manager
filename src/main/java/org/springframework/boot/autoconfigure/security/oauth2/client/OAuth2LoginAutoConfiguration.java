@@ -1,24 +1,41 @@
 package org.springframework.boot.autoconfigure.security.oauth2.client;
 
+import org.springframework.boot.autoconfigure.AutoConfigureAfter;
+import org.springframework.boot.autoconfigure.AutoConfigureBefore;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
+import org.springframework.boot.autoconfigure.security.SecurityAutoConfiguration;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
+import org.springframework.core.env.Environment;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfiguration;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
+import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
+
 /**
  * <p>Copyright 2017 IDLab (Ghent University - imec)</p>
  *
  * @author Gerald Haesendonck
  */
-/*@Configuration
+@Configuration
 @ConditionalOnWebApplication
 @ConditionalOnClass(EnableWebSecurity.class)
 @ConditionalOnMissingBean(WebSecurityConfiguration.class)
 @ConditionalOnBean(ClientRegistrationRepository.class)
 @AutoConfigureBefore(SecurityAutoConfiguration.class)
 @AutoConfigureAfter(ClientRegistrationAutoConfiguration.class)
-@Order(10) */
 public class OAuth2LoginAutoConfiguration {
 	private static final String USER_INFO_URI_PROPERTY = "user-info-uri";
 	private static final String USER_NAME_ATTR_NAME_PROPERTY = "user-name-attribute-name";
 	private static final String CLIENT_ID_PROPERTY = "client-id";
 
-/*	@EnableWebSecurity
+	@EnableWebSecurity
+	@Order(10)
 	protected static class OAuth2LoginSecurityConfiguration extends WebSecurityConfigurerAdapter {
 		private final Environment environment;
 
@@ -56,22 +73,22 @@ public class OAuth2LoginAutoConfiguration {
 					.exceptionHandling().authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/loginrequired"))
 			;
 
-			this.registerUserNameAttributeNames(http.oauth2Login());
+			//this.registerUserNameAttributeNames(http.oauth2Login());
 		}
 
-		private void registerUserNameAttributeNames(OAuth2LoginConfigurer<HttpSecurity> oauth2LoginConfigurer) throws Exception {
-			Set<String> clientPropertyKeys = resolveClientPropertyKeys(this.environment);
-			for (String clientPropertyKey : clientPropertyKeys) {
-				String fullClientPropertyKey = CLIENT_PROPERTY_PREFIX + "." + clientPropertyKey;
-				if (!this.environment.containsProperty(fullClientPropertyKey + "." + CLIENT_ID_PROPERTY)) {
-					continue;
-				}
-				String userInfoUriValue = this.environment.getProperty(fullClientPropertyKey + "." + USER_INFO_URI_PROPERTY);
-				String userNameAttributeNameValue = this.environment.getProperty(fullClientPropertyKey + "." + USER_NAME_ATTR_NAME_PROPERTY);
-				/*if (userInfoUriValue != null && userNameAttributeNameValue != null) {
-					oauth2LoginConfigurer.userInfoEndpoint().userNameAttributeName(userNameAttributeNameValue, URI.create(userInfoUriValue));
-				} */
-/*			}
-		}
-	} */
+//		private void registerUserNameAttributeNames(OAuth2LoginConfigurer<HttpSecurity> oauth2LoginConfigurer) throws Exception {
+//			Set<String> clientPropertyKeys = resolveClientPropertyKeys(this.environment);
+//			for (String clientPropertyKey : clientPropertyKeys) {
+//				String fullClientPropertyKey = CLIENT_PROPERTY_PREFIX + "." + clientPropertyKey;
+//				if (!this.environment.containsProperty(fullClientPropertyKey + "." + CLIENT_ID_PROPERTY)) {
+//					continue;
+//				}
+//				String userInfoUriValue = this.environment.getProperty(fullClientPropertyKey + "." + USER_INFO_URI_PROPERTY);
+//				String userNameAttributeNameValue = this.environment.getProperty(fullClientPropertyKey + "." + USER_NAME_ATTR_NAME_PROPERTY);
+//				/*if (userInfoUriValue != null && userNameAttributeNameValue != null) {
+//					oauth2LoginConfigurer.userInfoEndpoint().userNameAttributeName(userNameAttributeNameValue, URI.create(userInfoUriValue));
+//				} */
+//			}
+//		}
+	}
 }
