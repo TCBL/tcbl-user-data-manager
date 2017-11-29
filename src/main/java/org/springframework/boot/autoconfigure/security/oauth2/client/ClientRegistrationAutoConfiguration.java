@@ -9,17 +9,21 @@ import org.springframework.boot.context.properties.bind.Binder;
 import org.springframework.context.annotation.*;
 import org.springframework.core.env.Environment;
 import org.springframework.core.type.AnnotatedTypeMetadata;
+import org.springframework.security.oauth2.client.InMemoryOAuth2AuthorizedClientService;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
-import org.springframework.security.oauth2.client.registration.ClientRegistrationProperties;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.client.registration.InMemoryClientRegistrationRepository;
+import org.springframework.security.oauth2.core.AuthorizationGrantType;
+import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+//import org.springframework.security.oauth2.client.registration.ClientRegistrationProperties;
 
 /**
  * <p>Copyright 2017 IDLab (Ghent University - imec)</p>
@@ -29,12 +33,12 @@ import java.util.stream.Collectors;
 @Configuration
 @ConditionalOnWebApplication
 @ConditionalOnClass(ClientRegistrationRepository.class)
-@ConditionalOnMissingBean(ClientRegistrationRepository.class)
+//@ConditionalOnMissingBean(ClientRegistrationRepository.class)
 @AutoConfigureBefore(SecurityAutoConfiguration.class)
 public class ClientRegistrationAutoConfiguration {
 	private static final String CLIENT_ID_PROPERTY = "client-id";
 	//private static final String CLIENTS_DEFAULTS_RESOURCE = "META-INF/oauth2-clients-defaults.yml";
-	public static final String CLIENT_PROPERTY_PREFIX = "security.oauth2.client";
+	public static final String CLIENT_PROPERTY_PREFIX = "spring.security.oauth2.client.registration";
 
 	@Configuration
 	@Conditional(ClientPropertiesAvailableCondition.class)
@@ -53,20 +57,58 @@ public class ClientRegistrationAutoConfiguration {
 				propertySources.addLast(new PropertiesPropertySource("oauth2ClientsDefaults", clientsDefaultProperties));
 			}*/
 			Binder binder = Binder.get(this.environment);
-			List<ClientRegistration> clientRegistrations = new ArrayList<>();
+			OAuth2ClientProperties clientProperties = binder.bind(
+					"spring.security.oauth2.client", Bindable.of(OAuth2ClientProperties.class)).get();
+
+			// NOTE: in this case, we assume only one client registration at a time, since there is only one production server!
+			OAuth2ClientProperties.Registration registrationProperties = clientProperties.getRegistration().values().iterator().next();
+			OAuth2ClientProperties.Provider providerProperties = clientProperties.getProvider().get(registrationProperties.getProvider());
+			ClientRegistration.Builder clientRegistrationBuilder = ClientRegistration.withRegistrationId(registrationProperties.getClientId());
+			ClientRegistration clientRegistration = clientRegistrationBuilder
+					.clientId(registrationProperties.getClientId())
+					.clientName(registrationProperties.getClientName())
+					.clientSecret(registrationProperties.getClientSecret())
+					.authorizationGrantType(new AuthorizationGrantType(registrationProperties.getAuthorizationGrantType()))
+					.clientAuthenticationMethod(new ClientAuthenticationMethod(registrationProperties.getClientAuthenticationMethod()))
+					.scope(new ArrayList<>(registrationProperties.getScope()).toArray(new String[registrationProperties.getScope().size()]))
+					.redirectUriTemplate(registrationProperties.getRedirectUri())
+
+					.authorizationUri(providerProperties.getAuthorizationUri())
+					.jwkSetUri(providerProperties.getJwkSetUri())
+					.tokenUri(providerProperties.getTokenUri())
+					.userInfoUri(providerProperties.getUserInfoUri())
+					//.userNameAttributeName()
+					.build();
+
+
+			/*List<ClientRegistration> clientRegistrations = new ArrayList<>();
 			Set<String> clientPropertyKeys = resolveClientPropertyKeys(this.environment);
 			for (String clientPropertyKey : clientPropertyKeys) {
 				String fullClientPropertyKey = CLIENT_PROPERTY_PREFIX + "." + clientPropertyKey;
 				if (!this.environment.containsProperty(fullClientPropertyKey + "." + CLIENT_ID_PROPERTY)) {
 					continue;
 				}
-				ClientRegistrationProperties clientRegistrationProperties = binder.bind(
-						fullClientPropertyKey, Bindable.of(ClientRegistrationProperties.class)).get();
-				ClientRegistration clientRegistration = new ClientRegistration.Builder(clientRegistrationProperties).build();
-				clientRegistrations.add(clientRegistration);
-			}
+				OAuth2ClientProperties clientProperties = binder.bind(
+						"spring.security.oauth2.client", Bindable.of(OAuth2ClientProperties.class)).get();
+				//clientProperties.getRegistration().values()
+				ClientRegistration.Builder clientRegistrationBuilder = ClientRegistration.withRegistrationId(clientPropertyKey);
 
-			return new InMemoryClientRegistrationRepository(clientRegistrations);
+
+				//ClientRegistration.Builder clientRegistrationBuilder = ClientRegistration.withRegistrationId(clientPropertyKey);
+				//clientRegistrationBuilder
+
+				/*lientRegistrationProperties clientRegistrationProperties = binder.bind(
+						fullClientPropertyKey, Bindable.of(ClientRegistrationProperties.class)).get();
+				ClientRegistration clientRegistration = new ClientRegistration.Builder(clientRegistrationProperties).build();*/
+				//clientRegistrations.add(clientRegistration);
+			//}
+
+			return new InMemoryClientRegistrationRepository(clientRegistration);
+		}
+
+		@Bean
+		public OAuth2AuthorizedClientService oAuth2AuthorizedClientService(ClientRegistrationRepository clientRegistrationRepository) {
+			return new InMemoryOAuth2AuthorizedClientService(clientRegistrationRepository);
 		}
 
 		/*private Properties getClientsDefaultProperties() {

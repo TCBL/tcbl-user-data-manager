@@ -8,8 +8,9 @@ import be.ugent.idlab.tcbl.userdatamanager.model.TCBLUser;
 import be.ugent.idlab.tcbl.userdatamanager.model.TCBLUserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.autoconfigure.web.servlet.error.BasicErrorController;
 import org.springframework.http.HttpHeaders;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -43,6 +44,7 @@ public class UserController {
 	private final Mail mail;
 	private final static Base64.Encoder encoder = Base64.getUrlEncoder();
 	private final static Base64.Decoder decoder = Base64.getUrlDecoder();
+	private OAuth2AuthorizedClientService authorizedClientService;
 
 	/**
 	 * Creates a UserController; Spring injects the TCBLUserRepository.
@@ -50,9 +52,10 @@ public class UserController {
 	 * @param tcblUserRepository A repository where TCBLUsers are stored.
 	 * @param mail The background mail sender.
 	 */
-	public UserController(TCBLUserRepository tcblUserRepository, Mail mail) {
+	public UserController(TCBLUserRepository tcblUserRepository, Mail mail, OAuth2AuthorizedClientService authorizedClientService) {
 		this.tcblUserRepository = tcblUserRepository;
 		this.mail = mail;
+		this.authorizedClientService = authorizedClientService;
 	}
 
 	/**
@@ -66,10 +69,16 @@ public class UserController {
 	@GetMapping("/info")
 	public String userinfo(Model model, OAuth2AuthenticationToken authentication) {
 		try {
-			WebClient webClient = WebClient.create(authentication.getClientRegistration().getProviderDetails().getUserInfoUri());
-			Map userAttributes = webClient
-					.mutate().filter(oauth2Credentials(authentication)).build()
+			OAuth2AuthorizedClient authorizedClient = authorizedClientService.loadAuthorizedClient(authentication.getAuthorizedClientRegistrationId(), authentication.getName());
+			String userInfoEndpointUri = authorizedClient.getClientRegistration().getProviderDetails().getUserInfoEndpoint().getUri();
+
+
+			//WebClient webClient = WebClient.create(authentication.getClientRegistration().getProviderDetails().getUserInfoUri());
+			Map userAttributes = WebClient.builder()
+					.filter(oauth2Credentials(authorizedClient))
+					.build()
 					.get()
+					.uri(userInfoEndpointUri)
 					.retrieve()
 					.bodyToMono(Map.class)
 					.block();
@@ -279,11 +288,20 @@ public class UserController {
 		return ct.getPreparedPath(model);
 	}
 
-	private ExchangeFilterFunction oauth2Credentials(OAuth2AuthenticationToken authentication) {
+	/*private ExchangeFilterFunction oauth2Credentials(OAuth2AuthenticationToken authentication) {
 		return ExchangeFilterFunction.ofRequestProcessor(
 				clientRequest -> {
 					ClientRequest authorizedRequest = ClientRequest.from(clientRequest)
 							.header(HttpHeaders.AUTHORIZATION, "Bearer " + authentication.getAccessToken().getTokenValue())
+							.build();
+					return Mono.just(authorizedRequest);
+				});
+	}*/
+	private ExchangeFilterFunction oauth2Credentials(OAuth2AuthorizedClient authorizedClient) {
+		return ExchangeFilterFunction.ofRequestProcessor(
+				clientRequest -> {
+					ClientRequest authorizedRequest = ClientRequest.from(clientRequest)
+							.header(HttpHeaders.AUTHORIZATION, "Bearer " + authorizedClient.getAccessToken().getTokenValue())
 							.build();
 					return Mono.just(authorizedRequest);
 				});

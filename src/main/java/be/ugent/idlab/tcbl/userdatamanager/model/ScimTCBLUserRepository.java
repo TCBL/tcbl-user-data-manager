@@ -215,7 +215,7 @@ public class ScimTCBLUserRepository implements TCBLUserRepository {
 	private static Map<String, String> resolveScimClientProperties(final Environment environment) {
 		Binder binder = Binder.get(environment);
 		BindResult<Map<String, String>> result = binder.bind(
-				"security.scim", Bindable.mapOf(String.class, String.class));
+				"scim", Bindable.mapOf(String.class, String.class));
 		return result.get();
 	}
 

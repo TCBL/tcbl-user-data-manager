@@ -2,12 +2,15 @@ package be.ugent.idlab.tcbl.userdatamanager.controller;
 
 import be.ugent.idlab.tcbl.userdatamanager.model.NavLink;
 import be.ugent.idlab.tcbl.userdatamanager.model.Status;
-import org.springframework.boot.autoconfigure.security.oauth2.client.ClientRegistrationAutoConfiguration;
+import org.springframework.boot.context.properties.bind.BindResult;
+import org.springframework.boot.context.properties.bind.Bindable;
+import org.springframework.boot.context.properties.bind.Binder;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -24,10 +27,10 @@ public class LoginController {
 		// find the redirect path; we need this to do a correct forwarding. The path is composed
 		// with the authorized-grand-type and the client-alias, which can be found in the configuration.
 
-		Set<String> clientPropertyKeys = ClientRegistrationAutoConfiguration.resolveClientPropertyKeys(environment);
+		Set<String> clientPropertyKeys = resolveClientPropertyKeys(environment);
 		if (!clientPropertyKeys.isEmpty()) {
 			String clientPropertyKey = clientPropertyKeys.iterator().next();
-			String fullClientPropertyKey = ClientRegistrationAutoConfiguration.CLIENT_PROPERTY_PREFIX + "." + clientPropertyKey;
+			String fullClientPropertyKey = "spring.security.oauth2.client.registration." + clientPropertyKey;
 			String authGrantTypeKey = fullClientPropertyKey + ".authorization-grant-type";
 			String clientAliasKey = fullClientPropertyKey + ".client-alias";
 			if (environment.containsProperty(clientAliasKey) && environment.containsProperty(authGrantTypeKey)) {
@@ -52,5 +55,12 @@ public class LoginController {
 		model.addAttribute("navLinks", new NavLink(NavLink.DisplayCondition.ALWAYS, "Login with TCBL", "/oiclogin"));
 		model.addAttribute("status", new Status(Status.Value.ERROR, "Login required."));
 		return "loginrequired";
+	}
+
+	private static Set<String> resolveClientPropertyKeys(Environment environment) {
+		Binder binder = Binder.get(environment);
+		BindResult<Map<String, Object>> result = binder.bind(
+				"spring.security.oauth2.client.registration", Bindable.mapOf(String.class, Object.class));
+		return result.get().keySet();
 	}
 }
