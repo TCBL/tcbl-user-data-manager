@@ -122,7 +122,7 @@ the other templates.
 <th:block th:fragment="srvlinks(links)">
 	<th:block th:each="link: ${links}">
 		<div>
-			<form action="#" th:action="@{${link.url}}">
+			<form action="#" target="_blank" th:action="@{${link.url}}">
 				<input type="submit" value="Link text here" class="button button--srvlink" th:classappend="|button--srvlink--${link.style}|" th:value="${link.text}">
 			</form>
 		</div>
