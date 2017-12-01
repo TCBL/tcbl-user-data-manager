@@ -71,7 +71,7 @@ public class ClientRegistrationAutoConfiguration {
 					.authorizationGrantType(new AuthorizationGrantType(registrationProperties.getAuthorizationGrantType()))
 					.clientAuthenticationMethod(new ClientAuthenticationMethod(registrationProperties.getClientAuthenticationMethod()))
 					.scope(new ArrayList<>(registrationProperties.getScope()).toArray(new String[registrationProperties.getScope().size()]))
-					.redirectUriTemplate(registrationProperties.getRedirectUri())
+					.redirectUriTemplate(/*registrationProperties.getRedirectUri()*/"{baseUrl}/login/oauth2/code/{registrationId}")
 
 					.authorizationUri(providerProperties.getAuthorizationUri())
 					.jwkSetUri(providerProperties.getJwkSetUri())

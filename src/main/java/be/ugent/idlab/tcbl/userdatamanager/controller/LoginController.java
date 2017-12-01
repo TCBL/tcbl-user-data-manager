@@ -38,7 +38,7 @@ public class LoginController {
 			if (environment.containsProperty(clientAliasKey) && environment.containsProperty(authGrantTypeKey)) {
 				String authGrantTypeDirective = environment.getProperty(authGrantTypeKey).replace('_', '/');
 				String clientAlias = environment.getProperty(clientAliasKey);
-				redirectDirective = "redirect:/oauth2/" + authGrantTypeDirective + "/" + clientAlias;
+				redirectDirective = "redirect:/login/oauth2/code/" + clientAlias;
 			} else {
 				throw new Exception("authorization-grant-type or client-alias not specified.");
 			}
