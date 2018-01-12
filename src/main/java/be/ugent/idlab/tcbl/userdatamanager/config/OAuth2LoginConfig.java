@@ -1,22 +1,11 @@
 package be.ugent.idlab.tcbl.userdatamanager.config;
 
-import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientProperties;
-import org.springframework.boot.context.properties.bind.Bindable;
-import org.springframework.boot.context.properties.bind.Binder;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.oauth2.client.registration.ClientRegistration;
-import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
-import org.springframework.security.oauth2.client.registration.InMemoryClientRegistrationRepository;
-import org.springframework.security.oauth2.core.AuthorizationGrantType;
-import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
-
-import java.util.ArrayList;
 
 /**
  * <p>Copyright 2017 IDLab (Ghent University - imec)</p>
@@ -77,38 +66,6 @@ public class OAuth2LoginConfig {
 			//this.registerUserNameAttributeNames(http.oauth2Login());
 
 		}
-
-		@Bean
-		public ClientRegistrationRepository clientRegistrationRepository() {
-			return new InMemoryClientRegistrationRepository(this.oidcClientRegistration());
-		}
-
-		private ClientRegistration oidcClientRegistration() {
-			Binder binder = Binder.get(this.environment);
-			OAuth2ClientProperties clientProperties = binder.bind(
-					"spring.security.oauth2.client", Bindable.of(OAuth2ClientProperties.class)).get();
-
-			// NOTE: in this case, we assume only one client registration at a time, since there is only one production server!
-			OAuth2ClientProperties.Registration registrationProperties = clientProperties.getRegistration().values().iterator().next();
-			OAuth2ClientProperties.Provider providerProperties = clientProperties.getProvider().get(registrationProperties.getProvider());
-			ClientRegistration.Builder clientRegistrationBuilder = ClientRegistration.withRegistrationId(registrationProperties.getClientId());
-			return clientRegistrationBuilder
-					.clientId(registrationProperties.getClientId())
-					.clientName(registrationProperties.getClientName())
-					.clientSecret(registrationProperties.getClientSecret())
-					.authorizationGrantType(new AuthorizationGrantType(registrationProperties.getAuthorizationGrantType()))
-					.clientAuthenticationMethod(new ClientAuthenticationMethod(registrationProperties.getClientAuthenticationMethod()))
-					.scope(new ArrayList<>(registrationProperties.getScope()).toArray(new String[registrationProperties.getScope().size()]))
-					.redirectUriTemplate(/*registrationProperties.getRedirectUri()*/"{baseUrl}/login/oauth2/code/{registrationId}")
-
-					.authorizationUri(providerProperties.getAuthorizationUri())
-					.jwkSetUri(providerProperties.getJwkSetUri())
-					.tokenUri(providerProperties.getTokenUri())
-					.userInfoUri(providerProperties.getUserInfoUri())
-					//.userNameAttributeName()
-					.build();
-		}
-
 	}
 
 }
