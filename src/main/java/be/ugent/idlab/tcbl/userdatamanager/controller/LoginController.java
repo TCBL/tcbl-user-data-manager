@@ -25,22 +25,11 @@ public class LoginController {
 	private final String redirectDirective;
 
 	public LoginController(final Environment environment) throws Exception {
-		
 		// find the redirect path; we need this to do a correct forwarding. The path is composed
-		// with the authorized-grand-type and the client-alias, which can be found in the configuration.
-
 		Set<String> clientPropertyKeys = resolveClientPropertyKeys(environment);
 		if (!clientPropertyKeys.isEmpty()) {
 			String clientPropertyKey = clientPropertyKeys.iterator().next();
-			String fullClientPropertyKey = "spring.security.oauth2.client.registration." + clientPropertyKey;
-			String authGrantTypeKey = fullClientPropertyKey + ".authorization-grant-type";
-			String clientAliasKey = fullClientPropertyKey + ".client-alias";
-			if (environment.containsProperty(clientAliasKey) && environment.containsProperty(authGrantTypeKey)) {
-				String clientAlias = environment.getProperty(clientAliasKey);
-				redirectDirective = "redirect:/oauth2/authorization/" + clientAlias;
-			} else {
-				throw new Exception("authorization-grant-type or client-alias not specified.");
-			}
+			redirectDirective = "redirect:/oauth2/authorization/" + clientPropertyKey; // we assume authorization_code as grant type.
 		} else {
 			throw new Exception("No client defined.");
 		}

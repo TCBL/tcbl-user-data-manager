@@ -62,9 +62,6 @@ public class OAuth2LoginConfig {
 					// see also https://github.com/spring-projects/spring-security-oauth/issues/786
 					.exceptionHandling().authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/loginrequired"))
 			;
-
-			//this.registerUserNameAttributeNames(http.oauth2Login());
-
 		}
 	}
 
