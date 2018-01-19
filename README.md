@@ -204,25 +204,26 @@ Here are the settings (example, adjust to correct hosts):
 For the client, this requires the following configuration snippet (example):
 
 ```yaml
-security:
-  oauth2:
-    client:
-      registration:
-        tcbl_manager:
-          client-id: "@!4F1B.EBA3.75E2.F47A!0001!EF35.6902!0008!1B4C.7A50.7F55.50D7"
-          client-secret: averysecrativesecret
-          client-name: TCBL_manager
-          client-authentication-method: post
-          redirect-uri-template: "{baseUrl}/login/oauth2/code/{registrationId}"
-          scope: openid, inum
-          provider: gluu-honegger
-          authorization-grant-type: authorization_code
-      provider:
-        gluu-honegger:
-          authorization-uri: "https://honegger.elis.ugent.be/oxauth/seam/resource/restv1/oxauth/authorize"
-          token-uri: "https://honegger.elis.ugent.be/oxauth/seam/resource/restv1/oxauth/token"
-          user-info-uri: "https://honegger.elis.ugent.be/oxauth/seam/resource/restv1/oxauth/userinfo"
-          jwk-set-uri: "https://honegger.elis.ugent.be/oxauth/seam/resource/restv1/oxauth/jwks"
+spring
+  security:
+    oauth2:
+      client:
+        registration:
+          tcbl_manager:
+            client-id: "@!4F1B.EBA3.75E2.F47A!0001!EF35.6902!0008!1B4C.7A50.7F55.50D7"
+            client-secret: averysecrativesecret
+            client-name: TCBL_manager
+            client-authentication-method: post
+            redirect-uri-template: "{baseUrl}/login/oauth2/code/{registrationId}"
+            scope: openid, inum
+            provider: gluu-honegger
+            authorization-grant-type: authorization_code
+        provider:
+          gluu-honegger:
+            authorization-uri: "https://honegger.elis.ugent.be/oxauth/seam/resource/restv1/oxauth/authorize"
+            token-uri: "https://honegger.elis.ugent.be/oxauth/seam/resource/restv1/oxauth/token"
+            user-info-uri: "https://honegger.elis.ugent.be/oxauth/seam/resource/restv1/oxauth/userinfo"
+            jwk-set-uri: "https://honegger.elis.ugent.be/oxauth/seam/resource/restv1/oxauth/jwks"
 ```
 
 ### 3. SCIM configuration
@@ -238,14 +239,13 @@ The client key id can be left empty since there is only one key in the store.
 This requires the following configuration snippet (example):
 
 ```yaml
-security:
-  scim:
-    domain: "https://honegger.elis.ugent.be/identity/seam/resource/restv1"
-    meta-data-url: "https://honegger.elis.ugent.be/.well-known/uma-configuration"
-    aat-client-id: "@!4F1B.EBA3.75E2.F47A!0001!EF35.6902!0008!224B.6C55"
-    aat-client-jks-path: /home/ghaesen/projects/TCBL/config/scim-rp-honegger.jks
-    aat-client-jks-password: secret
-    aat-client-key-id:
+scim:
+  domain: "https://honegger.elis.ugent.be/identity/seam/resource/restv1"
+  meta-data-url: "https://honegger.elis.ugent.be/.well-known/uma-configuration"
+  aat-client-id: "@!4F1B.EBA3.75E2.F47A!0001!EF35.6902!0008!224B.6C55"
+  aat-client-jks-path: /home/ghaesen/projects/TCBL/config/scim-rp-honegger.jks
+  aat-client-jks-password: secret
+  aat-client-key-id:
 ```
 
 ### 4. TCBL User Data Manager application specific settings
@@ -373,37 +373,37 @@ spring:
           ssl:
             enable: true
 
-##
-# Security related settings
-##
-security:
+  ##
+  # Security related settings
+  ##
+  security:
+  
+    # OpenID Connect (which is OAuth2) properties.
+    oauth2:
+      client:
+        # config for client on honegger
+        tcbl-manager:
+          client-id: "@!4F1B.EBA3.75E2.F47A!0001!EF35.6902!0008!1B4C.7A50.7F55.50D7"
+          client-secret: averysecrativesecret
+          client-authentication-method: post
+          authorization-grant-type: authorization_code
+          redirect-uri: "https://ravel.elis.ugent.be/oauth2/authorize/code/tcbl_manager"
+          scope: openid, inum
+          authorization-uri: "https://honegger.elis.ugent.be/oxauth/seam/resource/restv1/oxauth/authorize"
+          token-uri: "https://honegger.elis.ugent.be/oxauth/seam/resource/restv1/oxauth/token"
+          jwk-set-uri: "https://honegger.elis.ugent.be/oxauth/seam/resource/restv1/oxauth/jwks"
+          user-info-uri: "https://honegger.elis.ugent.be/oxauth/seam/resource/restv1/oxauth/userinfo"
+          client-name: TCBL_manager
+          client-alias: tcbl-manager
 
-  # OpenID Connect (which is OAuth2) properties.
-  oauth2:
-    client:
-      # config for client on honegger
-      tcbl-manager:
-        client-id: "@!4F1B.EBA3.75E2.F47A!0001!EF35.6902!0008!1B4C.7A50.7F55.50D7"
-        client-secret: averysecrativesecret
-        client-authentication-method: post
-        authorization-grant-type: authorization_code
-        redirect-uri: "https://ravel.elis.ugent.be/oauth2/authorize/code/tcbl_manager"
-        scope: openid, inum
-        authorization-uri: "https://honegger.elis.ugent.be/oxauth/seam/resource/restv1/oxauth/authorize"
-        token-uri: "https://honegger.elis.ugent.be/oxauth/seam/resource/restv1/oxauth/token"
-        jwk-set-uri: "https://honegger.elis.ugent.be/oxauth/seam/resource/restv1/oxauth/jwks"
-        user-info-uri: "https://honegger.elis.ugent.be/oxauth/seam/resource/restv1/oxauth/userinfo"
-        client-name: TCBL_manager
-        client-alias: tcbl-manager
-
-  # Gluu Federation SCIM Client settings
-  scim:
-    domain: "https://honegger.elis.ugent.be/identity/seam/resource/restv1"
-    meta-data-url: "https://honegger.elis.ugent.be/.well-known/uma-configuration"
-    aat-client-id: "@!4F1B.EBA3.75E2.F47A!0001!EF35.6902!0008!224B.6C55"
-    aat-client-jks-path: /home/ghaesen/projects/TCBL/config/scim-rp-honegger.jks
-    aat-client-jks-password: secret
-    aat-client-key-id:
+# Gluu Federation SCIM Client settings
+scim:
+  domain: "https://honegger.elis.ugent.be/identity/seam/resource/restv1"
+  meta-data-url: "https://honegger.elis.ugent.be/.well-known/uma-configuration"
+  aat-client-id: "@!4F1B.EBA3.75E2.F47A!0001!EF35.6902!0008!224B.6C55"
+  aat-client-jks-path: /home/ghaesen/projects/TCBL/config/scim-rp-honegger.jks
+  aat-client-jks-password: secret
+  aat-client-key-id:
 
 ##
 # TCBL User Data Manager application specific settings
