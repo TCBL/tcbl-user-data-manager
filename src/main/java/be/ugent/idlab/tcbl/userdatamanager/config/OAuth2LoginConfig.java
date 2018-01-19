@@ -1,7 +1,6 @@
 package be.ugent.idlab.tcbl.userdatamanager.config;
 
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.env.Environment;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -17,11 +16,6 @@ public class OAuth2LoginConfig {
 
 	@EnableWebSecurity
 	protected static class OAuth2LoginSecurityConfiguration extends WebSecurityConfigurerAdapter {
-		private Environment environment;
-
-		public OAuth2LoginSecurityConfiguration(Environment environment) {
-			this.environment = environment;
-		}
 
 		@Override
 		protected void configure(HttpSecurity http) throws Exception {

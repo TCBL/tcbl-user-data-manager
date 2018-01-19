@@ -207,19 +207,22 @@ For the client, this requires the following configuration snippet (example):
 security:
   oauth2:
     client:
-      tcbl-manager:
-        client-id: "@!4F1B.EBA3.75E2.F47A!0001!EF35.6902!0008!1B4C.7A50.7F55.50D7"
-        client-secret: averysecrativesecret
-        client-authentication-method: post
-        authorization-grant-type: authorization_code
-        redirect-uri: "https://ravel.elis.ugent.be/usermanager/oauth2/authorize/code/tcbl_manager"
-        scope: openid, inum
-        authorization-uri: "https://honegger.elis.ugent.be/oxauth/seam/resource/restv1/oxauth/authorize"
-        token-uri: "https://honegger.elis.ugent.be/oxauth/seam/resource/restv1/oxauth/token"
-        jwk-set-uri: "https://honegger.elis.ugent.be/oxauth/seam/resource/restv1/oxauth/jwks"
-        user-info-uri: "https://honegger.elis.ugent.be/oxauth/seam/resource/restv1/oxauth/userinfo"
-        client-name: TCBL_manager
-        client-alias: tcbl-manager
+      registration:
+        tcbl_manager:
+          client-id: "@!4F1B.EBA3.75E2.F47A!0001!EF35.6902!0008!1B4C.7A50.7F55.50D7"
+          client-secret: averysecrativesecret
+          client-name: TCBL_manager
+          client-authentication-method: post
+          redirect-uri-template: "{baseUrl}/login/oauth2/code/{registrationId}"
+          scope: openid, inum
+          provider: gluu-honegger
+          authorization-grant-type: authorization_code
+      provider:
+        gluu-honegger:
+          authorization-uri: "https://honegger.elis.ugent.be/oxauth/seam/resource/restv1/oxauth/authorize"
+          token-uri: "https://honegger.elis.ugent.be/oxauth/seam/resource/restv1/oxauth/token"
+          user-info-uri: "https://honegger.elis.ugent.be/oxauth/seam/resource/restv1/oxauth/userinfo"
+          jwk-set-uri: "https://honegger.elis.ugent.be/oxauth/seam/resource/restv1/oxauth/jwks"
 ```
 
 ### 3. SCIM configuration
