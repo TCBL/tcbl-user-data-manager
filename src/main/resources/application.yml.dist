@@ -81,40 +81,40 @@ spring:
           ssl:
             enable: true
 
-##
-# Security related settings
-##
-security:
+  ##
+  # Security related settings
+  ##
+  security:
+  
+    # OpenID Connect (which is OAuth2) properties.
+    oauth2:
+      client:
+        registration:
+          # config for client on honegger
+          tcbl_manager:
+            client-id: "@!4F1B.EBA3.75E2.F47A!0001!EF35.6902!0008!1B4C.7A50.7F55.50D7"
+            client-secret: averysecrativesecret
+            client-name: TCBL_manager
+            client-authentication-method: post
+            redirect-uri-template: "{baseUrl}/login/oauth2/code/{registrationId}"
+            scope: openid, inum
+            provider: gluu-honegger
+            authorization-grant-type: authorization_code
+        provider:
+          gluu-honegger:
+            authorization-uri: "https://honegger.elis.ugent.be/oxauth/seam/resource/restv1/oxauth/authorize"
+            token-uri: "https://honegger.elis.ugent.be/oxauth/seam/resource/restv1/oxauth/token"
+            user-info-uri: "https://honegger.elis.ugent.be/oxauth/seam/resource/restv1/oxauth/userinfo"
+            jwk-set-uri: "https://honegger.elis.ugent.be/oxauth/seam/resource/restv1/oxauth/jwks"
 
-  # OpenID Connect (which is OAuth2) properties.
-  oauth2:
-    client:
-      registration:
-        # config for client on honegger
-        tcbl_manager:
-          client-id: "@!4F1B.EBA3.75E2.F47A!0001!EF35.6902!0008!1B4C.7A50.7F55.50D7"
-          client-secret: averysecrativesecret
-          client-name: TCBL_manager
-          client-authentication-method: post
-          redirect-uri-template: "{baseUrl}/login/oauth2/code/{registrationId}"
-          scope: openid, inum
-          provider: gluu-honegger
-          authorization-grant-type: authorization_code
-      provider:
-        gluu-honegger:
-          authorization-uri: "https://honegger.elis.ugent.be/oxauth/seam/resource/restv1/oxauth/authorize"
-          token-uri: "https://honegger.elis.ugent.be/oxauth/seam/resource/restv1/oxauth/token"
-          user-info-uri: "https://honegger.elis.ugent.be/oxauth/seam/resource/restv1/oxauth/userinfo"
-          jwk-set-uri: "https://honegger.elis.ugent.be/oxauth/seam/resource/restv1/oxauth/jwks"
-
-  # Gluu Federation SCIM Client settings
-  scim:
-    domain: "https://honegger.elis.ugent.be/identity/seam/resource/restv1"
-    meta-data-url: "https://honegger.elis.ugent.be/.well-known/uma-configuration"
-    aat-client-id: "@!4F1B.EBA3.75E2.F47A!0001!EF35.6902!0008!224B.6C55"
-    aat-client-jks-path: /home/ghaesen/projects/TCBL/config/scim-rp-honegger.jks
-    aat-client-jks-password: secret
-    aat-client-key-id:
+# Gluu Federation SCIM Client settings
+scim:
+  domain: "https://honegger.elis.ugent.be/identity/seam/resource/restv1"
+  meta-data-url: "https://honegger.elis.ugent.be/.well-known/uma-configuration"
+  aat-client-id: "@!4F1B.EBA3.75E2.F47A!0001!EF35.6902!0008!224B.6C55"
+  aat-client-jks-path: /home/ghaesen/projects/TCBL/config/scim-rp-honegger.jks
+  aat-client-jks-password: secret
+  aat-client-key-id:
 
 ##
 # TCBL User Data Manager application specific settings
