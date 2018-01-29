@@ -38,8 +38,6 @@ server:
     # e.g. https://myserver.example.com/usermanager/...
     context-path: /usermanager
 
-
-
 ##
 # Logging settings
 # See https://www.slf4j.org/
@@ -55,11 +53,11 @@ logging:
     org.springframework.security: warn
 
 ##
-# Misc Spring settings
+# Spring settings
 ##
 spring:
 
-  # template engine settings. See http://www.thymeleaf.org/
+  # Template engine settings. See http://www.thymeleaf.org/
   thymeleaf:
     # --- cache: false for test environment; true for production environment
     cache: false
@@ -81,9 +79,7 @@ spring:
           ssl:
             enable: true
 
-  ##
   # Security related settings
-  ##
   security:
   
     # OpenID Connect (which is OAuth2) properties.
@@ -106,7 +102,9 @@ spring:
             user-info-uri: "https://honegger.elis.ugent.be/oxauth/seam/resource/restv1/oxauth/userinfo"
             jwk-set-uri: "https://honegger.elis.ugent.be/oxauth/seam/resource/restv1/oxauth/jwks"
 
+##
 # Gluu Federation SCIM Client settings
+##
 scim:
   domain: "https://honegger.elis.ugent.be/identity/seam/resource/restv1"
   meta-data-url: "https://honegger.elis.ugent.be/.well-known/uma-configuration"
