@@ -330,8 +330,6 @@ server:
     # e.g. https://myserver.example.com/usermanager/...
     context-path: /usermanager
 
-
-
 ##
 # Logging settings
 # See https://www.slf4j.org/
@@ -347,11 +345,11 @@ logging:
     org.springframework.security: warn
 
 ##
-# Misc Spring settings
+# Spring settings
 ##
 spring:
 
-  # template engine settings. See http://www.thymeleaf.org/
+  # Template engine settings. See http://www.thymeleaf.org/
   thymeleaf:
     # --- cache: false for test environment; true for production environment
     cache: false
@@ -373,30 +371,32 @@ spring:
           ssl:
             enable: true
 
-  ##
   # Security related settings
-  ##
   security:
   
     # OpenID Connect (which is OAuth2) properties.
     oauth2:
       client:
-        # config for client on honegger
-        tcbl-manager:
-          client-id: "@!4F1B.EBA3.75E2.F47A!0001!EF35.6902!0008!1B4C.7A50.7F55.50D7"
-          client-secret: averysecrativesecret
-          client-authentication-method: post
-          authorization-grant-type: authorization_code
-          redirect-uri: "https://ravel.elis.ugent.be/oauth2/authorize/code/tcbl_manager"
-          scope: openid, inum
-          authorization-uri: "https://honegger.elis.ugent.be/oxauth/seam/resource/restv1/oxauth/authorize"
-          token-uri: "https://honegger.elis.ugent.be/oxauth/seam/resource/restv1/oxauth/token"
-          jwk-set-uri: "https://honegger.elis.ugent.be/oxauth/seam/resource/restv1/oxauth/jwks"
-          user-info-uri: "https://honegger.elis.ugent.be/oxauth/seam/resource/restv1/oxauth/userinfo"
-          client-name: TCBL_manager
-          client-alias: tcbl-manager
+        registration:
+          tcbl_manager:
+            client-id: "@!4F1B.EBA3.75E2.F47A!0001!EF35.6902!0008!1B4C.7A50.7F55.50D7"
+            client-secret: averysecrativesecret
+            client-name: TCBL_manager
+            client-authentication-method: post
+            redirect-uri-template: "{baseUrl}/login/oauth2/code/{registrationId}"
+            scope: openid, inum
+            provider: gluu-honegger
+            authorization-grant-type: authorization_code
+        provider:
+          gluu-honegger:
+            authorization-uri: "https://honegger.elis.ugent.be/oxauth/seam/resource/restv1/oxauth/authorize"
+            token-uri: "https://honegger.elis.ugent.be/oxauth/seam/resource/restv1/oxauth/token"
+            user-info-uri: "https://honegger.elis.ugent.be/oxauth/seam/resource/restv1/oxauth/userinfo"
+            jwk-set-uri: "https://honegger.elis.ugent.be/oxauth/seam/resource/restv1/oxauth/jwks"
 
+##
 # Gluu Federation SCIM Client settings
+##
 scim:
   domain: "https://honegger.elis.ugent.be/identity/seam/resource/restv1"
   meta-data-url: "https://honegger.elis.ugent.be/.well-known/uma-configuration"
