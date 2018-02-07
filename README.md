@@ -196,7 +196,7 @@ Here are the settings (example, adjust to correct hosts):
 * Logo URI: https://tcblsso.ilabt.iminds.be/resources/logos/login-with-TCBL.png
 * Subject Type: pairwise
 * Authentication method for the Token Endpoint: client_secret_post
-* Redirect Login URIs: https://ravel.elis.ugent.be/usermanager/oauth2/authorize/code/tcbl_manager (or wherever the app lives, on the test server, this would be https://tcblsso2.ilabt.imec.be/usermanager/oauth2/authorize/code/tcbl_manager)
+* Redirect Login URIs: https://ravel.elis.ugent.be:8444/usermanager/login/oauth2/code/tcbl_manager (or wherever the app lives, on the test server, this would be https://tcblsso2.ilabt.imec.be/usermanager/login/oauth2/code/tcbl_manager)
 * Scopes: openid, inum
 * Response Types: code
 * Grant Types: authorization_code
