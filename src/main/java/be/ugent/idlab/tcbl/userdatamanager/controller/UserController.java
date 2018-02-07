@@ -87,7 +87,7 @@ public class UserController {
 			// note: if no user found, tcblUser is null, and this is covered nicely by the view
 			model.addAttribute("tcblUser", tcblUser);
 		} catch (Exception e) {
-			log.error("Cannot get user info", e);
+			log.error("Cannot get user info. Possible causes: wrong OP configured; scope 'inum' is not defined or assigned to the user manager client.", e);
 			model.addAttribute("status", new Status(Status.Value.ERROR, "Your information could not be found."));
 		}
 		return "user/info";
