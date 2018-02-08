@@ -4,7 +4,13 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.oauth2.core.oidc.OidcIdToken;
+import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
+import org.springframework.security.oauth2.core.oidc.user.OidcUserAuthority;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
+
+import java.util.Collection;
 
 /**
  * <p>Copyright 2017 IDLab (Ghent University - imec)</p>
@@ -29,6 +35,8 @@ public class OAuth2LoginConfig {
 							"/oiclogin",
 							"/login",
 							"/login/*",
+							"/logout",
+							"/gluulogout",
 							// mappings under /
 							"/",
 							"/index",
@@ -50,6 +58,25 @@ public class OAuth2LoginConfig {
 					.anyRequest().authenticated()
 					.and()
 					.oauth2Login()
+					.and()
+					.logout()
+						.logoutSuccessUrl("/index")
+						.logoutSuccessHandler((request, response, authentication) -> {
+							Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+							String endSessionUri = null;
+							for (GrantedAuthority authority : authorities) {
+								if (authority instanceof OidcUserAuthority) {
+									OidcIdToken idToken = ((OidcUserAuthority) authority).getIdToken();
+									String idTokenStr = idToken.getTokenValue();
+									String redirecturl = request.getRequestURL().toString().replace("/logout", "");
+									// compose end session uri
+									String op = ((DefaultOidcUser) authentication.getPrincipal()).getAttributes().get("iss").toString();
+									endSessionUri = "/gluulogout?op=" + op +"&id_token_hint=" + idTokenStr + "&post_logout_redirect_uri=" + redirecturl;
+								}
+							}
+							String targetUrl = endSessionUri != null ? endSessionUri : "/index";
+							request.getRequestDispatcher(targetUrl).forward(request, response);
+						})
 					.and()
 					// next exceptionHandling replaces .oauth2Login()
 					// see also https://spring.io/guides/tutorials/spring-boot-oauth2/, "Unauthenticated users are re-directed to the home page"

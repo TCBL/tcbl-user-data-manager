@@ -107,6 +107,12 @@ the other templates.
 			</form>
 		</div>
 	</th:block>
+	<div class="columns no-padding-right" sec:authorize="isAuthenticated()">
+		<form action="#" th:action="@{/logout}" method="post">
+			<input type="submit" value="Logout" />
+		</form>
+	</div>
+
 </th:block>
 
 <!-- A fragment that displays one navigation link -->

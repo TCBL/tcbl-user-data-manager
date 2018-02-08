@@ -9,6 +9,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,6 +34,11 @@ public class LoginController {
 		} else {
 			throw new Exception("No client defined.");
 		}
+	}
+
+	@RequestMapping("/gluulogout")
+	public String gluuLogout(@RequestParam String op, @RequestParam String id_token_hint, @RequestParam String post_logout_redirect_uri) {
+		return "redirect:" + op + "/oxauth/seam/resource/restv1/oxauth/end_session?id_token_hint=" + id_token_hint + "&post_logout_redirect_uri=" + post_logout_redirect_uri;
 	}
 
 	@RequestMapping("/oiclogin")
