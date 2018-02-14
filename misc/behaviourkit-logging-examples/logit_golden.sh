@@ -1,0 +1,2 @@
+# "Golden" reference logging in curl, derived from mails with Jan Everaert
+curl http://api.behaviourkit.tocker.iminds.be/logs -H 'authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJwbGF0Zm9ybSI6IlNTTyIsInV1aWQiOiJiYTdiYTY3MC0wZmY1LTExZTgtYWNhNi0wZDM4MjYyMWE1NmIifQ.-gOJedAmc4fOSRGEvp0rpcgj-JbYfxri6bXRmmLG0dY' -H 'content-type: application/json' -d '{"type": "martin.test/curl/golden", "userID": "martin.vanbrabant.ugent@gmail.com", "data": {"field1": "value1"} }'
