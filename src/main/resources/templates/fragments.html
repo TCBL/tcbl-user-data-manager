@@ -48,6 +48,7 @@ the other templates.
 		<th:block th:if="${navLinks} != null">
 			<th:block th:replace="::navlinks(${navLinks})"> </th:block>
 		</th:block>
+		<th:block th:replace="::logout-navlink-style"> </th:block>
 	</div>
 
 	<th:block th:if="${standardBodyVariant} == 0">
@@ -79,19 +80,6 @@ the other templates.
 	</div>
 </div>
 
-<!-- A work-in-progress fragment, not OK for usage! -->
-<div th:fragment="logout" style="float: right" sec:authorize="isAuthenticated()">
-	<div style="float:left">
-		<span style="font-weight:bold">User: </span><span sec:authentication="name"></span>
-	</div>
-	<div style="float:none">&nbsp;</div>
-	<div style="float:right">
-		<form action="#" th:action="@{/logout}" method="post">
-			<input type="submit" value="Logout" />
-		</form>
-	</div>
-</div>
-
 <!-- A fragment that displays navigation links (parameter links not null) -->
 <th:block th:fragment="navlinks(links)">
 	<th:block th:each="link: ${links}">
@@ -107,12 +95,6 @@ the other templates.
 			</form>
 		</div>
 	</th:block>
-	<div class="columns no-padding-right" sec:authorize="isAuthenticated()">
-		<form action="#" th:action="@{/logout}" method="post">
-			<input type="submit" value="Logout" />
-		</form>
-	</div>
-
 </th:block>
 
 <!-- A fragment that displays one navigation link -->
@@ -123,6 +105,28 @@ the other templates.
 		</form>
 	</div>
 </th:block>
+
+<!-- A fragment that displays the logout button in the style of a navigation -->
+<th:block th:fragment="logout-navlink-style">
+	<div class="columns no-padding-right" sec:authorize="isAuthenticated()">
+		<form action="#" th:action="@{/logout}" method="post">
+			<input type="submit" value="Logout"  class="button button--nav" >
+		</form>
+	</div>
+</th:block>
+
+<!-- A work-in-progress fragment, not OK for usage! -->
+<div th:fragment="logout-work-in-progress" style="float: right" sec:authorize="isAuthenticated()">
+	<div style="float:left">
+		<span style="font-weight:bold">User: </span><span sec:authentication="name"></span>
+	</div>
+	<div style="float:none">&nbsp;</div>
+	<div style="float:right">
+		<form action="#" th:action="@{/logout}" method="post">
+			<input type="submit" value="Logout" />
+		</form>
+	</div>
+</div>
 
 <!-- A fragment that displays service links (parameter links not null) -->
 <th:block th:fragment="srvlinks(links)">
