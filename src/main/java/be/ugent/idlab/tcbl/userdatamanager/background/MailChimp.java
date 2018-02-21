@@ -39,7 +39,7 @@ public class MailChimp {
 			String auth = "anystring:" + key;
 			String b64Key = Base64.getEncoder().encodeToString(auth.getBytes(StandardCharsets.US_ASCII));
 			String response = WebClient.builder()
-					.baseUrl("https://" + dcPart + ".api.mailchimp.com/3.0")
+					.baseUrl("https://" + dcPart + ".api.mailchimp.com/" + loader.getApiVersion())
 					.defaultHeader(HttpHeaders.AUTHORIZATION, "Basic " + b64Key)
 					.build()
 					.get()

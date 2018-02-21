@@ -24,6 +24,7 @@ public class MailChimpLoader {
 
 	private String key;
 	private String listId;
+	private String apiVersion;
 
 	@PostConstruct
 	public void refresh() {
@@ -32,6 +33,7 @@ public class MailChimpLoader {
 			properties.load(in);
 			key = properties.getProperty("key");
 			listId = properties.getProperty("list");
+			apiVersion = properties.getProperty("api");
 			log.info("MailChimpLoader's properties rerfreshed");
 		} catch (Exception e) {
 			log.error("MailChimpLoader's properties not rerfreshed: ", e);
@@ -44,5 +46,9 @@ public class MailChimpLoader {
 
 	public String getListId() {
 		return listId;
+	}
+
+	public String getApiVersion() {
+		return apiVersion;
 	}
 }
