@@ -37,7 +37,7 @@ public class ServicesLoader {
 	public void refresh() {
 		try (Reader in = new FileReader(filename)) {
 			services = new Gson().fromJson(in, Services.class);
-			log.debug("ServiceLoader's services refreshed.");
+			log.info("ServiceLoader's services refreshed.");
 		} catch (Exception e) {
 			log.error("ServiceLoader's services no refreshed:", e);
 		}
