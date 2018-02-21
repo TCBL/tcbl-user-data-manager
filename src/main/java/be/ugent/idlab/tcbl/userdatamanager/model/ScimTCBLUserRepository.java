@@ -58,27 +58,9 @@ public class ScimTCBLUserRepository implements TCBLUserRepository {
 	@Override
 	public Iterable<TCBLUser> findAll() throws Exception {
 		log.debug("Find all users.");
-		try {
-			ScimResponse response = client.retrieveAllUsers();
-			if (response.getStatusCode() == 200) {
-				ListResponse userList = Util.toListResponseUser(response, userExtensionSchema);
-				List<TCBLUser> users = new ArrayList<>();
-				for (Resource userResource : userList.getResources()) {
-					User user = (User) userResource;
-					TCBLUser tcblUser = TCBLUser.createFromScimUser(user);
-					users.add(tcblUser);
-				}
-				return users;
-			} else {
-				String message = "Cannot request user list to OpenID Connect server: " + response.getStatusCode() + ": " + response.getStatus() + ". " + response.getResponseBodyString();
-				log.error(message);
-				throw new Exception(message);
-			}
-		} catch (Exception e) {
-			String message = "Cannot request user list: " + e.getMessage();
-			log.error(message, e);
-			throw new Exception(message, e);
-		}
+		final List<TCBLUser> users = new ArrayList<>();
+		processUsers(user -> users.add(TCBLUser.createFromScimUser(user)));
+		return users;
 	}
 
 	@Override
