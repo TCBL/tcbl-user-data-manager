@@ -45,14 +45,15 @@ public class MailChimp {
 					.defaultHeader(HttpHeaders.AUTHORIZATION, "Basic " + b64Key)
 					.build();
 
-			String response = webClient
+			MailChimpMembers members = webClient
 					.get()
-					.uri("/lists/" + listId + "/members?fields=members.id,members.email_address,members.status")
+					//.uri("/lists/" + listId + "/members?fields=members.id,members.email_address,members.status")
+					.uri("/lists/" + listId + "/members?fields=members.email_address,members.status")
 					.accept(MediaType.APPLICATION_JSON)
 					.retrieve()
-					.bodyToMono(String.class)
+					.bodyToMono(MailChimpMembers.class)
 					.block();
-			System.out.println(response);
+			System.out.println(members);
 		}
 	}
 
