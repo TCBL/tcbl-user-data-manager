@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.io.FileReader;
+import java.io.Reader;
 import java.util.List;
 
 /**
@@ -34,9 +35,8 @@ public class ServicesLoader {
 
 	@PostConstruct
 	public void refresh() {
-		try {
-			Services newServices = new Gson().fromJson(new FileReader(filename), Services.class);
-			services = newServices;
+		try (Reader in = new FileReader(filename)) {
+			services = new Gson().fromJson(in, Services.class);
 			log.debug("ServiceLoader's services refreshed.");
 		} catch (Exception e) {
 			log.error("ServiceLoader's services no refreshed:", e);
