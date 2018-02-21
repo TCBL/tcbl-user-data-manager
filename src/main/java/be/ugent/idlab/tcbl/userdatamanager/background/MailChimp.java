@@ -4,6 +4,7 @@ import be.ugent.idlab.tcbl.userdatamanager.model.MailChimpLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -38,12 +39,16 @@ public class MailChimp {
 			String dcPart = key.substring(key.lastIndexOf('-') + 1);
 			String auth = "anystring:" + key;
 			String b64Key = Base64.getEncoder().encodeToString(auth.getBytes(StandardCharsets.US_ASCII));
-			String response = WebClient.builder()
+
+			WebClient webClient = WebClient.builder()
 					.baseUrl("https://" + dcPart + ".api.mailchimp.com/" + loader.getApiVersion())
 					.defaultHeader(HttpHeaders.AUTHORIZATION, "Basic " + b64Key)
-					.build()
+					.build();
+
+			String response = webClient
 					.get()
 					.uri("/lists/" + listId + "/members?fields=members.id,members.email_address,members.status")
+					.accept(MediaType.APPLICATION_JSON)
 					.retrieve()
 					.bodyToMono(String.class)
 					.block();
