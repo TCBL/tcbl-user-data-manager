@@ -1,9 +1,7 @@
 package be.ugent.idlab.tcbl.userdatamanager.model;
 
-import org.gluu.oxtrust.model.scim2.Email;
-import org.gluu.oxtrust.model.scim2.Extension;
-import org.gluu.oxtrust.model.scim2.Name;
-import org.gluu.oxtrust.model.scim2.User;
+import org.apache.commons.collections.map.SingletonMap;
+import org.gluu.oxtrust.model.scim2.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,6 +24,10 @@ public class TCBLUser {
 	private boolean active;
 	private boolean subscribedNL;	// is the user subscribed to the TCBL newsletter?
 	private boolean acceptedPP;		// did the user accept the TCBL privacy policy?
+	private final static String extensionUrn = "urn:ietf:params:scim:schemas:extension:gluu:2.0:User";
+	private final static String subscribedField = "gcpSubscribedToTCBLnewsletter";
+	private final static String acceptedField = "gcpAcceptedTCBLprivacyPolicy";
+
 
 	public TCBLUser() {
 		active = false;
@@ -39,17 +41,18 @@ public class TCBLUser {
 		user.setLastName(scimUser.getName().getFamilyName());
 		user.setActive(scimUser.isActive() == null ? false : scimUser.isActive());
 
-		String extensionUrn = "urn:ietf:params:scim:schemas:extension:gluu:2.0:User";
-		String subscribedField = "gcpSubscribedToTCBLnewsletter";
-		String acceptedField = "gcpAcceptedTCBLprivacyPolicy";
-		try {
+		if (scimUser.isExtensionPresent(extensionUrn)) {
 			Extension extension = scimUser.getExtension(extensionUrn);
-			user.setSubscribedNL(Boolean.parseBoolean(extension.getFieldAsString(subscribedField)));
-			user.setAcceptedPP(Boolean.parseBoolean(extension.getFieldAsString(acceptedField)));
-		} catch (NoSuchElementException e) {
-			log.warn("No extension URN '{}' found on the Gluu server OR (one of) the fields {} and {} do not exist. Setting subscribedNL and acceptedPP to 'false'", extensionUrn, subscribedField, acceptedField);
-			user.setSubscribedNL(false);
-			user.setAcceptedPP(false);
+			try {
+				user.setSubscribedNL(Boolean.parseBoolean(extension.getFieldAsString(subscribedField)));
+				user.setAcceptedPP(Boolean.parseBoolean(extension.getFieldAsString(acceptedField)));
+			} catch (NoSuchElementException e) {
+				log.warn("(One of) the fields {} and {} do not exist. Setting subscribedNL and acceptedPP to 'false'",subscribedField, acceptedField);
+				user.setSubscribedNL(false);
+				user.setAcceptedPP(false);
+			}
+		} else {
+			log.warn("No extension URN '{}' found on the Gluu server", extensionUrn);
 		}
 		return user;
 	}
@@ -74,6 +77,17 @@ public class TCBLUser {
 		scimUser.setName(newName);
 		scimUser.setDisplayName(displayName);
 		scimUser.setActive(active);
+
+		Extension extension = new Extension.Builder(extensionUrn)
+				.setField(subscribedField, Boolean.toString(subscribedNL), ExtensionFieldType.STRING, false)
+				.setField(acceptedField, Boolean.toString(acceptedPP), ExtensionFieldType.STRING, false)
+				.build();
+		if (scimUser.isExtensionPresent(extensionUrn)) {
+			scimUser.setExtensions(new SingletonMap(extensionUrn, extension));
+		} else {
+			scimUser.addExtension(extension);
+		}
+		System.out.println();
 	}
 
 	public String getFirstName() {
