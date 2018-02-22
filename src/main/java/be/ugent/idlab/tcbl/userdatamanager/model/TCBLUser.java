@@ -1,10 +1,14 @@
 package be.ugent.idlab.tcbl.userdatamanager.model;
 
 import org.gluu.oxtrust.model.scim2.Email;
+import org.gluu.oxtrust.model.scim2.Extension;
 import org.gluu.oxtrust.model.scim2.Name;
 import org.gluu.oxtrust.model.scim2.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
+import java.util.NoSuchElementException;
 
 /**
  * <p>Copyright 2017 IDLab (Ghent University - imec)</p>
@@ -12,6 +16,7 @@ import java.util.Collections;
  * @author Gerald Haesendonck
  */
 public class TCBLUser {
+	private static Logger log = LoggerFactory.getLogger(TCBLUser.class);
 
 	private String id;
 	private String userName;
@@ -19,6 +24,8 @@ public class TCBLUser {
 	private String lastName;
 	private String password;
 	private boolean active;
+	private boolean subscribedNL;	// is the user subscribed to the TCBL newsletter?
+	private boolean acceptedPP;		// did the user accept the TCBL privacy policy?
 
 	public TCBLUser() {
 		active = false;
@@ -31,6 +38,19 @@ public class TCBLUser {
 		user.setFirstName(scimUser.getName().getGivenName());
 		user.setLastName(scimUser.getName().getFamilyName());
 		user.setActive(scimUser.isActive() == null ? false : scimUser.isActive());
+
+		String extensionUrn = "urn:ietf:params:scim:schemas:extension:gluu:2.0:User";
+		String subscribedField = "gcpSubscribedToTCBLnewsletter";
+		String acceptedField = "gcpAcceptedTCBLprivacyPolicy";
+		try {
+			Extension extension = scimUser.getExtension(extensionUrn);
+			user.setSubscribedNL(Boolean.parseBoolean(extension.getFieldAsString(subscribedField)));
+			user.setAcceptedPP(Boolean.parseBoolean(extension.getFieldAsString(acceptedField)));
+		} catch (NoSuchElementException e) {
+			log.warn("No extension URN '{}' found on the Gluu server OR (one of) the fields {} and {} do not exist. Setting subscribedNL and acceptedPP to 'false'", extensionUrn, subscribedField, acceptedField);
+			user.setSubscribedNL(false);
+			user.setAcceptedPP(false);
+		}
 		return user;
 	}
 
@@ -79,6 +99,21 @@ public class TCBLUser {
 	public void setUserName(String userName) {
 		this.userName = userName;
 	}
+	public boolean isSubscribedNL() {
+		return subscribedNL;
+	}
+
+	public void setSubscribedNL(boolean subscribedNL) {
+		this.subscribedNL = subscribedNL;
+	}
+
+	public boolean hasAcceptedPP() {
+		return acceptedPP;
+	}
+
+	public void setAcceptedPP(boolean acceptedPP) {
+		this.acceptedPP = acceptedPP;
+	}
 
 	@Override
 	public String toString() {
@@ -86,6 +121,8 @@ public class TCBLUser {
 				"userName='" + userName + '\'' +
 				", firstName='" + firstName + '\'' +
 				", lastName='" + lastName + '\'' +
+				", subscribedNL='" + subscribedNL + '\'' +
+				", acceptedPP='" + acceptedPP + '\'' +
 				'}';
 	}
 
