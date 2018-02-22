@@ -107,7 +107,7 @@ public class TCBLUser {
 		this.subscribedNL = subscribedNL;
 	}
 
-	public boolean hasAcceptedPP() {
+	public boolean isAcceptedPP() {
 		return acceptedPP;
 	}
 
