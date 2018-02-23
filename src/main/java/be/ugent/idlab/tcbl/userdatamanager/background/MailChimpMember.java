@@ -9,8 +9,6 @@ public class MailChimpMember {
 	private String email_address;
 	private String status;
 
-	public MailChimpMember() {}
-
 	public MailChimpMember(String email_address, String status) {
 		this.email_address = email_address;
 		this.status = status;

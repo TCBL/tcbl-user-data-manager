@@ -2,16 +2,17 @@ package be.ugent.idlab.tcbl.userdatamanager.background;
 
 import be.ugent.idlab.tcbl.userdatamanager.model.MailChimpLoader;
 import be.ugent.idlab.tcbl.userdatamanager.model.TCBLUserRepository;
+import com.google.gson.Gson;
+import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.JsonNode;
+import com.mashape.unirest.http.Unirest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
+import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import org.springframework.web.reactive.function.client.WebClient;
 
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -25,6 +26,7 @@ public class MailChimp {
 	private final Logger log = LoggerFactory.getLogger(this.getClass());
 	private final MailChimpLoader loader;
 	private final TCBLUserRepository userRepository;
+	private final Gson gson = new Gson();
 
 
 	public MailChimp(MailChimpLoader loader, TCBLUserRepository userRepository) {
@@ -44,13 +46,7 @@ public class MailChimp {
 			try {
 				log.debug("Initialising MailChimp client");
 				String dcPart = key.substring(key.lastIndexOf('-') + 1);
-				String auth = "anystring:" + key;
-				String b64Key = Base64.getEncoder().encodeToString(auth.getBytes(StandardCharsets.US_ASCII));
 
-				WebClient webClient = WebClient.builder()
-						.baseUrl("https://" + dcPart + ".api.mailchimp.com/" + loader.getApiVersion())
-						.defaultHeader(HttpHeaders.AUTHORIZATION, "Basic " + b64Key)
-						.build();
 
 				// first get list of TCBL users
 				log.debug("Retrieving users from the Gluu server");
@@ -66,14 +62,19 @@ public class MailChimp {
 
 				// then get MailChimp users
 				log.debug("Retrieving users from MailChimp list {}", listId);
-				MailChimpMembers members = webClient
-						.get()
-						//.uri("/lists/" + listId + "/members?fields=members.id,members.email_address,members.status")
-						.uri("/lists/" + listId + "/members?fields=members.email_address,members.status")
-						.accept(MediaType.APPLICATION_JSON)
-						.retrieve()
-						.bodyToMono(MailChimpMembers.class)
-						.block();
+
+				String baseUrl = "https://" + dcPart + ".api.mailchimp.com/" + loader.getApiVersion();
+
+				HttpResponse<JsonNode> response = Unirest.get(baseUrl + "/lists/" + listId + "/members")
+						.queryString("fields", "members.email_address,members.status")
+						.basicAuth("anystring", key)
+						.asJson();
+				if (response.getStatus() != HttpStatus.OK.value()) {
+					log.error("Could not retrieve list of members from MailChimp! Response: {}", response.getStatusText());
+					return;
+				}
+				String responseStr = response.getBody().getObject().toString();
+				MailChimpMembers members = gson.fromJson(responseStr, MailChimpMembers.class);
 
 				// now compare the two sets of users and categorise
 				Set<MailChimpMember> updateMembers = new HashSet<>();
@@ -84,6 +85,7 @@ public class MailChimp {
 						case "cleaned":
 						case "unsubscribed":
 							if (subscribedUsers.contains(userName)) {
+								mailChimpMember.setStatus("subscribed");
 								updateMembers.add(mailChimpMember);
 								subscribedUsers.remove(userName);
 							} else if (!unsubscribedUsers.contains(userName)) {
@@ -92,10 +94,12 @@ public class MailChimp {
 							break;
 						case "subscribed" :
 							if (unsubscribedUsers.contains(userName)) {
+								mailChimpMember.setStatus("unsubscribed");
 								updateMembers.add(mailChimpMember);
 							} else if (subscribedUsers.contains(userName)) {
 								subscribedUsers.remove(userName);
 							} else {
+								mailChimpMember.setStatus("unsubscribed");
 								deleteMembers.add(mailChimpMember);
 							}
 							break;
@@ -114,15 +118,27 @@ public class MailChimp {
 				}
 
 				// perform the update / delete / new members requests!
-				/*if (!updateMembers.isEmpty()) {
-					webClient.post()
-							.uri("/lists/" + listId )
-							.contentType(MediaType.APPLICATION_JSON)
-							.body()
-							
-				}*/
-
-
+				if (!updateMembers.isEmpty()) {
+					MailChimpMembers membersToUpdate = new MailChimpMembers(new ArrayList<>(updateMembers), true);
+					HttpResponse<JsonNode> updateResponse = Unirest.post(baseUrl + "/lists/" + listId)
+							.basicAuth("anystring", key)
+							.body(new JsonNode(gson.toJson(membersToUpdate)))
+							.asJson();
+					if (updateResponse.getStatus() != HttpStatus.OK.value()) {
+						log.error("Could not update list of members from MailChimp! Response: {}", response.getStatusText());
+						return;
+					}
+				}
+				if (!newMembers.isEmpty()) {
+					MailChimpMembers membersToAdd = new MailChimpMembers(new ArrayList<>(newMembers), false);
+					HttpResponse<JsonNode> newResponse = Unirest.post(baseUrl + "/lists/" + listId)
+							.basicAuth("anystring", key)
+							.body(new JsonNode(gson.toJson(membersToAdd)))
+							.asJson();
+					if (newResponse.getStatus() != HttpStatus.OK.value()) {
+						log.error("Could not add members to list in MailChimp! Response: {}", response.getStatusText());
+					}
+				}
 			} catch (Exception e) {
 				log.error("Something went wrong updating MailChimp subscriptions", e);
 			}

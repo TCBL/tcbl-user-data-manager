@@ -193,5 +193,12 @@
             <version>4.12</version>
             <scope>test</scope>
         </dependency>
+
+        <!-- REST client -->
+        <dependency>
+            <groupId>com.mashape.unirest</groupId>
+            <artifactId>unirest-java</artifactId>
+            <version>1.4.9</version>
+        </dependency>
     </dependencies>
 </project>
