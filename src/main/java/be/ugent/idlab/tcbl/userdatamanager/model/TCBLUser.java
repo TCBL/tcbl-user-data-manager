@@ -87,7 +87,6 @@ public class TCBLUser {
 		} else {
 			scimUser.addExtension(extension);
 		}
-		System.out.println();
 	}
 
 	public String getFirstName() {
