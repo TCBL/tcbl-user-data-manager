@@ -48,7 +48,8 @@
 					<div class="row">
 						<div class="columns large-2">
 							<input type="checkbox" th:field="*{acceptedPP}" required/>
-							<label class="label--checkbox" th:for="${#ids.prev('acceptedPP')}">I accept the TCBL privacy policy.</label>
+							<label class="label--checkbox" th:for="${#ids.prev('acceptedPP')}">I accept</label>
+							<label class="label--checkbox"><a target="_blank" th:href="${privacyUrl}" class="normal">the TCBL privacy policy</a>.</label>
 						</div>
 					</div>
 				</fieldset>

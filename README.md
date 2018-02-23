@@ -253,7 +253,7 @@ scim:
 
 The TCBL User Data Manager application specific settings are grouped under `tudm`.
 
-##### TCBL services
+#### TCBL services
 
 The TCBL services are maintained in a file outside the main configuration file,
 but the name of that file is defined in the main configuration file.
@@ -266,8 +266,12 @@ with an additional refresh parameter set to true:
 ```
 /usermanager/services?refresh=true
 ``` 
+
+#### TCBL privacy URL
+
+The TCBL privacy is declared on an external webpage, whose URL is defined in the main configuration file.
  
-A configuration snippet (example):
+#### A configuration snippet example, grouping all TCBL User Data Manager application specific settings
 
 ```yaml
 ##
@@ -277,6 +281,8 @@ tudm:
   tcbl-services:
     # name of the json file containing the descriptions of the TCBL services
     filename: services.json
+  # url of the webpage containing the TCBL privacy declaration
+  tcbl-privacy-url: "https://tcbl.eu/about"
 ```
  
 
@@ -287,133 +293,6 @@ tudm:
 Always start your copy from the contents found there.
  
 Of course, change ports, host names and other details to your needs.
-
-Contents of `tcbl-user-data-manager/src/main/resources/application.yml.dist` at the time of writing:
-
-```yaml
-####
-#
-# This is a sample configuration.
-# Copy it into your application.yml, adapt to your needs and place it where the application will read it:
-# - in the project directory (when running from maven or from your IDE)
-# - in your working directory, next to the built jar file (when starting the jar file from the command line).
-#
-####
-
-##
-# Tomcat server settings
-##
-server:
-  # --- HTTP connector port
-  port: 443
-
-  # --- SSL settings for HTTP connector. Enable only if tomcat has to handle https requests.
-  ssl:
-    # contains the TLS certificate to use
-    key-store: /home/ghaesen/projects/TCBL/config/tudm.jks
-    key-store-password: secret
-    key-store-type: PKCS12
-    key-alias: tudm
-
-  # --- Settings for AJP connector (in stead of HTTP connector). Enable only if running behind Apache HTTP server that acts as reverse proxy.
-  # If these properties are set, the HTTP connector settings above are not relevant anymore,
-  # except for server.port, which will be in use anyway, so set it to a free port number (such as 8444)!!!!!
-  # See https://tomcat.apache.org/tomcat-8.5-doc/config/ajp.html for explanation of properties
-  #ajp:
-  #  port: 8445
-  #  scheme: https
-  #  proxy-name: ravel.elis.ugent.be
-  #  proxy-port: 443
-  #  secure: true
-
-  servlet:
-    # set this if your content will be served from a certain path in stead of the root
-    # e.g. https://myserver.example.com/usermanager/...
-    context-path: /usermanager
-
-##
-# Logging settings
-# See https://www.slf4j.org/
-##
-logging:
-  file: logs/logfile.log
-  level:
-    root: info
-    be.ugent.idlab: debug
-    org.thymeleaf: info
-    org.apache: info
-    org.springframework.web: warn
-    org.springframework.security: warn
-
-##
-# Spring settings
-##
-spring:
-
-  # Template engine settings. See http://www.thymeleaf.org/
-  thymeleaf:
-    # --- cache: false for test environment; true for production environment
-    cache: false
-
-  # SMTP settings, necessary to send mails. See https://docs.spring.io/spring-boot/docs/current/reference/html/boot-features-email.html
-  mail:
-    host: smtp.ugent.be
-    port: 465
-    username: yourusernameoremail
-    password: yourpassword
-    test-connection: true
-    from: "no-reply@ilabt.iminds.be"
-    properties:
-      mail:
-        smtp:
-          connectiontimeout: 5000
-          timeout: 3000
-          writetimeout: 5000
-          ssl:
-            enable: true
-
-  # Security related settings
-  security:
-  
-    # OpenID Connect (which is OAuth2) properties.
-    oauth2:
-      client:
-        registration:
-          tcbl_manager:
-            client-id: "@!4F1B.EBA3.75E2.F47A!0001!EF35.6902!0008!1B4C.7A50.7F55.50D7"
-            client-secret: averysecrativesecret
-            client-name: TCBL_manager
-            client-authentication-method: post
-            redirect-uri-template: "{baseUrl}/login/oauth2/code/{registrationId}"
-            scope: openid, inum
-            provider: gluu-honegger
-            authorization-grant-type: authorization_code
-        provider:
-          gluu-honegger:
-            authorization-uri: "https://honegger.elis.ugent.be/oxauth/seam/resource/restv1/oxauth/authorize"
-            token-uri: "https://honegger.elis.ugent.be/oxauth/seam/resource/restv1/oxauth/token"
-            user-info-uri: "https://honegger.elis.ugent.be/oxauth/seam/resource/restv1/oxauth/userinfo"
-            jwk-set-uri: "https://honegger.elis.ugent.be/oxauth/seam/resource/restv1/oxauth/jwks"
-
-##
-# Gluu Federation SCIM Client settings
-##
-scim:
-  domain: "https://honegger.elis.ugent.be/identity/seam/resource/restv1"
-  meta-data-url: "https://honegger.elis.ugent.be/.well-known/uma-configuration"
-  aat-client-id: "@!4F1B.EBA3.75E2.F47A!0001!EF35.6902!0008!224B.6C55"
-  aat-client-jks-path: /home/ghaesen/projects/TCBL/config/scim-rp-honegger.jks
-  aat-client-jks-password: secret
-  aat-client-key-id:
-
-##
-# TCBL User Data Manager application specific settings
-##
-tudm:
-  tcbl-services:
-    # name of the json file containing the descriptions of the TCBL services
-    filename: services.json
-```
 
 ## Running
 
