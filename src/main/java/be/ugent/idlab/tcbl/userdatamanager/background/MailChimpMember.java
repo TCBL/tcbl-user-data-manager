@@ -29,4 +29,12 @@ public class MailChimpMember {
 	public void setStatus(String status) {
 		this.status = status;
 	}
+
+	@Override
+	public String toString() {
+		return "MailChimpMember{" +
+				"email_address='" + email_address + '\'' +
+				", status='" + status + '\'' +
+				'}';
+	}
 }

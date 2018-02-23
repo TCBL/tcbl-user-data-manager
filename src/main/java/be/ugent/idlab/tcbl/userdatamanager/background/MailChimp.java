@@ -119,6 +119,7 @@ public class MailChimp {
 
 				// perform the update / delete / new members requests!
 				if (!updateMembers.isEmpty()) {
+					log.debug("Updating MailChimp members {}", updateMembers);
 					MailChimpMembers membersToUpdate = new MailChimpMembers(new ArrayList<>(updateMembers), true);
 					HttpResponse<JsonNode> updateResponse = Unirest.post(baseUrl + "/lists/" + listId)
 							.basicAuth("anystring", key)
@@ -130,6 +131,7 @@ public class MailChimp {
 					}
 				}
 				if (!newMembers.isEmpty()) {
+					log.debug("Adding MailChimp members {}", newMembers);
 					MailChimpMembers membersToAdd = new MailChimpMembers(new ArrayList<>(newMembers), false);
 					HttpResponse<JsonNode> newResponse = Unirest.post(baseUrl + "/lists/" + listId)
 							.basicAuth("anystring", key)
@@ -141,9 +143,7 @@ public class MailChimp {
 				}
 			} catch (Exception e) {
 				log.error("Something went wrong updating MailChimp subscriptions", e);
-			}
+			} 
 		}
 	}
-
-
 }

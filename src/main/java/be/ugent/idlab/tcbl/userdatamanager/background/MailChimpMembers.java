@@ -27,4 +27,12 @@ public class MailChimpMembers {
 	public void setUpdate_existing(boolean update_existing) {
 		this.update_existing = update_existing;
 	}
+
+	@Override
+	public String toString() {
+		return "MailChimpMembers{" +
+				"members=" + members +
+				", update_existing=" + update_existing +
+				'}';
+	}
 }
