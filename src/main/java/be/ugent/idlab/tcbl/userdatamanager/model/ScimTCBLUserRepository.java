@@ -185,12 +185,10 @@ public class ScimTCBLUserRepository implements TCBLUserRepository {
 			ScimResponse listResponse = client.searchUsers("userName sw \"" + c + "\"", 1, MAX_COUNT, "", "", new String[]{});
 			ListResponse userListResponse = Util.toListResponseUser(listResponse, client.getUserExtensionSchema());
 			List<Resource> userList = userListResponse.getResources();
-			if (!userList.isEmpty()) {
-				for (Resource userResource : userList) {
-					User user = (User) userResource;
-					processor.process(user);
-				}
-			}
+			userList.stream()
+					.map(user -> (User)user)
+					.filter(user -> !user.getUserName().equals("admin"))
+					.forEach(processor::process);
 		}
 	}
 
