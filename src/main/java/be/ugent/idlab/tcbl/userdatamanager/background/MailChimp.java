@@ -65,6 +65,7 @@ public class MailChimp {
 
 				String baseUrl = "https://" + dcPart + ".api.mailchimp.com/" + loader.getApiVersion();
 
+				// TODO: pagination!
 				HttpResponse<JsonNode> response = Unirest.get(baseUrl + "/lists/" + listId + "/members")
 						.queryString("fields", "members.email_address,members.status")
 						.basicAuth("anystring", key)
