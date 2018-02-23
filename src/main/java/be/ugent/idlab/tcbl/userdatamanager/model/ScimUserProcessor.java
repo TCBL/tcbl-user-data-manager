@@ -8,6 +8,6 @@ import org.gluu.oxtrust.model.scim2.User;
  * @author Gerald Haesendonck
  */
 @FunctionalInterface
-public interface UserProcessor {
+public interface ScimUserProcessor {
 	void process(final User user);
 }

@@ -59,7 +59,7 @@ public class ScimTCBLUserRepository implements TCBLUserRepository {
 	public Iterable<TCBLUser> findAll() throws Exception {
 		log.debug("Find all users.");
 		List<TCBLUser> users = new ArrayList<>();
-		processUsers(user -> users.add(TCBLUser.createFromScimUser(user, userExtensionSchema.getId())));
+		processTCBLUsers(users::add);
 		return users;
 	}
 
@@ -176,7 +176,7 @@ public class ScimTCBLUserRepository implements TCBLUserRepository {
 	}
 
 	@Override
-	public void processUsers(UserProcessor processor) throws Exception {
+	public void processScimUsers(ScimUserProcessor processor) throws Exception {
 		// Iterating all users does not work with Gluu Scim, because of pagination does not work.
 		// To work around this, we request users by each letter of the alphabet and some other characters, as to limit
 		// the risk of getting over the maximum of 200 users per request. This is dirty, but what else is there to do...
@@ -190,6 +190,11 @@ public class ScimTCBLUserRepository implements TCBLUserRepository {
 					.filter(user -> !user.getUserName().equals("admin"))
 					.forEach(processor::process);
 		}
+	}
+
+	@Override
+	public void processTCBLUsers(TCBLUserProcessor processor) throws Exception {
+		processScimUsers(scimUser -> processor.process(TCBLUser.createFromScimUser(scimUser, userExtensionSchema.getId())));
 	}
 
 	private static Map<String, String> resolveScimClientProperties(final Environment environment) {
