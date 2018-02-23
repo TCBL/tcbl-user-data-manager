@@ -1,7 +1,10 @@
 package be.ugent.idlab.tcbl.userdatamanager.model;
 
 import org.apache.commons.collections.map.SingletonMap;
-import org.gluu.oxtrust.model.scim2.*;
+import org.gluu.oxtrust.model.scim2.Email;
+import org.gluu.oxtrust.model.scim2.Extension;
+import org.gluu.oxtrust.model.scim2.Name;
+import org.gluu.oxtrust.model.scim2.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,7 +27,6 @@ public class TCBLUser {
 	private boolean active;
 	private boolean subscribedNL;	// is the user subscribed to the TCBL newsletter?
 	private boolean acceptedPP;		// did the user accept the TCBL privacy policy?
-	private final static String extensionUrn = "urn:ietf:params:scim:schemas:extension:gluu:2.0:User";
 	private final static String subscribedField = "gcpSubscribedToTCBLnewsletter";
 	private final static String acceptedField = "gcpAcceptedTCBLprivacyPolicy";
 
@@ -33,7 +35,7 @@ public class TCBLUser {
 		active = false;
 	}
 
-	static TCBLUser createFromScimUser(final User scimUser) {
+	static TCBLUser createFromScimUser(final User scimUser, String extensionUrn) {
 		TCBLUser user = new TCBLUser();
 		user.setId(scimUser.getId());
 		user.setUserName(scimUser.getUserName());
@@ -57,7 +59,7 @@ public class TCBLUser {
 		return user;
 	}
 
-	void updateScimUser(final User scimUser) {
+	void updateScimUser(final User scimUser, String extensionUrn) {
 		if (scimUser.getUserName() == null) {
 			scimUser.setUserName(userName);
 		}
@@ -79,8 +81,8 @@ public class TCBLUser {
 		scimUser.setActive(active);
 
 		Extension extension = new Extension.Builder(extensionUrn)
-				.setField(subscribedField, Boolean.toString(subscribedNL), ExtensionFieldType.STRING, false)
-				.setField(acceptedField, Boolean.toString(acceptedPP), ExtensionFieldType.STRING, false)
+				.setField(subscribedField, Boolean.toString(subscribedNL))
+				.setField(acceptedField, Boolean.toString(acceptedPP))
 				.build();
 		if (scimUser.isExtensionPresent(extensionUrn)) {
 			scimUser.setExtensions(new SingletonMap(extensionUrn, extension));
