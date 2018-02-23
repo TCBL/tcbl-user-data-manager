@@ -111,6 +111,16 @@ form input, form textarea {
     transition: border-color 0.15s linear, background 0.15s linear;
 }
 
+form input[type="checkbox"] {
+    width: 1rem;
+    height: 1rem;
+    float: left;
+}
+
+form label.label--checkbox {
+    display: inline;
+}
+
 form input#reset {
     margin-left: 0;
 }

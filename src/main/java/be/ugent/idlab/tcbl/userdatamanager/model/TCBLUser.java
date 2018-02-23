@@ -1,10 +1,15 @@
 package be.ugent.idlab.tcbl.userdatamanager.model;
 
+import org.apache.commons.collections.map.SingletonMap;
 import org.gluu.oxtrust.model.scim2.Email;
+import org.gluu.oxtrust.model.scim2.Extension;
 import org.gluu.oxtrust.model.scim2.Name;
 import org.gluu.oxtrust.model.scim2.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
+import java.util.NoSuchElementException;
 
 /**
  * <p>Copyright 2017 IDLab (Ghent University - imec)</p>
@@ -12,6 +17,7 @@ import java.util.Collections;
  * @author Gerald Haesendonck
  */
 public class TCBLUser {
+	private static Logger log = LoggerFactory.getLogger(TCBLUser.class);
 
 	private String id;
 	private String userName;
@@ -19,22 +25,41 @@ public class TCBLUser {
 	private String lastName;
 	private String password;
 	private boolean active;
+	private boolean subscribedNL;	// is the user subscribed to the TCBL newsletter?
+	private boolean acceptedPP;		// did the user accept the TCBL privacy policy?
+	private final static String subscribedField = "gcpSubscribedToTCBLnewsletter";
+	private final static String acceptedField = "gcpAcceptedTCBLprivacyPolicy";
+
 
 	public TCBLUser() {
 		active = false;
 	}
 
-	static TCBLUser createFromScimUser(final User scimUser) {
+	static TCBLUser createFromScimUser(final User scimUser, String extensionUrn) {
 		TCBLUser user = new TCBLUser();
 		user.setId(scimUser.getId());
 		user.setUserName(scimUser.getUserName());
 		user.setFirstName(scimUser.getName().getGivenName());
 		user.setLastName(scimUser.getName().getFamilyName());
 		user.setActive(scimUser.isActive() == null ? false : scimUser.isActive());
+
+		if (scimUser.isExtensionPresent(extensionUrn)) {
+			Extension extension = scimUser.getExtension(extensionUrn);
+			try {
+				user.setSubscribedNL(Boolean.parseBoolean(extension.getFieldAsString(subscribedField)));
+				user.setAcceptedPP(Boolean.parseBoolean(extension.getFieldAsString(acceptedField)));
+			} catch (NoSuchElementException e) {
+				log.warn("(One of) the fields {} and {} do not exist. Setting subscribedNL and acceptedPP to 'false'",subscribedField, acceptedField);
+				user.setSubscribedNL(false);
+				user.setAcceptedPP(false);
+			}
+		} else {
+			log.warn("No extension URN '{}' found on the Gluu server", extensionUrn);
+		}
 		return user;
 	}
 
-	void updateScimUser(final User scimUser) {
+	void updateScimUser(final User scimUser, String extensionUrn) {
 		if (scimUser.getUserName() == null) {
 			scimUser.setUserName(userName);
 		}
@@ -54,6 +79,16 @@ public class TCBLUser {
 		scimUser.setName(newName);
 		scimUser.setDisplayName(displayName);
 		scimUser.setActive(active);
+
+		Extension extension = new Extension.Builder(extensionUrn)
+				.setField(subscribedField, Boolean.toString(subscribedNL))
+				.setField(acceptedField, Boolean.toString(acceptedPP))
+				.build();
+		if (scimUser.isExtensionPresent(extensionUrn)) {
+			scimUser.setExtensions(new SingletonMap(extensionUrn, extension));
+		} else {
+			scimUser.addExtension(extension);
+		}
 	}
 
 	public String getFirstName() {
@@ -79,6 +114,21 @@ public class TCBLUser {
 	public void setUserName(String userName) {
 		this.userName = userName;
 	}
+	public boolean isSubscribedNL() {
+		return subscribedNL;
+	}
+
+	public void setSubscribedNL(boolean subscribedNL) {
+		this.subscribedNL = subscribedNL;
+	}
+
+	public boolean isAcceptedPP() {
+		return acceptedPP;
+	}
+
+	public void setAcceptedPP(boolean acceptedPP) {
+		this.acceptedPP = acceptedPP;
+	}
 
 	@Override
 	public String toString() {
@@ -86,6 +136,8 @@ public class TCBLUser {
 				"userName='" + userName + '\'' +
 				", firstName='" + firstName + '\'' +
 				", lastName='" + lastName + '\'' +
+				", subscribedNL='" + subscribedNL + '\'' +
+				", acceptedPP='" + acceptedPP + '\'' +
 				'}';
 	}
 

@@ -58,27 +58,9 @@ public class ScimTCBLUserRepository implements TCBLUserRepository {
 	@Override
 	public Iterable<TCBLUser> findAll() throws Exception {
 		log.debug("Find all users.");
-		try {
-			ScimResponse response = client.retrieveAllUsers();
-			if (response.getStatusCode() == 200) {
-				ListResponse userList = Util.toListResponseUser(response, userExtensionSchema);
-				List<TCBLUser> users = new ArrayList<>();
-				for (Resource userResource : userList.getResources()) {
-					User user = (User) userResource;
-					TCBLUser tcblUser = TCBLUser.createFromScimUser(user);
-					users.add(tcblUser);
-				}
-				return users;
-			} else {
-				String message = "Cannot request user list to OpenID Connect server: " + response.getStatusCode() + ": " + response.getStatus() + ". " + response.getResponseBodyString();
-				log.error(message);
-				throw new Exception(message);
-			}
-		} catch (Exception e) {
-			String message = "Cannot request user list: " + e.getMessage();
-			log.error(message, e);
-			throw new Exception(message, e);
-		}
+		List<TCBLUser> users = new ArrayList<>();
+		processUsers(user -> users.add(TCBLUser.createFromScimUser(user, userExtensionSchema.getId())));
+		return users;
 	}
 
 	@Override
@@ -86,7 +68,7 @@ public class ScimTCBLUserRepository implements TCBLUserRepository {
 		log.debug("Saving user {}", tcblUser.getUserName() );
 		User user = findUser(tcblUser.getId());
 		user.setPassword("");
-		tcblUser.updateScimUser(user);
+		tcblUser.updateScimUser(user, userExtensionSchema.getId());
 		client.updateUser(user, tcblUser.getId(), new String[0]);
 		return tcblUser;
 	}
@@ -95,7 +77,7 @@ public class ScimTCBLUserRepository implements TCBLUserRepository {
 	public TCBLUser find(final String id) throws Exception {
 		log.debug("Finding user with id {}", id);
 		User user = findUser(id);
-		return TCBLUser.createFromScimUser(user);
+		return TCBLUser.createFromScimUser(user, userExtensionSchema.getId());
 	}
 
 	@Override
@@ -106,7 +88,7 @@ public class ScimTCBLUserRepository implements TCBLUserRepository {
 		ListResponse userList = Util.toListResponseUser(existsResponse, userExtensionSchema);
 		if (userList.getTotalResults() == 1) {
 			User user = (User) userList.getResources().get(0);
-			return TCBLUser.createFromScimUser(user);
+			return TCBLUser.createFromScimUser(user, userExtensionSchema.getId());
 		} else {
 			String message = "Did not find user " + userName;
 			log.error(message);
@@ -119,7 +101,7 @@ public class ScimTCBLUserRepository implements TCBLUserRepository {
 		log.debug("Creating user {}", tcblUser.getUserName());
 		try {
 			User user = new User();
-			tcblUser.updateScimUser(user);
+			tcblUser.updateScimUser(user, userExtensionSchema.getId());
 			ScimResponse response = client.createUser(user, new String[0]);
 			if (response.getStatusCode() == 201) {
 				user = Util.toUser(response, userExtensionSchema);
@@ -172,7 +154,7 @@ public class ScimTCBLUserRepository implements TCBLUserRepository {
 					if (!userList.isEmpty()) {
 						for (Resource userResource : userListResponse.getResources()) {
 							User user = (User) userResource;
-							TCBLUser tcblUser = TCBLUser.createFromScimUser(user);
+							TCBLUser tcblUser = TCBLUser.createFromScimUser(user, userExtensionSchema.getId());
 							users.add(tcblUser);
 						}
 						startIndex += Constants.MAX_COUNT;
@@ -203,12 +185,10 @@ public class ScimTCBLUserRepository implements TCBLUserRepository {
 			ScimResponse listResponse = client.searchUsers("userName sw \"" + c + "\"", 1, MAX_COUNT, "", "", new String[]{});
 			ListResponse userListResponse = Util.toListResponseUser(listResponse, client.getUserExtensionSchema());
 			List<Resource> userList = userListResponse.getResources();
-			if (!userList.isEmpty()) {
-				for (Resource userResource : userList) {
-					User user = (User) userResource;
-					processor.process(user);
-				}
-			}
+			userList.stream()
+					.map(user -> (User)user)
+					.filter(user -> !user.getUserName().equals("admin"))
+					.forEach(processor::process);
 		}
 	}
 
