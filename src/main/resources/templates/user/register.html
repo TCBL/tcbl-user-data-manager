@@ -39,6 +39,18 @@
 							<input type="text" name="lastName" id="lastName" th:field="*{lastName}" required/>
 						</div>
 					</div>
+					<div class="row">
+						<div class="columns large-2">
+							<label class="label--checkbox" th:for="${#ids.next('subscribedNL')}">I want to receive the TCBL newsletter.</label>
+							<input type="checkbox" th:field="*{subscribedNL}"/>
+						</div>
+					</div>
+					<div class="row">
+						<div class="columns large-2">
+							<label class="label--checkbox" th:for="${#ids.next('acceptedPP')}">I accept the TCBL privacy policy.</label>
+							<input type="checkbox" th:field="*{acceptedPP}"/>
+						</div>
+					</div>
 				</fieldset>
 
 				<input type="submit" value="Sign up for TCBL now" class="button button--red"/>

@@ -13,15 +13,28 @@
 					<div class="row">
 						<div class="columns large-2">
 							<label for="firstName">First name</label>
-							<input type="text" name="firstName" id="firstName" th:field="*{firstName}" required/><br>
+							<input type="text" name="firstName" id="firstName" th:field="*{firstName}" required/>
 						</div>
 						<div class="columns large-2">
 							<label for="lastName">Last name</label>
-							<input type="text" name="lastName" id="lastName" th:field="*{lastName}" required/><br>
+							<input type="text" name="lastName" id="lastName" th:field="*{lastName}" required/>
 						</div>
 					</div>
-					<input type="submit" value="Update" class="button button--red"/>
+					<div class="row">
+						<div class="columns large-2">
+							<label class="label--checkbox" th:for="${#ids.next('subscribedNL')}">I want to receive the TCBL newsletter.</label>
+							<input type="checkbox" th:field="*{subscribedNL}"/>
+						</div>
+					</div>
+					<div class="row">
+						<div class="columns large-2">
+							<label class="label--checkbox" th:for="${#ids.next('acceptedPP')}">I accept the TCBL privacy policy.</label>
+							<input type="checkbox" th:field="*{acceptedPP}"/>
+						</div>
+					</div>
 				</fieldset>
+
+				<input type="submit" value="Update" class="button button--red"/>
 				<input type="hidden" th:field="*{id}"/>
 				<!--/* post all other tcblUser's properties in the returned TCBLUser object as well! */-->
 				<input type="hidden" th:field="*{userName}"/>

@@ -109,6 +109,10 @@ public class UserController {
 	@GetMapping("/register")
 	public String getRegister(Model model) {
 		TCBLUser user = new TCBLUser();
+
+		// set defaults for new user:
+		user.setSubscribedNL(true);
+
 		model.addAttribute("tcblUser", user);
 		return "user/register";
 	}
