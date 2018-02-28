@@ -102,6 +102,10 @@ public class MailChimper {
 		return org.springframework.util.DigestUtils.md5DigestAsHex(emailAddress.toLowerCase().getBytes(StandardCharsets.UTF_8));
 	}
 
+	/**
+	 * Sets the field subscribedNL of all users that are unsubscribed to the newsletter in MailChimp to false
+	 * and update the Gluu server accordingly.
+	 */
 	// @Scheduled(cron = "0 * * * * *") // every minute, good to test
 	@Scheduled(cron = "0 0 3 * * *")	// every day at 3
 	public void synchronise() {
