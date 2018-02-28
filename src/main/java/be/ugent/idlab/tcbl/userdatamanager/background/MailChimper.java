@@ -132,6 +132,7 @@ public class MailChimper {
 					totalCount = response.getBody().getObject().getInt("total_items");
 				}
 				totalCount -= 100;
+				offset += 100;
 				String responseStr = response.getBody().getObject().toString();
 				MailChimpMembers members = gson.fromJson(responseStr, MailChimpMembers.class);
 				for (MailChimpMember mailChimpMember : members.getMembers()) {
