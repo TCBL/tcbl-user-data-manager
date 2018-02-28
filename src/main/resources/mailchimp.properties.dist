@@ -1,0 +1,6 @@
+# the API version
+api=3.0
+# the API key
+key=<your mailchimp API key>
+# id of the list
+list=<member list id>
