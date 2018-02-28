@@ -1,6 +1,7 @@
 package be.ugent.idlab.tcbl.userdatamanager.background;
 
 import be.ugent.idlab.tcbl.userdatamanager.model.TCBLUser;
+import be.ugent.idlab.tcbl.userdatamanager.model.TCBLUserRepository;
 import com.google.gson.Gson;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
@@ -10,7 +11,9 @@ import com.mashape.unirest.request.body.RequestBodyEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.io.FileReader;
@@ -27,6 +30,8 @@ import java.util.Properties;
 public class MailChimper {
 	private final Logger log = LoggerFactory.getLogger(this.getClass());
 
+	private final TCBLUserRepository userRepository;
+
 	@Value("${mailchimp.filename}")
 	private String filename;
 
@@ -35,6 +40,10 @@ public class MailChimper {
 	private String baseUrl;
 
 	private final Gson gson = new Gson();
+
+	public MailChimper(TCBLUserRepository userRepository) {
+		this.userRepository = userRepository;
+	}
 
 	private void load() {
 		try (Reader in = new FileReader(filename)) {
@@ -91,6 +100,53 @@ public class MailChimper {
 
 	private String getSubscriberHash(final String emailAddress) {
 		return org.springframework.util.DigestUtils.md5DigestAsHex(emailAddress.toLowerCase().getBytes(StandardCharsets.UTF_8));
+	}
+
+	// @Scheduled(cron = "0 * * * * *") // every minute, good to test
+	@Scheduled(cron = "0 0 3 * * *")	// every day at 3
+	public void synchronise() {
+		log.debug("Synchronising MailChimp list subscriptions");
+
+		load();
+		// get unsubscribed users, and update these in the gluu server
+		int offset = 0;
+		int totalCount = 100000000;
+		try {
+			while (totalCount > 0) {
+				HttpResponse<JsonNode> response = Unirest.get(baseUrl + "/lists/" + listId + "/members")
+					.queryString("fields", "members.email_address,total_items")
+					.queryString("status", "unsubscribed")
+					.queryString("offset", offset)
+					.queryString("count", 100)
+					.basicAuth("anystring", key)
+					.asJson();
+				if (response.getStatus() != HttpStatus.OK.value()) {
+					log.error("Could not retrieve list of members from MailChimp! Response: {}", response.getStatusText());
+					return;
+				}
+				if (totalCount == 100000000) {
+					totalCount = response.getBody().getObject().getInt("total_items");
+				}
+				totalCount -= 100;
+				String responseStr = response.getBody().getObject().toString();
+				MailChimpMembers members = gson.fromJson(responseStr, MailChimpMembers.class);
+				for (MailChimpMember mailChimpMember : members.getMembers()) {
+					String userName = mailChimpMember.getEmail_address();
+					try {
+						TCBLUser user = userRepository.findByName(userName);
+						if (user.isSubscribedNL()) {
+							user.setSubscribedNL(false);
+							userRepository.save(user);
+						}
+					} catch (Exception e) {
+						// normal if user is not found
+					}
+				}
+
+			}
+		} catch (UnirestException e) {
+			log.error("Could not retrieve list of members from MailChimp!",e);
+		}
 	}
 
 	private class UpdateUserData {
