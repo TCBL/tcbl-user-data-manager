@@ -9,7 +9,6 @@ import com.mashape.unirest.http.Unirest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -34,7 +33,7 @@ public class MailChimp {
 		this.userRepository = userRepository;
 	}
 
-	@Scheduled(cron = "0 * * * * *")
+	//@Scheduled(cron = "0 * * * * *")
 	public void listMembers() {
 		log.debug("Listing MailChimp list subscriptions");
 		String key = loader.getKey();

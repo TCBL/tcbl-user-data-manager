@@ -1,6 +1,7 @@
 package be.ugent.idlab.tcbl.userdatamanager.controller;
 
 import be.ugent.idlab.tcbl.userdatamanager.background.Mail;
+import be.ugent.idlab.tcbl.userdatamanager.background.MailChimper;
 import be.ugent.idlab.tcbl.userdatamanager.controller.support.ConfirmationTemplate;
 import be.ugent.idlab.tcbl.userdatamanager.model.NavLink;
 import be.ugent.idlab.tcbl.userdatamanager.model.Status;
@@ -45,6 +46,7 @@ public class UserController {
 	private final static Base64.Encoder encoder = Base64.getUrlEncoder();
 	private final static Base64.Decoder decoder = Base64.getUrlDecoder();
 	private OAuth2AuthorizedClientService authorizedClientService;
+	private final MailChimper mailChimper;
 
 	/**
 	 * Creates a UserController; Spring injects the TCBLUserRepository.
@@ -52,10 +54,11 @@ public class UserController {
 	 * @param tcblUserRepository A repository where TCBLUsers are stored.
 	 * @param mail The background mail sender.
 	 */
-	public UserController(TCBLUserRepository tcblUserRepository, Mail mail, OAuth2AuthorizedClientService authorizedClientService) {
+	public UserController(TCBLUserRepository tcblUserRepository, Mail mail, OAuth2AuthorizedClientService authorizedClientService, MailChimper mailChimper) {
 		this.tcblUserRepository = tcblUserRepository;
 		this.mail = mail;
 		this.authorizedClientService = authorizedClientService;
+		this.mailChimper = mailChimper;
 	}
 
 	/**
@@ -99,6 +102,7 @@ public class UserController {
 			tcblUserRepository.save(user);
 			model.addAttribute("tcblUser", user);
 			model.addAttribute("status", new Status(Status.Value.OK, "Your information is updated."));
+			mailChimper.addOrUpdate(user);
 		} catch (Exception e) {
 			log.error("Cannot update user info", e);
 			model.addAttribute("status", new Status(Status.Value.ERROR, "Your information could not be updated."));
@@ -175,6 +179,7 @@ public class UserController {
 			if (!user.isActive()) {
 				user.setActive(true);
 				tcblUserRepository.save(user);
+				mailChimper.addOrUpdate(user);
 			}
 			ct.setUtext("<p>You're successfully signed up!</p>" +
 					"<p>You can now use your new account to login.</p>" +
