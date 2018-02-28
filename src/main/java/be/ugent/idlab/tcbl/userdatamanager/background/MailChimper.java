@@ -57,7 +57,7 @@ public class MailChimper {
 		load();
 		if (key != null) {
 			String subscriberHash = getSubscriberHash(user.getUserName());
-			String body = new UpdateUserData(user.getUserName(), user.isSubscribedNL()).toJSON();
+			String body = new UpdateUserData(user).toJSON();
 			RequestBodyEntity request = Unirest.put(baseUrl + "/lists/" + listId + "/members/" + subscriberHash)
 					.basicAuth("anystring", key)
 					.body(body);
@@ -97,15 +97,28 @@ public class MailChimper {
 		private final String email_address;
 		private final String status_if_new;
 		private final String status;
+		private final MergeFields merge_fields;
 
-		public UpdateUserData(String email_address, boolean status) {
-			this.email_address = email_address;
-			this.status_if_new = status ? "subscribed" : "unsubscribed";
+		public UpdateUserData(TCBLUser user) {
+			this.email_address = user.getUserName();
+			this.status_if_new = user.isSubscribedNL() ? "subscribed" : "unsubscribed";
 			this.status = status_if_new;
+			this.merge_fields = new MergeFields(user.getFirstName(), user.getLastName());
 		}
 
 		public String toJSON() {
 			return gson.toJson(this);
 		}
+
+		private class MergeFields {
+			private final String FNAME;
+			private final String LNAME;
+
+			public MergeFields(String FNAME, String LNAME) {
+				this.FNAME = FNAME;
+				this.LNAME = LNAME;
+			}
+		}
 	}
+
 }
