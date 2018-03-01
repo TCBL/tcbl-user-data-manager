@@ -285,7 +285,7 @@ tudm:
   tcbl-privacy-url: "https://tcbl.eu/about"
 ```
 
-#### MailChimp
+### 5. MailChimp
 
 The TCBL User Data Manager application can communicate if a user wants to be subscribed to the TCBL newsletter, or the
 other way araound: if a user unsubscribes via MailChimp, these changes will propagate to the data manager application.
@@ -309,7 +309,7 @@ in the working directory. The file is self-explanatory.
 To **disable** MailChimp communication, set the `mailchimp.filename` property to point to an non-existing file.
 
 
-### 5. Putting it all together: the complete application configuration
+### 6. Putting it all together: the complete application configuration
 
 **Putting it all together**, your client configuration file `application.yml` should look like `tcbl-user-data-manager/src/main/resources/application.yml.dist`.
 
