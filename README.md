@@ -284,7 +284,30 @@ tudm:
   # url of the webpage containing the TCBL privacy declaration
   tcbl-privacy-url: "https://tcbl.eu/about"
 ```
- 
+
+#### MailChimp
+
+The TCBL User Data Manager application can communicate if a user wants to be subscribed to the TCBL newsletter, or the
+other way araound: if a user unsubscribes via MailChimp, these changes will propagate to the data manager application.
+
+The application.yml requires the following settings:
+
+```yaml
+##
+# MailChimp settings.
+##
+mailchimp:
+  # name of the properties file containing the API key and the list id
+  filename: mailchimp.properties
+```
+
+The mailchimp.properties file contains the actual settings and **will be read every time** a request to the MailChimp API
+is made. This way you can re-congifure the settings without having to restart the application. Use the file
+`tcbl-user-data-manager/src/main/resources/mailchimp.properties.dist` as a template and store it as `mailchimp.properties`
+in the working directory. The file is self-explanatory.
+
+To **disable** MailChimp communication, set the `mailchimp.filename` property to point to an non-existing file.
+
 
 ### 5. Putting it all together: the complete application configuration
 
