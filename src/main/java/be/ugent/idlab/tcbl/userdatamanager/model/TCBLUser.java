@@ -8,6 +8,7 @@ import org.gluu.oxtrust.model.scim2.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import java.util.Collections;
@@ -25,11 +26,12 @@ public class TCBLUser {
 	private static Logger log = LoggerFactory.getLogger(TCBLUser.class);
 
 	@Id
+	@Column(length = 64)
 	private String id;
 	private String userName;
 	private String firstName;
 	private String lastName;
-	private String password;
+	private transient String password;
 	private boolean active;
 	private boolean subscribedNL;	// is the user subscribed to the TCBL newsletter?
 	private boolean acceptedPP;		// did the user accept the TCBL privacy policy?
