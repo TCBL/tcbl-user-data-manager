@@ -22,14 +22,15 @@
 					</div>
 					<div class="row">
 						<div class="columns large-2">
-							<label class="label--checkbox" th:for="${#ids.next('subscribedNL')}">I want to receive the TCBL newsletter.</label>
 							<input type="checkbox" th:field="*{subscribedNL}"/>
+							<label class="label--checkbox" th:for="${#ids.prev('subscribedNL')}">I want to receive the TCBL newsletter.</label>
 						</div>
 					</div>
 					<div class="row">
 						<div class="columns large-2">
-							<label class="label--checkbox" th:for="${#ids.next('acceptedPP')}">I accept the TCBL privacy policy.</label>
-							<input type="checkbox" th:field="*{acceptedPP}"/>
+							<input type="checkbox" th:field="*{acceptedPP}" required/>
+							<label class="label--checkbox" th:for="${#ids.prev('acceptedPP')}">I accept</label>
+							<label class="label--checkbox"><a target="_blank" th:href="${privacyUrl}" class="normal">the TCBL privacy policy</a>.</label>
 						</div>
 					</div>
 				</fieldset>

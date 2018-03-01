@@ -120,6 +120,8 @@ tudm:
   tcbl-services:
     # name of the json file containing the descriptions of the TCBL services
     filename: services.json
+  # url of the webpage containing the TCBL privacy declaration
+  tcbl-privacy-url: "https://tcbl.eu/about"
 
 ##
 # MailChimp settings.
