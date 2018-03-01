@@ -45,7 +45,7 @@ public class MailChimper {
 		this.userRepository = userRepository;
 	}
 
-	private void load() {
+	private boolean load() {
 		try (Reader in = new FileReader(filename)) {
 			Properties properties = new Properties();
 			properties.load(in);
@@ -55,16 +55,16 @@ public class MailChimper {
 			String dcPart = key.substring(key.lastIndexOf('-') + 1);
 			baseUrl = "https://" + dcPart + ".api.mailchimp.com/" + apiVersion;
 			log.info("MailChimpLoader's properties (re)loaded");
+			return true;
 		} catch (Exception e) {
-			log.warn("MailChimpLoader's properties not loaded: ", e);
-			key = null;
+			log.warn("MailChimpLoader's properties not loaded. Doing nothing ", e);
+			return false;
 		}
 	}
 
 	@Async
 	public void addOrUpdate(final TCBLUser user) {
-		load();
-		if (key != null) {
+		if (load()) {
 			String subscriberHash = getSubscriberHash(user.getUserName());
 			String body = new UpdateUserData(user).toJSON();
 			RequestBodyEntity request = Unirest.put(baseUrl + "/lists/" + listId + "/members/" + subscriberHash)
@@ -111,46 +111,47 @@ public class MailChimper {
 	public void synchronise() {
 		log.debug("Synchronising MailChimp list subscriptions");
 
-		load();
-		// get unsubscribed users, and update these in the gluu server
-		int offset = 0;
-		int totalCount = 100000000;
-		try {
-			while (totalCount > 0) {
-				HttpResponse<JsonNode> response = Unirest.get(baseUrl + "/lists/" + listId + "/members")
-					.queryString("fields", "members.email_address,total_items")
-					.queryString("status", "unsubscribed")
-					.queryString("offset", offset)
-					.queryString("count", 100)
-					.basicAuth("anystring", key)
-					.asJson();
-				if (response.getStatus() != HttpStatus.OK.value()) {
-					log.error("Could not retrieve list of members from MailChimp! Response: {}", response.getStatusText());
-					return;
-				}
-				if (totalCount == 100000000) {
-					totalCount = response.getBody().getObject().getInt("total_items");
-				}
-				totalCount -= 100;
-				offset += 100;
-				String responseStr = response.getBody().getObject().toString();
-				MailChimpMembers members = gson.fromJson(responseStr, MailChimpMembers.class);
-				for (MailChimpMember mailChimpMember : members.getMembers()) {
-					String userName = mailChimpMember.getEmail_address();
-					try {
-						TCBLUser user = userRepository.findByName(userName);
-						if (user.isSubscribedNL()) {
-							user.setSubscribedNL(false);
-							userRepository.save(user);
-						}
-					} catch (Exception e) {
-						// normal if user is not found
+		if (load()) {
+			// get unsubscribed users, and update these in the gluu server
+			int offset = 0;
+			int totalCount = 100000000;
+			try {
+				while (totalCount > 0) {
+					HttpResponse<JsonNode> response = Unirest.get(baseUrl + "/lists/" + listId + "/members")
+							.queryString("fields", "members.email_address,total_items")
+							.queryString("status", "unsubscribed")
+							.queryString("offset", offset)
+							.queryString("count", 100)
+							.basicAuth("anystring", key)
+							.asJson();
+					if (response.getStatus() != HttpStatus.OK.value()) {
+						log.error("Could not retrieve list of members from MailChimp! Response: {}", response.getStatusText());
+						return;
 					}
-				}
+					if (totalCount == 100000000) {
+						totalCount = response.getBody().getObject().getInt("total_items");
+					}
+					totalCount -= 100;
+					offset += 100;
+					String responseStr = response.getBody().getObject().toString();
+					MailChimpMembers members = gson.fromJson(responseStr, MailChimpMembers.class);
+					for (MailChimpMember mailChimpMember : members.getMembers()) {
+						String userName = mailChimpMember.getEmail_address();
+						try {
+							TCBLUser user = userRepository.findByName(userName);
+							if (user.isSubscribedNL()) {
+								user.setSubscribedNL(false);
+								userRepository.save(user);
+							}
+						} catch (Exception e) {
+							// normal if user is not found
+						}
+					}
 
+				}
+			} catch (UnirestException e) {
+				log.error("Could not retrieve list of members from MailChimp!", e);
 			}
-		} catch (UnirestException e) {
-			log.error("Could not retrieve list of members from MailChimp!",e);
 		}
 	}
 
