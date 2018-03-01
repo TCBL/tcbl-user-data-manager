@@ -8,17 +8,23 @@ import org.gluu.oxtrust.model.scim2.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.persistence.Entity;
+import javax.persistence.Id;
 import java.util.Collections;
 import java.util.NoSuchElementException;
+
+;
 
 /**
  * <p>Copyright 2017 IDLab (Ghent University - imec)</p>
  *
  * @author Gerald Haesendonck
  */
+@Entity
 public class TCBLUser {
 	private static Logger log = LoggerFactory.getLogger(TCBLUser.class);
 
+	@Id
 	private String id;
 	private String userName;
 	private String firstName;
@@ -27,8 +33,10 @@ public class TCBLUser {
 	private boolean active;
 	private boolean subscribedNL;	// is the user subscribed to the TCBL newsletter?
 	private boolean acceptedPP;		// did the user accept the TCBL privacy policy?
-	private final static String subscribedField = "gcpSubscribedToTCBLnewsletter";
-	private final static String acceptedField = "gcpAcceptedTCBLprivacyPolicy";
+
+
+	private final transient static String subscribedField = "gcpSubscribedToTCBLnewsletter";
+	private final transient static String acceptedField = "gcpAcceptedTCBLprivacyPolicy";
 
 
 	public TCBLUser() {

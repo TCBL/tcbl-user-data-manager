@@ -1,7 +1,7 @@
 package be.ugent.idlab.tcbl.userdatamanager.background;
 
+import be.ugent.idlab.tcbl.userdatamanager.model.GluuTCBLUserRepository;
 import be.ugent.idlab.tcbl.userdatamanager.model.TCBLUser;
-import be.ugent.idlab.tcbl.userdatamanager.model.TCBLUserRepository;
 import com.google.gson.Gson;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
@@ -30,7 +30,7 @@ import java.util.Properties;
 public class MailChimper {
 	private final Logger log = LoggerFactory.getLogger(this.getClass());
 
-	private final TCBLUserRepository userRepository;
+	private final GluuTCBLUserRepository userRepository;
 
 	@Value("${mailchimp.filename}")
 	private String filename;
@@ -41,7 +41,7 @@ public class MailChimper {
 
 	private final Gson gson = new Gson();
 
-	public MailChimper(TCBLUserRepository userRepository) {
+	public MailChimper(GluuTCBLUserRepository userRepository) {
 		this.userRepository = userRepository;
 	}
 

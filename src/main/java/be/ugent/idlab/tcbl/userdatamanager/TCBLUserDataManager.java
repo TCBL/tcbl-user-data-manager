@@ -1,8 +1,8 @@
 package be.ugent.idlab.tcbl.userdatamanager;
 
-import be.ugent.idlab.tcbl.userdatamanager.model.ScimTCBLUserRepository;
+import be.ugent.idlab.tcbl.userdatamanager.model.GluuTCBLUserRepository;
+import be.ugent.idlab.tcbl.userdatamanager.model.ScimGluuTCBLUserRepository;
 import be.ugent.idlab.tcbl.userdatamanager.model.TCBLUser;
-import be.ugent.idlab.tcbl.userdatamanager.model.TCBLUserRepository;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -21,8 +21,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 public class TCBLUserDataManager {
 
 	@Bean
-	public TCBLUserRepository tcblUserRepository(final Environment environment) throws Exception {
-		return new ScimTCBLUserRepository(environment);
+	public GluuTCBLUserRepository gluuTcblUserRepository(final Environment environment) throws Exception {
+		return new ScimGluuTCBLUserRepository(environment);
 	}
 
 	@Bean
@@ -32,7 +32,7 @@ public class TCBLUserDataManager {
 			@Override
 			public TCBLUser convert(String id) {
 				try {
-					return tcblUserRepository(environment).find(id);
+					return gluuTcblUserRepository(environment).find(id);
 				} catch (Exception e) {
 					throw new IllegalArgumentException(e);
 				}

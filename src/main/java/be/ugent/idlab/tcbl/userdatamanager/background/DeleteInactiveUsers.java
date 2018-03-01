@@ -1,7 +1,7 @@
 package be.ugent.idlab.tcbl.userdatamanager.background;
 
+import be.ugent.idlab.tcbl.userdatamanager.model.GluuTCBLUserRepository;
 import be.ugent.idlab.tcbl.userdatamanager.model.TCBLUser;
-import be.ugent.idlab.tcbl.userdatamanager.model.TCBLUserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -16,9 +16,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class DeleteInactiveUsers {
 	private final Logger log = LoggerFactory.getLogger(getClass());
-	private final TCBLUserRepository userRepository;
+	private final GluuTCBLUserRepository userRepository;
 
-	public DeleteInactiveUsers(TCBLUserRepository userRepository) {
+	public DeleteInactiveUsers(GluuTCBLUserRepository userRepository) {
 		this.userRepository = userRepository;
 	}
 
