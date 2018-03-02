@@ -14,6 +14,7 @@ import org.springframework.boot.context.properties.bind.BindResult;
 import org.springframework.boot.context.properties.bind.Bindable;
 import org.springframework.boot.context.properties.bind.Binder;
 import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +27,8 @@ import static org.gluu.oxtrust.model.scim2.Constants.MAX_COUNT;
  *
  * @author Gerald Haesendonck
  */
-public class ScimUserRepository implements UserRepository {
+@Component
+public class ScimUserRepository {
 
 	// SCIM query language: see https://tools.ietf.org/html/rfc7644#section-3.4.2.2
 
@@ -55,7 +57,6 @@ public class ScimUserRepository implements UserRepository {
 		log.debug("ScimUserRepository initialised.");
 	}
 
-	@Override
 	public Iterable<TCBLUser> findAll() throws Exception {
 		log.debug("Find all users.");
 		List<TCBLUser> users = new ArrayList<>();
@@ -63,7 +64,6 @@ public class ScimUserRepository implements UserRepository {
 		return users;
 	}
 
-	@Override
 	public TCBLUser save(final TCBLUser tcblUser) throws Exception {
 		log.debug("Saving user {}", tcblUser.getUserName() );
 		User user = findUser(tcblUser.getInum());
@@ -73,14 +73,12 @@ public class ScimUserRepository implements UserRepository {
 		return tcblUser;
 	}
 
-	@Override
 	public TCBLUser find(final String inum) throws Exception {
 		log.debug("Finding user with inum {}", inum);
 		User user = findUser(inum);
 		return TCBLUser.createFromScimUser(user, userExtensionSchema.getId());
 	}
 
-	@Override
 	public TCBLUser findByName(final String userName) throws Exception {
 		log.debug("Finding user by userName {}", userName);
 		String usernameQuery = "userName eq \"" + userName + "\"";
@@ -96,7 +94,6 @@ public class ScimUserRepository implements UserRepository {
 		}
 	}
 
-	@Override
 	public TCBLUser create(final TCBLUser tcblUser) throws Exception {
 		log.debug("Creating user {}", tcblUser.getUserName());
 		try {
@@ -121,7 +118,6 @@ public class ScimUserRepository implements UserRepository {
 		}
 	}
 
-	@Override
 	public void deleteTCBLUser(final TCBLUser user) throws Exception {
 		log.debug("Deleting user {}", user.getUserName());
 		try {
@@ -138,7 +134,6 @@ public class ScimUserRepository implements UserRepository {
 		}
 	}
 
-	@Override
 	public Iterable<TCBLUser> findInactive() throws Exception {
 		log.debug("Finding inactive users.");
 		String query = "active eq \"false\"";
@@ -175,7 +170,6 @@ public class ScimUserRepository implements UserRepository {
 		}
 	}
 
-	@Override
 	public void processScimUsers(ScimUserProcessor processor) throws Exception {
 		// Iterating all users does not work with Gluu Scim, because of pagination does not work.
 		// To work around this, we request users by each letter of the alphabet and some other characters, as to limit
@@ -192,7 +186,6 @@ public class ScimUserRepository implements UserRepository {
 		}
 	}
 
-	@Override
 	public void processTCBLUsers(TCBLUserProcessor processor) throws Exception {
 		processScimUsers(scimUser -> processor.process(TCBLUser.createFromScimUser(scimUser, userExtensionSchema.getId())));
 	}
