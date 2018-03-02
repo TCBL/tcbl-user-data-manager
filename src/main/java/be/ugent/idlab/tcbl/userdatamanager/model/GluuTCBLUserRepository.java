@@ -8,7 +8,7 @@ package be.ugent.idlab.tcbl.userdatamanager.model;
 public interface GluuTCBLUserRepository {
 	Iterable<TCBLUser> findAll() throws Exception;
 	TCBLUser save(TCBLUser user) throws Exception;
-	TCBLUser find(String id) throws  Exception;
+	TCBLUser find(String inum) throws  Exception;
 	TCBLUser findByName(final String userName) throws Exception;
 	TCBLUser create(TCBLUser user) throws Exception;
 	void deleteTCBLUser(TCBLUser user) throws Exception;

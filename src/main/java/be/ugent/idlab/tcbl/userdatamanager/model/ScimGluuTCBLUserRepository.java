@@ -74,9 +74,9 @@ public class ScimGluuTCBLUserRepository implements GluuTCBLUserRepository {
 	}
 
 	@Override
-	public TCBLUser find(final String id) throws Exception {
-		log.debug("Finding user with id {}", id);
-		User user = findUser(id);
+	public TCBLUser find(final String inum) throws Exception {
+		log.debug("Finding user with inum {}", inum);
+		User user = findUser(inum);
 		return TCBLUser.createFromScimUser(user, userExtensionSchema.getId());
 	}
 
@@ -204,9 +204,9 @@ public class ScimGluuTCBLUserRepository implements GluuTCBLUserRepository {
 		return result.get();
 	}
 
-	private User findUser(final String id) throws Exception {
+	private User findUser(final String inum) throws Exception {
 		try {
-			ScimResponse response = client.retrieveUser(id, new String[0]);
+			ScimResponse response = client.retrieveUser(inum, new String[0]);
 			if (response.getStatusCode() == 200) {
 				return Util.toUser(response, userExtensionSchema);
 			} else {
