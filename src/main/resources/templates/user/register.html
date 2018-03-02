@@ -41,12 +41,35 @@
 					</div>
 					<div class="row">
 						<div class="columns large-2">
-						<input type="checkbox" th:field="*{subscribedNL}"/>
-						<label class="label--checkbox" th:for="${#ids.prev('subscribedNL')}">I want to receive the TCBL newsletter.</label>
+							<fieldset class="fieldset--inner">
+								<legend>Picture</legend>
+								<div class="columns">
+									<div id="targetOuter">
+										<div id="targetLayer"></div>
+										<div class="icon--choose-image">
+											<div class="text--choose-image">Add</div>
+										</div>
+										<div class="icon--choose-image">
+											<input type="file" class="input--choose-image" name="userImage" id="userImage" onchange="showPreview(this);">
+										</div>
+									</div>
+								</div>
+								<div class="columns">
+									<div>
+										<input type="button" class="button button--nav" name="profileImageDelete" id="profileImageDelete" value="Delete"/>
+									</div>
+								</div>
+							</fieldset>
 						</div>
 					</div>
 					<div class="row">
-						<div class="columns large-2">
+						<div class="columns large-1">
+							<input type="checkbox" th:field="*{subscribedNL}"/>
+							<label class="label--checkbox" th:for="${#ids.prev('subscribedNL')}">I want to receive the TCBL newsletter.</label>
+						</div>
+					</div>
+					<div class="row">
+						<div class="columns large-1">
 							<input type="checkbox" th:field="*{acceptedPP}" required/>
 							<label class="label--checkbox" th:for="${#ids.prev('acceptedPP')}">I accept</label>
 							<label class="label--checkbox"><a target="_blank" th:href="${privacyUrl}" class="normal">the TCBL privacy policy</a>.</label>
