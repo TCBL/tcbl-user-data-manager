@@ -5,7 +5,7 @@ package be.ugent.idlab.tcbl.userdatamanager.model;
  *
  * @author Gerald Haesendonck
  */
-public interface GluuTCBLUserRepository {
+public interface UserRepository {
 	Iterable<TCBLUser> findAll() throws Exception;
 	TCBLUser save(TCBLUser user) throws Exception;
 	TCBLUser find(String inum) throws  Exception;

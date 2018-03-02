@@ -3,10 +3,10 @@ package be.ugent.idlab.tcbl.userdatamanager.controller;
 import be.ugent.idlab.tcbl.userdatamanager.background.Mail;
 import be.ugent.idlab.tcbl.userdatamanager.background.MailChimper;
 import be.ugent.idlab.tcbl.userdatamanager.controller.support.ConfirmationTemplate;
-import be.ugent.idlab.tcbl.userdatamanager.model.GluuTCBLUserRepository;
 import be.ugent.idlab.tcbl.userdatamanager.model.NavLink;
 import be.ugent.idlab.tcbl.userdatamanager.model.Status;
 import be.ugent.idlab.tcbl.userdatamanager.model.TCBLUser;
+import be.ugent.idlab.tcbl.userdatamanager.model.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -39,7 +39,7 @@ import java.util.Map;
 @RequestMapping("user")
 public class UserController {
 	private final Logger log = LoggerFactory.getLogger(this.getClass());
-	private final GluuTCBLUserRepository tcblUserRepository;
+	private final UserRepository tcblUserRepository;
 	private final Mail mail;
 	private final static Base64.Encoder encoder = Base64.getUrlEncoder();
 	private final static Base64.Decoder decoder = Base64.getUrlDecoder();
@@ -51,12 +51,12 @@ public class UserController {
 
 
 	/**
-	 * Creates a UserController; Spring injects the GluuTCBLUserRepository.
+	 * Creates a UserController; Spring injects the UserRepository.
 	 *
 	 * @param tcblUserRepository A repository where TCBLUsers are stored.
 	 * @param mail The background mail sender.
 	 */
-	public UserController(GluuTCBLUserRepository tcblUserRepository, Mail mail, OAuth2AuthorizedClientService authorizedClientService, MailChimper mailChimper) {
+	public UserController(UserRepository tcblUserRepository, Mail mail, OAuth2AuthorizedClientService authorizedClientService, MailChimper mailChimper) {
 		this.tcblUserRepository = tcblUserRepository;
 		this.mail = mail;
 		this.authorizedClientService = authorizedClientService;

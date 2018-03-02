@@ -1,8 +1,8 @@
 package be.ugent.idlab.tcbl.userdatamanager.background;
 
-import be.ugent.idlab.tcbl.userdatamanager.model.GluuTCBLUserRepository;
 import be.ugent.idlab.tcbl.userdatamanager.model.ScimUserProcessor;
 import be.ugent.idlab.tcbl.userdatamanager.model.Stats;
+import be.ugent.idlab.tcbl.userdatamanager.model.UserRepository;
 import org.gluu.oxtrust.model.scim2.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,10 +17,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class CalculateStats implements ScimUserProcessor {
 	private final Logger log = LoggerFactory.getLogger(getClass());
-	private final GluuTCBLUserRepository userRepository;
+	private final UserRepository userRepository;
 	private Stats stats = new Stats();
 
-	public CalculateStats(GluuTCBLUserRepository userRepository) {
+	public CalculateStats(UserRepository userRepository) {
 		this.userRepository = userRepository;
 	}
 

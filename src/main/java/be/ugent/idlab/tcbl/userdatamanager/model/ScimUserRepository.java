@@ -26,7 +26,7 @@ import static org.gluu.oxtrust.model.scim2.Constants.MAX_COUNT;
  *
  * @author Gerald Haesendonck
  */
-public class ScimGluuTCBLUserRepository implements GluuTCBLUserRepository {
+public class ScimUserRepository implements UserRepository {
 
 	// SCIM query language: see https://tools.ietf.org/html/rfc7644#section-3.4.2.2
 
@@ -35,8 +35,8 @@ public class ScimGluuTCBLUserRepository implements GluuTCBLUserRepository {
 	private final Scim2Client client;
 	private final UserExtensionSchema userExtensionSchema;
 
-	public ScimGluuTCBLUserRepository(final Environment environment) throws Exception {
-		log.debug("Initialising ScimGluuTCBLUserRepository");
+	public ScimUserRepository(final Environment environment) throws Exception {
+		log.debug("Initialising ScimUserRepository");
 		Map<String, String> clientProperties = resolveScimClientProperties(environment);
 		String domain = clientProperties.get("domain");
 		String metaDataUrl = clientProperties.get("meta-data-url");
@@ -52,7 +52,7 @@ public class ScimGluuTCBLUserRepository implements GluuTCBLUserRepository {
 			log.error(message, e);
 			throw new Exception(message, e);
 		}
-		log.debug("ScimGluuTCBLUserRepository initialised.");
+		log.debug("ScimUserRepository initialised.");
 	}
 
 	@Override
