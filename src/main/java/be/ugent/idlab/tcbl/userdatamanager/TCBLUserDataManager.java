@@ -1,10 +1,10 @@
 package be.ugent.idlab.tcbl.userdatamanager;
 
-import be.ugent.idlab.tcbl.userdatamanager.controller.storage.StorageService;
+// TODO import be.ugent.idlab.tcbl.userdatamanager.controller.storage.StorageService;
 import be.ugent.idlab.tcbl.userdatamanager.model.ScimTCBLUserRepository;
 import be.ugent.idlab.tcbl.userdatamanager.model.TCBLUser;
 import be.ugent.idlab.tcbl.userdatamanager.model.TCBLUserRepository;
-import org.springframework.boot.CommandLineRunner;
+// TODO import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -42,13 +42,15 @@ public class TCBLUserDataManager {
 		};
 	}
 
-	@Bean
-	CommandLineRunner init(StorageService storageService) {
-		return (args) -> {
-			storageService.deleteAll();
-			storageService.init();
-		};
-	}
+// TODO
+//	@Bean
+//	CommandLineRunner init(StorageService storageService) {
+//		return (args) -> {
+//			storageService.deleteAll();
+//			storageService.init();
+//		};
+//	}
+
 	public static void main(String[] args) {
 		SpringApplication.run(TCBLUserDataManager.class, args);
 	}
