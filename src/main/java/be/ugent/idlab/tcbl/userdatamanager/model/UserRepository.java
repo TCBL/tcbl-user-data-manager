@@ -60,7 +60,7 @@ public class UserRepository {
 		scimUserRepository.deleteTCBLUser(user);
 		databaseUserRepository.delete(user);
 	}
-	public Iterable<TCBLUser> findInactive() throws Exception {
+	public Iterable<TCBLUser> findInactive() {
 		return databaseUserRepository.findByActive(false);
 	}
 	public void processScimUsers(final ScimUserProcessor processor) throws Exception {

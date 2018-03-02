@@ -24,15 +24,21 @@ import java.util.NoSuchElementException;
 public class TCBLUser {
 	private static Logger log = LoggerFactory.getLogger(TCBLUser.class);
 
-	@Column(length = 128)
+	@Column(length = 128, nullable = false)
 	private String inum;
 
 	@Id
-	@Column(length = 128)
+	@Column(length = 128, nullable = false)
 	private String userName;
+
+	@Column(nullable = false)
 	private String firstName;
+
+	@Column(nullable = false)
 	private String lastName;
-	private transient String password;
+
+	private transient String password; // this is only relevant for gluu
+
 	private boolean active;
 	private boolean subscribedNL;	// is the user subscribed to the TCBL newsletter?
 	private boolean acceptedPP;		// did the user accept the TCBL privacy policy?
