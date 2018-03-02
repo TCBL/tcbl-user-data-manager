@@ -38,8 +38,9 @@ public class UserRepository {
 		return scimUserRepository.findAll();
 	}*/
 	public TCBLUser save(TCBLUser user) throws Exception {
-		databaseUserRepository.save(user);
-		return scimUserRepository.save(user);
+		TCBLUser savedUser = scimUserRepository.save(user);
+		databaseUserRepository.save(savedUser);
+		return savedUser;
 	}
 	public TCBLUser findByName(final String userName) throws Exception {
 		Optional<TCBLUser> userOption = databaseUserRepository.findById(userName);

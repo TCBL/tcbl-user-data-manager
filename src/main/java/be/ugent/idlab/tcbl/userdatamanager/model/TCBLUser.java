@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.persistence.*;
 import java.util.Collections;
+import java.util.Date;
 import java.util.NoSuchElementException;
 
 ;
@@ -43,6 +44,9 @@ public class TCBLUser {
 	private boolean subscribedNL;	// is the user subscribed to the TCBL newsletter?
 	private boolean acceptedPP;		// did the user accept the TCBL privacy policy?
 
+	private Date created;
+	private Date lastModified;
+
 
 	private final transient static String subscribedField = "gcpSubscribedToTCBLnewsletter";
 	private final transient static String acceptedField = "gcpAcceptedTCBLprivacyPolicy";
@@ -59,6 +63,9 @@ public class TCBLUser {
 		user.setFirstName(scimUser.getName().getGivenName());
 		user.setLastName(scimUser.getName().getFamilyName());
 		user.setActive(scimUser.isActive() == null ? false : scimUser.isActive());
+
+		user.setCreated(scimUser.getMeta().getCreated());
+		user.setLastModified(scimUser.getMeta().getLastModified());
 
 		if (scimUser.isExtensionPresent(extensionUrn)) {
 			Extension extension = scimUser.getExtension(extensionUrn);
@@ -180,5 +187,21 @@ public class TCBLUser {
 
 	public void setActive(boolean active) {
 		this.active = active;
+	}
+
+	public Date getCreated() {
+		return created;
+	}
+
+	public void setCreated(Date created) {
+		this.created = created;
+	}
+
+	public Date getLastModified() {
+		return lastModified;
+	}
+
+	public void setLastModified(Date lastModified) {
+		this.lastModified = lastModified;
 	}
 }

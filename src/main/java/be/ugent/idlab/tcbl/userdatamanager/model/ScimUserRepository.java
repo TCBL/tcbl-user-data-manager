@@ -103,6 +103,8 @@ public class ScimUserRepository {
 			if (response.getStatusCode() == 201) {
 				user = Util.toUser(response, userExtensionSchema);
 				tcblUser.setInum(user.getId());
+				tcblUser.setCreated(user.getMeta().getCreated());
+				tcblUser.setLastModified(user.getMeta().getLastModified());
 				return tcblUser;
 			} else if (response.getStatusCode() == 409) {
 				String message = "user with username " + tcblUser.getUserName() + " already exists.";
