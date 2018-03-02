@@ -25,11 +25,6 @@ public class TCBLUserDataManager {
 		userRepository.synchronise();
 	}
 
-	/*@Bean
-	public UserRepository gluuTcblUserRepository(final Environment environment) throws Exception {
-		return new ScimUserRepository(environment);
-	} */
-
 	@Bean
 	public Converter<String, TCBLUser> tcblUserConverter(final Environment environment) {
 		return new Converter<String, TCBLUser>() {
