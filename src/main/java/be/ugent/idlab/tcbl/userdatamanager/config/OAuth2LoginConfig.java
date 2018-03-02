@@ -51,8 +51,10 @@ public class OAuth2LoginConfig {
 							"/user/resetpwform/*",
 							"/user/passwordset",
 							// mappings under /stats
-							"/stats/users"
-							// mappings under /stats
+							"/stats/users",
+							// mappings under /files
+							"/files/*"
+							// mappings under /rest
 							//not at this time: "/rest/*"
 					).permitAll()
 					.anyRequest().authenticated()

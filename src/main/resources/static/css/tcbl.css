@@ -164,16 +164,15 @@ form input[type=file].input--choose-image {
     margin-left: -40px;
 }
 
-.text--choose-image {
-    padding: 30px 0;
-    font-size: 1.25rem;
-    font-weight: bold;
-}
-
-#targetOuter {
+#profilePictureOuter {
     position: relative;
     text-align: center;
     background-color: #DDDDDD;
+    width: 100px;
+    height: 150px;
+}
+
+.profilePicturePreview {
     width: 100px;
     height: 150px;
 }

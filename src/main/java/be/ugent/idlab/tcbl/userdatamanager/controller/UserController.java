@@ -16,6 +16,7 @@ import org.springframework.security.oauth2.client.authentication.OAuth2Authentic
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.reactive.function.client.ClientRequest;
 import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -125,8 +126,17 @@ public class UserController {
 	}
 
 	@PostMapping("/register")
-	public String postRegister(HttpServletRequest request, Model model, TCBLUser user) {
+	public String postRegister(HttpServletRequest request,
+							   Model model,
+							   TCBLUser user,
+							   @RequestParam("profilePictureFile") MultipartFile profilePictureFile) {
 		ConfirmationTemplate ct = new ConfirmationTemplate("Sign up for TCBL");
+
+		// TODO continue here!
+		// The profilePictureFile comes in here now (checked).
+		// Check the profilePictureFile type and size and refuse illegal stuff.
+		// If the newUser can be created, save the image somewhere (filesystem or database?)
+		// and add the URL to get it to the newUser properties!
 
 		boolean oldActive = false;
 		try {

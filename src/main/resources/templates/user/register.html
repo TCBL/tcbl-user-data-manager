@@ -7,7 +7,7 @@
 	<h1>Sign up for TCBL</h1>
     <main>
         <th:block th:if="${tcblUser} != null">
-			<form action="#" th:action="@{/user/register}" th:object="${tcblUser}" method="post" name="regForm"
+			<form action="#" th:action="@{/user/register}" th:object="${tcblUser}" enctype="multipart/form-data" method="post" name="regForm"
 				  onsubmit="return validatePassword()">
 				<fieldset>
 					<legend>Login details</legend>
@@ -44,19 +44,18 @@
 							<fieldset class="fieldset--inner">
 								<legend>Picture</legend>
 								<div class="columns">
-									<div id="targetOuter">
-										<div id="targetLayer"></div>
+									<div id="profilePictureOuter">
+										<div id="profilePictureLayer"></div>
 										<div class="icon--choose-image">
-											<div class="text--choose-image">Add</div>
-										</div>
-										<div class="icon--choose-image">
-											<input type="file" class="input--choose-image" name="userImage" id="userImage" onchange="showPreview(this);">
+											<input type="file" class="input--choose-image" name="profilePictureFile" id="profilePictureFile" accept="image/jpeg,image/png" onchange="updateProfilePicture(this);">
 										</div>
 									</div>
 								</div>
 								<div class="columns">
 									<div>
-										<input type="button" class="button button--nav" name="profileImageDelete" id="profileImageDelete" value="Delete"/>
+										<input type="button" class="button button--nav" name="profilePictureAdd" id="profilePictureAdd" value="Add" onclick="clickProfilePictureFile();" />
+										<input type="button" class="button button--nav" name="profilePictureChange" id="profilePictureChange" value="Change" onclick="clickProfilePictureFile();" />
+										<input type="button" class="button button--nav" name="profilePictureDelete" id="profilePictureDelete" value="Delete" onclick="deleteProfilePictureFile();"/>
 									</div>
 								</div>
 							</fieldset>
@@ -83,5 +82,6 @@
     </main>
 </div>
 <script th:replace="fragments :: validatePassword"></script>
+<script th:replace="fragments :: updateProfilePicture"></script>
 </body>
 </html>
