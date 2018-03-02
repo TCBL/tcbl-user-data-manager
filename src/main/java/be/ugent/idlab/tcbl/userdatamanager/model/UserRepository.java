@@ -1,5 +1,8 @@
 package be.ugent.idlab.tcbl.userdatamanager.model;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
@@ -13,6 +16,8 @@ import java.util.Optional;
 public class UserRepository {
 	private final ScimUserRepository scimUserRepository;
 	private final DatabaseUserRepository databaseUserRepository;
+
+	private final Logger log = LoggerFactory.getLogger(TCBLUser.class);
 
 	public UserRepository(ScimUserRepository scimUserRepository, DatabaseUserRepository databaseUserRepository) {
 		this.scimUserRepository = scimUserRepository;
@@ -57,12 +62,23 @@ public class UserRepository {
 	}
 	public Iterable<TCBLUser> findInactive() throws Exception {
 		return databaseUserRepository.findByActive(false);
-		//return scimUserRepository.findInactive();
 	}
 	public void processScimUsers(final ScimUserProcessor processor) throws Exception {
 		scimUserRepository.processScimUsers(processor);
 	}
 	public void processTCBLUsers(final TCBLUserProcessor processor) throws Exception {
 		scimUserRepository.processTCBLUsers(processor);
+	}
+
+	@Async
+	public void synchronise() {
+		try {
+			for (TCBLUser tcblUser : scimUserRepository.findAll()) {
+				databaseUserRepository.save(tcblUser);
+			}
+			log.info("Database synchronised!");
+		} catch (Exception e) {
+			log.error("Something went wrong synchronising the databases!");
+		}
 	}
 }

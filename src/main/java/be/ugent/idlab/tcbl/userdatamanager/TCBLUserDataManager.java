@@ -22,6 +22,7 @@ public class TCBLUserDataManager {
 
 	public TCBLUserDataManager(UserRepository userRepository) {
 		this.userRepository = userRepository;
+		userRepository.synchronise();
 	}
 
 	/*@Bean
