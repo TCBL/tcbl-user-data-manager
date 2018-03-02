@@ -28,6 +28,7 @@ public class DeleteInactiveUsers {
 	 * @throws Exception Something goes wrong. Should not occur, since Exceptons are catched.
 	 */
 	@Scheduled(cron = "0 0 2 * * *")
+	//@Scheduled(cron = "0 * * * * *")
 	public void deleteInactiveUsers() throws Exception {
 		log.debug("Deleting inactive users in background...");
 		Iterable<TCBLUser> inactiveUserIds = userRepository.findInactive();

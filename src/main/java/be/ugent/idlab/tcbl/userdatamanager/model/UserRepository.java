@@ -2,6 +2,8 @@ package be.ugent.idlab.tcbl.userdatamanager.model;
 
 import org.springframework.stereotype.Component;
 
+import java.util.Optional;
+
 /**
  * <p>Copyright 2017 IDLab (Ghent University - imec)</p>
  *
@@ -10,32 +12,52 @@ import org.springframework.stereotype.Component;
 @Component
 public class UserRepository {
 	private final ScimUserRepository scimUserRepository;
+	private final DatabaseUserRepository databaseUserRepository;
 
-	public UserRepository(ScimUserRepository scimUserRepository) {
+	public UserRepository(ScimUserRepository scimUserRepository, DatabaseUserRepository databaseUserRepository) {
 		this.scimUserRepository = scimUserRepository;
+		this.databaseUserRepository = databaseUserRepository;
 	}
 
 	public TCBLUser find(String inum) throws  Exception {
-		return scimUserRepository.find(inum);
+		if (databaseUserRepository.existsByInum(inum)) {
+			return databaseUserRepository.findByInum(inum);
+		} else {
+			TCBLUser user = scimUserRepository.find(inum);
+			databaseUserRepository.save(user);
+			return user;
+		}
 	}
 
-	public Iterable<TCBLUser> findAll() throws Exception {
+	/*public Iterable<TCBLUser> findAll() throws Exception {
 		return scimUserRepository.findAll();
-	}
+	}*/
 	public TCBLUser save(TCBLUser user) throws Exception {
+		databaseUserRepository.save(user);
 		return scimUserRepository.save(user);
 	}
 	public TCBLUser findByName(final String userName) throws Exception {
-		return scimUserRepository.findByName(userName);
+		Optional<TCBLUser> userOption = databaseUserRepository.findById(userName);
+		if (userOption.isPresent()) {
+			return userOption.get();
+		} else {
+			TCBLUser user = scimUserRepository.findByName(userName);
+			databaseUserRepository.save(user);
+			return user;
+		}
 	}
 	public TCBLUser create(TCBLUser user) throws Exception {
-		return scimUserRepository.create(user);
+		TCBLUser resultUser = scimUserRepository.create(user);
+		databaseUserRepository.save(resultUser);
+		return resultUser;
 	}
 	public void deleteTCBLUser(TCBLUser user) throws Exception {
 		scimUserRepository.deleteTCBLUser(user);
+		databaseUserRepository.delete(user);
 	}
 	public Iterable<TCBLUser> findInactive() throws Exception {
-		return scimUserRepository.findInactive();
+		return databaseUserRepository.findByActive(false);
+		//return scimUserRepository.findInactive();
 	}
 	public void processScimUsers(final ScimUserProcessor processor) throws Exception {
 		scimUserRepository.processScimUsers(processor);

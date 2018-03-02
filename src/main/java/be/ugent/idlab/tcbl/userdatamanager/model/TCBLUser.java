@@ -8,9 +8,7 @@ import org.gluu.oxtrust.model.scim2.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.util.Collections;
 import java.util.NoSuchElementException;
 
@@ -22,8 +20,11 @@ import java.util.NoSuchElementException;
  * @author Gerald Haesendonck
  */
 @Entity
+@Table(indexes = @Index(columnList = "inum"))
 public class TCBLUser {
 	private static Logger log = LoggerFactory.getLogger(TCBLUser.class);
+
+	@Column(length = 128)
 	private String inum;
 
 	@Id
