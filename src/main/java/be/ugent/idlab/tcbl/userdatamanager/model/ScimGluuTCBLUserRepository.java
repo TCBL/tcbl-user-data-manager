@@ -66,10 +66,10 @@ public class ScimGluuTCBLUserRepository implements GluuTCBLUserRepository {
 	@Override
 	public TCBLUser save(final TCBLUser tcblUser) throws Exception {
 		log.debug("Saving user {}", tcblUser.getUserName() );
-		User user = findUser(tcblUser.getId());
+		User user = findUser(tcblUser.getInum());
 		user.setPassword("");
 		tcblUser.updateScimUser(user, userExtensionSchema.getId());
-		client.updateUser(user, tcblUser.getId(), new String[0]);
+		client.updateUser(user, tcblUser.getInum(), new String[0]);
 		return tcblUser;
 	}
 
@@ -105,7 +105,7 @@ public class ScimGluuTCBLUserRepository implements GluuTCBLUserRepository {
 			ScimResponse response = client.createUser(user, new String[0]);
 			if (response.getStatusCode() == 201) {
 				user = Util.toUser(response, userExtensionSchema);
-				tcblUser.setId(user.getId());
+				tcblUser.setInum(user.getId());
 				return tcblUser;
 			} else if (response.getStatusCode() == 409) {
 				String message = "user with username " + tcblUser.getUserName() + " already exists.";
@@ -125,7 +125,7 @@ public class ScimGluuTCBLUserRepository implements GluuTCBLUserRepository {
 	public void deleteTCBLUser(final TCBLUser user) throws Exception {
 		log.debug("Deleting user {}", user.getUserName());
 		try {
-			ScimResponse response = client.deletePerson(user.getId());
+			ScimResponse response = client.deletePerson(user.getInum());
 			if (response.getStatusCode() != 204) {
 				String message = "Cannot delete user on OpenID Connect server: " + response.getStatusCode() + ": " + response.getStatus() + ". " + response.getResponseBodyString();
 				log.error(message);

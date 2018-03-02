@@ -24,10 +24,10 @@ import java.util.NoSuchElementException;
 @Entity
 public class TCBLUser {
 	private static Logger log = LoggerFactory.getLogger(TCBLUser.class);
+	private String inum;
 
 	@Id
-	@Column(length = 64)
-	private String id;
+	@Column(length = 128)
 	private String userName;
 	private String firstName;
 	private String lastName;
@@ -47,7 +47,7 @@ public class TCBLUser {
 
 	static TCBLUser createFromScimUser(final User scimUser, String extensionUrn) {
 		TCBLUser user = new TCBLUser();
-		user.setId(scimUser.getId());
+		user.setInum(scimUser.getId());
 		user.setUserName(scimUser.getUserName());
 		user.setFirstName(scimUser.getName().getGivenName());
 		user.setLastName(scimUser.getName().getFamilyName());
@@ -151,12 +151,12 @@ public class TCBLUser {
 				'}';
 	}
 
-	public String getId() {
-		return id;
+	public String getInum() {
+		return inum;
 	}
 
-	public void setId(String id) {
-		this.id = id;
+	public void setInum(String inum) {
+		this.inum = inum;
 	}
 
 	public String getPassword() {

@@ -354,7 +354,7 @@ public class UserController {
 	 * @param user	The user to send a mail to.
 	 */
 	private void sendRegisterMessage(final TCBLUser user, final String baseUri) {
-		String encodedId = encodeBase64(user.getId());
+		String encodedId = encodeBase64(user.getInum());
 		String text = "<p>Thank you for becoming a TCBL member. Click <a href=\""
 				+ baseUri + "/confirm/" + encodedId
 				+ "\">here</a> to activate your account.</p>";
@@ -362,7 +362,7 @@ public class UserController {
 	}
 
 	private void sendResetMessage(final TCBLUser user, final String baseUri) {
-		String passwordResetCode = generateResetPasswordCode(user.getId());
+		String passwordResetCode = generateResetPasswordCode(user.getInum());
 		String text = "<p>You receive this mail because you want to reset your TCBL password. Click <a href=\""
 				+ baseUri + "/resetpwform/" + passwordResetCode
 				+ "\">here</a> to do so.</p>" +
