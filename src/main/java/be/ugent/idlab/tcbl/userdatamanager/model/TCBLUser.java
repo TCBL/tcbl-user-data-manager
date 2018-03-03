@@ -1,17 +1,12 @@
 package be.ugent.idlab.tcbl.userdatamanager.model;
 
 import org.apache.commons.collections.map.SingletonMap;
-import org.gluu.oxtrust.model.scim2.Email;
-import org.gluu.oxtrust.model.scim2.Extension;
-import org.gluu.oxtrust.model.scim2.Name;
-import org.gluu.oxtrust.model.scim2.User;
+import org.gluu.oxtrust.model.scim2.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.persistence.*;
-import java.util.Collections;
-import java.util.Date;
-import java.util.NoSuchElementException;
+import java.util.*;
 
 ;
 
@@ -24,6 +19,7 @@ import java.util.NoSuchElementException;
 @Table(indexes = @Index(columnList = "inum"))
 public class TCBLUser {
 	private static Logger log = LoggerFactory.getLogger(TCBLUser.class);
+	public transient static final Calendar invitationDay = new GregorianCalendar(2017, Calendar.AUGUST, 31);
 
 	@Column(length = 128, nullable = false)
 	private String inum;
@@ -41,11 +37,13 @@ public class TCBLUser {
 	private transient String password; // this is only relevant for gluu
 
 	private boolean active;
+	private boolean invited;
 	private boolean subscribedNL;	// is the user subscribed to the TCBL newsletter?
 	private boolean acceptedPP;		// did the user accept the TCBL privacy policy?
 
 	private Date created;
 	private Date lastModified;
+	private Date passwordReset;
 
 
 	private final transient static String subscribedField = "gcpSubscribedToTCBLnewsletter";
@@ -64,8 +62,23 @@ public class TCBLUser {
 		user.setLastName(scimUser.getName().getFamilyName());
 		user.setActive(scimUser.isActive() == null ? false : scimUser.isActive());
 
-		user.setCreated(scimUser.getMeta().getCreated());
-		user.setLastModified(scimUser.getMeta().getLastModified());
+		Meta meta = scimUser.getMeta();
+		user.setCreated(meta.getCreated());
+		user.setLastModified(meta.getLastModified());
+
+		// fix passwordReset date
+		Date created = meta.getCreated();
+		Date modified = meta.getLastModified();
+		Calendar createdCalendar = toCalendarPerDay(created);
+		Calendar modifiedCalendar = toCalendarPerDay(modified);
+		if (createdCalendar.equals(invitationDay)) {
+			user.setInvited(true);
+			if (!created.equals(modified)) {
+				user.setPasswordReset(modifiedCalendar.getTime());
+			}
+		} else {
+			user.setInvited(false);
+		}
 
 		if (scimUser.isExtensionPresent(extensionUrn)) {
 			Extension extension = scimUser.getExtension(extensionUrn);
@@ -203,5 +216,31 @@ public class TCBLUser {
 
 	public void setLastModified(Date lastModified) {
 		this.lastModified = lastModified;
+	}
+
+	private static Calendar toCalendarPerDay(final Date date) {
+		if (date == null) {
+			return new GregorianCalendar(0, 0, 1);
+		} else {
+			Calendar original = new GregorianCalendar();
+			original.setTime(date);
+			return new GregorianCalendar(original.get(Calendar.YEAR), original.get(Calendar.MONTH), original.get(Calendar.DAY_OF_MONTH));
+		}
+	}
+
+	public Date getPasswordReset() {
+		return passwordReset;
+	}
+
+	public void setPasswordReset(Date passwordReset) {
+		this.passwordReset = passwordReset;
+	}
+
+	public boolean isInvited() {
+		return invited;
+	}
+
+	public void setInvited(boolean invited) {
+		this.invited = invited;
 	}
 }

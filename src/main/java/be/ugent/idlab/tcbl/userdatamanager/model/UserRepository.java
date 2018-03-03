@@ -75,7 +75,9 @@ public class UserRepository {
 	public void synchronise() {
 		try {
 			for (TCBLUser tcblUser : scimUserRepository.findAll()) {
-				databaseUserRepository.save(tcblUser);
+				if (!databaseUserRepository.existsById(tcblUser.getUserName())) {
+					databaseUserRepository.save(tcblUser);
+				}
 			}
 			log.info("Database synchronised!");
 		} catch (Exception e) {
