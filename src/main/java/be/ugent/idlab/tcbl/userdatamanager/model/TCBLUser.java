@@ -44,6 +44,7 @@ public class TCBLUser {
 	private Date created;
 	private Date lastModified;
 	private Date passwordReset;
+	private Date activeSince;	// only for invited users;
 
 
 	private final transient static String subscribedField = "gcpSubscribedToTCBLnewsletter";
@@ -70,14 +71,15 @@ public class TCBLUser {
 		Date created = meta.getCreated();
 		Date modified = meta.getLastModified();
 		Calendar createdCalendar = toCalendarPerDay(created);
-		Calendar modifiedCalendar = toCalendarPerDay(modified);
 		if (createdCalendar.equals(invitationDay)) {
 			user.setInvited(true);
 			if (!created.equals(modified)) {
-				user.setPasswordReset(modifiedCalendar.getTime());
+				user.setPasswordReset(user.getLastModified());
+				user.setActiveSince(user.getLastModified());
 			}
 		} else {
 			user.setInvited(false);
+			user.setActiveSince(user.getCreated());
 		}
 
 		if (scimUser.isExtensionPresent(extensionUrn)) {
@@ -218,7 +220,7 @@ public class TCBLUser {
 		this.lastModified = lastModified;
 	}
 
-	private static Calendar toCalendarPerDay(final Date date) {
+	public static Calendar toCalendarPerDay(final Date date) {
 		if (date == null) {
 			return new GregorianCalendar(0, 0, 1);
 		} else {
@@ -242,5 +244,13 @@ public class TCBLUser {
 
 	public void setInvited(boolean invited) {
 		this.invited = invited;
+	}
+
+	public Date getActiveSince() {
+		return activeSince;
+	}
+
+	public void setActiveSince(Date activeSince) {
+		this.activeSince = activeSince;
 	}
 }

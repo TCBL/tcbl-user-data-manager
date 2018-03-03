@@ -1,9 +1,9 @@
 package be.ugent.idlab.tcbl.userdatamanager.background;
 
-import be.ugent.idlab.tcbl.userdatamanager.model.ScimUserProcessor;
 import be.ugent.idlab.tcbl.userdatamanager.model.Stats;
+import be.ugent.idlab.tcbl.userdatamanager.model.TCBLUser;
+import be.ugent.idlab.tcbl.userdatamanager.model.TCBLUserProcessor;
 import be.ugent.idlab.tcbl.userdatamanager.model.UserRepository;
-import org.gluu.oxtrust.model.scim2.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
  * @author Gerald Haesendonck
  */
 @Component
-public class CalculateStats implements ScimUserProcessor {
+public class CalculateStats implements TCBLUserProcessor {
 	private final Logger log = LoggerFactory.getLogger(getClass());
 	private final UserRepository userRepository;
 	private Stats stats = new Stats();
@@ -33,7 +33,7 @@ public class CalculateStats implements ScimUserProcessor {
 			log.info("Stats already calculated. Skipping");
 		} else {
 			try {
-				userRepository.processScimUsers(this);
+				userRepository.processTCBLUsers(this);
 				stats.toFile();
 			} catch (Exception e) {
 				log.warn("Calculating statistics went wrong. ", e);
@@ -43,7 +43,7 @@ public class CalculateStats implements ScimUserProcessor {
 	}
 
 	@Override
-	public void process(final User user) {
+	public void process(final TCBLUser user) {
 		stats.add(user);
 	}
 }

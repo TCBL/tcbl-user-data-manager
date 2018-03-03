@@ -64,9 +64,6 @@ public class UserRepository {
 	public Iterable<TCBLUser> findInactive() {
 		return databaseUserRepository.findByActive(false);
 	}
-	public void processScimUsers(final ScimUserProcessor processor) throws Exception {
-		scimUserRepository.processScimUsers(processor);
-	}
 	public void processTCBLUsers(final TCBLUserProcessor processor) throws Exception {
 		scimUserRepository.processTCBLUsers(processor);
 	}

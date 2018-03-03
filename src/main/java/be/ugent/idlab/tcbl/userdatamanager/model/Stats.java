@@ -2,8 +2,6 @@ package be.ugent.idlab.tcbl.userdatamanager.model;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import org.gluu.oxtrust.model.scim2.Meta;
-import org.gluu.oxtrust.model.scim2.User;
 
 import java.io.*;
 import java.text.DateFormat;
@@ -26,38 +24,23 @@ public class Stats implements Serializable {
 
 	
 	private final long now = new Date().getTime();
-	public transient static final Calendar invitationDay = new GregorianCalendar(2017, Calendar.AUGUST, 31);
 	private transient static Gson gson = new GsonBuilder().setDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz").create();
 	private transient static DateFormat dateFormat = new SimpleDateFormat("YYYY-LL-dd");
 
 
-	public void add(final User user) {
+	public void add(final TCBLUser user) {
 		totalCount++;
-		Meta meta = user.getMeta();
-		Date created = meta.getCreated();
-		Date modified = meta.getLastModified();
-		Calendar createdCalendar = toCalendarPerDay(created);
-		Calendar modifiedCalendar = toCalendarPerDay(modified);
-		if (createdCalendar.equals(invitationDay)) {
+		if (user.isInvited()) {
 			invited++;
-			if (!created.equals(modified)) {
+			if (user.getActiveSince() != null) {
 				invitedActive++;
-				insertActive(modifiedCalendar);
+				insertActive(TCBLUser.toCalendarPerDay(user.getLastModified()));
 			}
-		} else if (createdCalendar.compareTo(invitationDay) > 0) {
+		} else {
 			newUsers++;
+			Calendar createdCalendar = TCBLUser.toCalendarPerDay(user.getCreated());
 			insertActive(createdCalendar);
 			insertSelfRegisteredUser(createdCalendar, user.getUserName());
-		}
-	}
-
-	private Calendar toCalendarPerDay(final Date date) {
-		if (date == null) {
-			return new GregorianCalendar(0, 0, 1);
-		} else {
-			Calendar original = new GregorianCalendar();
-			original.setTime(date);
-			return new GregorianCalendar(original.get(Calendar.YEAR), original.get(Calendar.MONTH), original.get(Calendar.DAY_OF_MONTH));
 		}
 	}
 
