@@ -1,6 +1,6 @@
 # TCBL User Data Manager.
 
-This application allows to manage user data as stored in a Gluu Server.
+This application allows to manage user data as stored in a Gluu Server and a relational database.
 It is a Java Spring Boot application that uses OpenID Connect 1.0 to authorize and SCIM 2.0 to manage the data.
 This README describes how to build and configure it.
 
@@ -249,7 +249,38 @@ scim:
   aat-client-key-id:
 ```
 
-### 4. TCBL User Data Manager application specific settings
+### 4. Datasource configuration
+
+Follow the instructions of [MariaDB](https://git.datasciencelab.ugent.be/TCBL/internal-server-docs/wikis/mariadb) of the
+server installation to set up a database.
+
+Then we need to add this database as a data source in the `spring` section of the `application.yml` (of course with a better password):
+
+```yaml
+spring:
+
+  # other config...
+
+  # database config
+  jpa:
+    hibernate:
+      ddl-auto: create
+  datasource:
+    url: "jdbc:mysql://localhost:3306/usermanager"
+    username: tcbluser
+    password: "ThePassword"
+    driver-class-name: org.mariadb.jdbc.Driver
+```
+
+Hint: if you need to connect from your local machine to a database on another server, an SSH tunnel can help. E.g.:
+
+```shell
+ssh -NL 3307:localhost:3306 honegger.elis.ugent.be
+```
+
+You then just have to change the port to `3307` in the configuration above.
+
+### 5. TCBL User Data Manager application specific settings
 
 The TCBL User Data Manager application specific settings are grouped under `tudm`.
 
@@ -270,6 +301,12 @@ with an additional refresh parameter set to true:
 #### TCBL privacy URL
 
 The TCBL privacy is declared on an external webpage, whose URL is defined in the main configuration file.
+
+#### Synchronise user data
+
+When set to `true`, it causes to copy all user data found in the Gluu Server to the user database (see below) when the
+TCBL User Data Manager starts. This is intended as a one-time operation, so unless really necessary, leave this set to
+`false`!
  
 #### A configuration snippet example, grouping all TCBL User Data Manager application specific settings
 
@@ -277,15 +314,20 @@ The TCBL privacy is declared on an external webpage, whose URL is defined in the
 ##
 # TCBL User Data Manager application specific settings
 ##
-tudm:
-  tcbl-services:
-    # name of the json file containing the descriptions of the TCBL services
-    filename: services.json
-  # url of the webpage containing the TCBL privacy declaration
-  tcbl-privacy-url: "https://tcbl.eu/about"
+ttudm:
+   tcbl-services:
+     # name of the json file containing the descriptions of the TCBL services
+     filename: services.json
+
+   # url of the webpage containing the TCBL privacy declaration
+   tcbl-privacy-url: "https://tcbl.eu/about"
+
+   # should we copy the user data from the Gluu server to the local database at boot-time? Set this to false unless
+   # this is necessary for some reason.
+   sync-userdata-at-boot: false
 ```
 
-### 5. MailChimp
+### 6. MailChimp
 
 The TCBL User Data Manager application can communicate if a user wants to be subscribed to the TCBL newsletter, or the
 other way araound: if a user unsubscribes via MailChimp, these changes will propagate to the data manager application.
@@ -309,7 +351,7 @@ in the working directory. The file is self-explanatory.
 To **disable** MailChimp communication, set the `mailchimp.filename` property to point to an non-existing file.
 
 
-### 6. Putting it all together: the complete application configuration
+### 7. Putting it all together: the complete application configuration
 
 **Putting it all together**, your client configuration file `application.yml` should look like `tcbl-user-data-manager/src/main/resources/application.yml.dist`.
 

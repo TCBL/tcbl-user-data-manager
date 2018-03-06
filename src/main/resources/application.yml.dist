@@ -102,6 +102,16 @@ spring:
             user-info-uri: "https://honegger.elis.ugent.be/oxauth/seam/resource/restv1/oxauth/userinfo"
             jwk-set-uri: "https://honegger.elis.ugent.be/oxauth/seam/resource/restv1/oxauth/jwks"
 
+  # database config
+  jpa:
+    hibernate:
+      ddl-auto: create
+  datasource:
+    url: "jdbc:mysql://localhost:3306/usermanager"
+    username: tcbluser
+    password: "ThePassword"
+    driver-class-name: org.mariadb.jdbc.Driver
+
 ##
 # Gluu Federation SCIM Client settings
 ##
@@ -120,8 +130,14 @@ tudm:
   tcbl-services:
     # name of the json file containing the descriptions of the TCBL services
     filename: services.json
+
   # url of the webpage containing the TCBL privacy declaration
   tcbl-privacy-url: "https://tcbl.eu/about"
+
+  # should we copy the user data from the Gluu server to the local database at boot-time? Set this to false unless
+  # this is necessary for some reason.
+  sync-userdata-at-boot: false
+
 
 ##
 # MailChimp settings.
