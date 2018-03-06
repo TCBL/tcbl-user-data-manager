@@ -77,11 +77,11 @@ public class UserRepository {
 		if (syncUserDataAtBoot) {
 			log.info("Synchronising user data (fron Gluu server to local database)");
 			try {
-				for (TCBLUser tcblUser : scimUserRepository.findAll()) {
-					if (!databaseUserRepository.existsById(tcblUser.getUserName())) {
-						databaseUserRepository.save(tcblUser);
+				scimUserRepository.processTCBLUsers(user -> {
+					if (!databaseUserRepository.existsById(user.getUserName())) {
+						databaseUserRepository.save(user);
 					}
-				}
+				});
 				log.info("Database synchronised!");
 			} catch (Exception e) {
 				log.error("Something went wrong synchronising the databases!");
