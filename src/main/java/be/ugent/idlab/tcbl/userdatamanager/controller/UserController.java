@@ -286,6 +286,7 @@ public class UserController {
 			String inum = decodeBase64(rpc);
 			TCBLUser user = tcblUserRepository.find(inum);
 			user.setPassword(password);
+			user.setPasswordReset(new Date());
 			tcblUserRepository.save(user);
 			ct.setUtext("<p>You've successfully updated your password!</p>");
 			ct.setStatus(new Status(Status.Value.OK, "Password updated."));
