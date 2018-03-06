@@ -2,6 +2,7 @@ package be.ugent.idlab.tcbl.userdatamanager.model;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
@@ -16,6 +17,9 @@ import java.util.Optional;
 public class UserRepository {
 	private final ScimUserRepository scimUserRepository;
 	private final DatabaseUserRepository databaseUserRepository;
+
+	@Value("${tudm.sync-userdata-at-boot}")
+	private boolean syncUserDataAtBoot;
 
 	private final Logger log = LoggerFactory.getLogger(TCBLUser.class);
 
@@ -70,15 +74,20 @@ public class UserRepository {
 
 	@Async
 	public void synchronise() {
-		try {
-			for (TCBLUser tcblUser : scimUserRepository.findAll()) {
-				if (!databaseUserRepository.existsById(tcblUser.getUserName())) {
-					databaseUserRepository.save(tcblUser);
+		if (syncUserDataAtBoot) {
+			log.info("Synchronising user data (fron Gluu server to local database)");
+			try {
+				for (TCBLUser tcblUser : scimUserRepository.findAll()) {
+					if (!databaseUserRepository.existsById(tcblUser.getUserName())) {
+						databaseUserRepository.save(tcblUser);
+					}
 				}
+				log.info("Database synchronised!");
+			} catch (Exception e) {
+				log.error("Something went wrong synchronising the databases!");
 			}
-			log.info("Database synchronised!");
-		} catch (Exception e) {
-			log.error("Something went wrong synchronising the databases!");
+		} else {
+			log.info("Not synchronising user data (fron Gluu server to local database)");
 		}
 	}
 }
