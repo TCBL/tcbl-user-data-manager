@@ -50,6 +50,7 @@ public class TCBLUser {
 
 	private final transient static String subscribedField = "gcpSubscribedToTCBLnewsletter";
 	private final transient static String acceptedField = "gcpAcceptedTCBLprivacyPolicy";
+	private final transient static String pictureField = "gcpPictureURL";
 
 
 	public TCBLUser() {
@@ -83,12 +84,14 @@ public class TCBLUser {
 			user.setActiveSince(user.getCreated());
 		}
 
-		// TODO set pictureURL
 		if (scimUser.isExtensionPresent(extensionUrn)) {
 			Extension extension = scimUser.getExtension(extensionUrn);
 			try {
 				user.setSubscribedNL(Boolean.parseBoolean(extension.getFieldAsString(subscribedField)));
 				user.setAcceptedPP(Boolean.parseBoolean(extension.getFieldAsString(acceptedField)));
+				if (extension.isFieldPresent(pictureField)) {
+					user.setPictureURL(extension.getFieldAsString(pictureField));
+				}
 			} catch (NoSuchElementException e) {
 				log.warn("(One of) the fields {} and {} do not exist. Setting subscribedNL and acceptedPP to 'false'",subscribedField, acceptedField);
 				user.setSubscribedNL(false);
@@ -120,11 +123,13 @@ public class TCBLUser {
 		scimUser.setName(newName);
 		scimUser.setDisplayName(displayName);
 		scimUser.setActive(active);
-		// TODO set pictureURL
-		Extension extension = new Extension.Builder(extensionUrn)
+		Extension.Builder extensionBuilder = new Extension.Builder(extensionUrn)
 				.setField(subscribedField, Boolean.toString(subscribedNL))
-				.setField(acceptedField, Boolean.toString(acceptedPP))
-				.build();
+				.setField(acceptedField, Boolean.toString(acceptedPP));
+		if (pictureURL != null) {
+			extensionBuilder.setField(pictureField, pictureURL);
+		}
+		Extension extension = extensionBuilder.build();
 		if (scimUser.isExtensionPresent(extensionUrn)) {
 			scimUser.setExtensions(new SingletonMap(extensionUrn, extension));
 		} else {
