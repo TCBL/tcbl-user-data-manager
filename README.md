@@ -280,7 +280,7 @@ spring:
   # database config
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
   datasource:
     url: "jdbc:mysql://localhost:3306/usermanager"
     username: tcbluser
