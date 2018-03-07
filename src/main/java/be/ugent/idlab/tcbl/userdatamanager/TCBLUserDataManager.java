@@ -1,5 +1,7 @@
 package be.ugent.idlab.tcbl.userdatamanager;
 
+import be.ugent.idlab.tcbl.userdatamanager.controller.support.ProfilePictureStorage;
+import be.ugent.idlab.tcbl.userdatamanager.controller.support.ProfilePictureStorageOnFileSystem;
 import be.ugent.idlab.tcbl.userdatamanager.model.TCBLUser;
 import be.ugent.idlab.tcbl.userdatamanager.model.UserRepository;
 import org.springframework.boot.SpringApplication;
@@ -23,6 +25,11 @@ public class TCBLUserDataManager {
 	public TCBLUserDataManager(UserRepository userRepository) {
 		this.userRepository = userRepository;
 		userRepository.synchronise();
+	}
+
+	@Bean
+	public ProfilePictureStorage profilePictureStorageService(final Environment environment) throws Exception {
+		return new ProfilePictureStorageOnFileSystem(environment);
 	}
 
 	@Bean

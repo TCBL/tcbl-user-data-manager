@@ -7,7 +7,7 @@
 	<h1>Sign up for TCBL</h1>
     <main>
         <th:block th:if="${tcblUser} != null">
-			<form action="#" th:action="@{/user/register}" th:object="${tcblUser}" method="post" name="regForm"
+			<form action="#" th:action="@{/user/register}" th:object="${tcblUser}" enctype="multipart/form-data" method="post" name="regForm"
 				  onsubmit="return validatePassword()">
 				<fieldset>
 					<legend>Login details</legend>
@@ -41,12 +41,35 @@
 					</div>
 					<div class="row">
 						<div class="columns large-2">
-						<input type="checkbox" th:field="*{subscribedNL}"/>
-						<label class="label--checkbox" th:for="${#ids.prev('subscribedNL')}">I want to receive the TCBL newsletter.</label>
+							<fieldset class="fieldset--inner">
+								<legend>Picture</legend>
+								<div class="columns">
+									<div id="profilePictureOuter">
+										<div id="profilePictureLayer"></div>
+										<div class="icon--choose-image">
+											<!-- /* css for this inspired on https://phppot.com/jquery/jquery-ajax-image-upload/ */ -->
+											<input type="file" class="input--choose-image" name="profilePictureFile" id="profilePictureFile" accept="image/jpeg,image/png" onchange="updateProfilePicture(this);">
+										</div>
+									</div>
+								</div>
+								<div class="columns">
+									<div>
+										<input type="button" class="button button--nav" name="profilePictureAdd" id="profilePictureAdd" value="Add" onclick="clickProfilePictureFile();" />
+										<input type="button" class="button button--nav" name="profilePictureChange" id="profilePictureChange" value="Change" onclick="clickProfilePictureFile();" />
+										<input type="button" class="button button--nav" name="profilePictureDelete" id="profilePictureDelete" value="Delete" onclick="deleteProfilePictureFile();"/>
+									</div>
+								</div>
+							</fieldset>
 						</div>
 					</div>
 					<div class="row">
-						<div class="columns large-2">
+						<div class="columns large-1">
+							<input type="checkbox" th:field="*{subscribedNL}"/>
+							<label class="label--checkbox" th:for="${#ids.prev('subscribedNL')}">I want to receive the TCBL newsletter.</label>
+						</div>
+					</div>
+					<div class="row">
+						<div class="columns large-1">
 							<input type="checkbox" th:field="*{acceptedPP}" required/>
 							<label class="label--checkbox" th:for="${#ids.prev('acceptedPP')}">I accept</label>
 							<label class="label--checkbox"><a target="_blank" th:href="${privacyUrl}" class="normal">the TCBL privacy policy</a>.</label>
@@ -60,5 +83,6 @@
     </main>
 </div>
 <script th:replace="fragments :: validatePassword"></script>
+<script th:replace="fragments :: updateProfilePicture"></script>
 </body>
 </html>

@@ -2,7 +2,7 @@ package be.ugent.idlab.tcbl.userdatamanager.controller;
 
 import be.ugent.idlab.tcbl.userdatamanager.background.Mail;
 import be.ugent.idlab.tcbl.userdatamanager.background.MailChimper;
-import be.ugent.idlab.tcbl.userdatamanager.controller.support.ConfirmationTemplate;
+import be.ugent.idlab.tcbl.userdatamanager.controller.support.*;
 import be.ugent.idlab.tcbl.userdatamanager.model.NavLink;
 import be.ugent.idlab.tcbl.userdatamanager.model.Status;
 import be.ugent.idlab.tcbl.userdatamanager.model.TCBLUser;
@@ -10,13 +10,16 @@ import be.ugent.idlab.tcbl.userdatamanager.model.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.reactive.function.client.ClientRequest;
 import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -45,6 +48,7 @@ public class UserController {
 	private final static Base64.Decoder decoder = Base64.getUrlDecoder();
 	private OAuth2AuthorizedClientService authorizedClientService;
 	private final MailChimper mailChimper;
+	private final ProfilePictureStorage profilePictureStorage;
 
 	@Value("${tudm.tcbl-privacy-url}")
 	private String privacyUrl;
@@ -56,10 +60,15 @@ public class UserController {
 	 * @param tcblUserRepository A repository where TCBLUsers are stored.
 	 * @param mail The background mail sender.
 	 */
-	public UserController(UserRepository tcblUserRepository, Mail mail, OAuth2AuthorizedClientService authorizedClientService, MailChimper mailChimper) {
+	public UserController(UserRepository tcblUserRepository,
+						  Mail mail,
+						  OAuth2AuthorizedClientService authorizedClientService,
+						  MailChimper mailChimper,
+						  ProfilePictureStorage profilePictureStorage) {
 		this.tcblUserRepository = tcblUserRepository;
 		this.mail = mail;
 		this.authorizedClientService = authorizedClientService;
+		this.profilePictureStorage = profilePictureStorage;
 		this.mailChimper = mailChimper;
 	}
 
@@ -129,10 +138,13 @@ public class UserController {
 	}
 
 	@PostMapping("/register")
-	public String postRegister(HttpServletRequest request, Model model, TCBLUser user) {
+	public String postRegister(HttpServletRequest request,
+							   Model model,
+							   TCBLUser user,
+							   @RequestParam("profilePictureFile") MultipartFile profilePictureFile) {
 		ConfirmationTemplate ct = new ConfirmationTemplate("Sign up for TCBL");
 
-		boolean oldActive = false;
+		String profilePictureKey = null;
 		try {
 			TCBLUser oldUser;
 			try {
@@ -142,33 +154,60 @@ public class UserController {
 			}
 			if (oldUser != null) {
 				if (oldUser.isActive()) {
-					oldActive = true;
-					throw new Exception("User already exists.");
+					throw new UserAlreadyExistsException("User already exists.");
 				} else {
 					// a previous registration attempt on this username was not completed...
 					// let's delete this old entry.
 					tcblUserRepository.deleteTCBLUser(oldUser);
 				}
 			}
-			TCBLUser newUser = tcblUserRepository.create(user);
+
 			String baseUri = getUriOneLevelUp(request);
+
+			profilePictureKey = profilePictureStorage.store(profilePictureFile, user.getUserName());
+			if (profilePictureKey == null) {
+				user.setPictureURL(null);
+			} else {
+				user.setPictureURL(baseUri + "/picture/" + profilePictureKey);
+			}
+
+			TCBLUser newUser = tcblUserRepository.create(user);
+
 			sendRegisterMessage(newUser, baseUri);
 			ct.setUtext(getEmailInformationText(user.getUserName()));
 			ct.addNavLink(new NavLink(NavLink.DisplayCondition.ALWAYS, "Try again", "/user/register"));
 			ct.setStatus(new Status(Status.Value.OK, "Please check your mailbox."));
+
+			// end well; avoid deletion here
+			profilePictureKey = null;
+		} catch (UserAlreadyExistsException e) {
+			log.error("Cannot register user {}", user.getUserName(), e);
+			ct.setUtext("<p>User '" + user.getUserName() + "' was signed up earlier.</p>" +
+					"<p>You may use it as-is, reset your password, or try again with a different email address.</p>");
+			ct.addNavLink(new NavLink(NavLink.DisplayCondition.ALWAYS, "Reset password", "/user/resetpw"));
+			ct.addNavLink(new NavLink(NavLink.DisplayCondition.ALWAYS, "Try again", "/user/register"));
+			ct.setStatus(new Status(Status.Value.WARNING, "User signed up earlier."));
+		} catch (BadContentTypeException e) {
+			log.error("Cannot register user {}", user.getUserName(), e);
+			ct.setUtext("<p>The profile picture file should be a .jpg or .png file.</p>" +
+					"<p>Please try again.</p>");
+			ct.addNavLink(new NavLink(NavLink.DisplayCondition.ALWAYS, "Try again", "/user/register"));
+			ct.setStatus(new Status(Status.Value.ERROR, "Unexpected profile picture file type."));
+		} catch (StorageException e) {
+			log.error("Cannot register user {}", user.getUserName(), e);
+			ct.setUtext("<p>We couldn't save the profile picture.</p>" +
+					"<p>Please try again.</p>");
+			ct.addNavLink(new NavLink(NavLink.DisplayCondition.ALWAYS, "Try again", "/user/register"));
+			ct.setStatus(new Status(Status.Value.ERROR, "Could not save profile picture."));
 		} catch (Exception e) {
 			log.error("Cannot register user {}", user.getUserName(), e);
-			if (oldActive) {
-				ct.setUtext("<p>User '" + user.getUserName() + "' was signed up earlier.</p>" +
-						"<p>You may use it as-is, reset your password, or try again with a different email address.</p>");
-				ct.addNavLink(new NavLink(NavLink.DisplayCondition.ALWAYS, "Reset password", "/user/resetpw"));
-				ct.addNavLink(new NavLink(NavLink.DisplayCondition.ALWAYS, "Try again", "/user/register"));
-				ct.setStatus(new Status(Status.Value.WARNING, "User signed up earlier."));
-			} else {
-				ct.setUtext("<p>We could not send you an email to complete sign up for TCBL at this moment.</p>" +
-						"<p>Please try again.</p>");
-				ct.addNavLink(new NavLink(NavLink.DisplayCondition.ALWAYS, "Try again", "/user/register"));
-				ct.setStatus(new Status(Status.Value.ERROR, "Could not send email."));
+			ct.setUtext("<p>We could not complete sign up for TCBL at this moment.</p>" +
+					"<p>Please try again.</p>");
+			ct.addNavLink(new NavLink(NavLink.DisplayCondition.ALWAYS, "Try again", "/user/register"));
+			ct.setStatus(new Status(Status.Value.ERROR, "Could not complete."));
+		} finally {
+			if (profilePictureKey != null) {
+				profilePictureStorage.delete(profilePictureKey);
 			}
 		}
 
@@ -301,6 +340,14 @@ public class UserController {
 
 		return ct.getPreparedPath(model);
 	}
+
+	@GetMapping("/picture/{key:.+}")
+	@ResponseBody
+	public ResponseEntity<Resource> servePicture(@PathVariable String key) {
+		ProfilePictureStorage.LoadResult loadResult = profilePictureStorage.load(key);
+		return ResponseEntity.ok().contentType(loadResult.mediaType).body(loadResult.resource);
+	}
+
 
 	/*private ExchangeFilterFunction oauth2Credentials(OAuth2AuthenticationToken authentication) {
 		return ExchangeFilterFunction.ofRequestProcessor(

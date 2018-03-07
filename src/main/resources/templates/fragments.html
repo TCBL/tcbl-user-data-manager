@@ -11,9 +11,11 @@ the other templates.
 	<title>TCBL User Manager</title>
 	<meta charset="utf-8" />
 	<link rel="stylesheet" th:href="@{/css/tcbl.css}" />
-	<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 	<!--/* not needed: -->
+	<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+	<!--*/-->
 	<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+	<!--/* not needed: -->
 	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 	<script>
 		$( function() {
@@ -21,6 +23,13 @@ the other templates.
 		} );
 	</script>
 	<!--*/-->
+	<script>
+		$(document).ready(function (e) {
+			$("#profilePictureAdd").show();
+			$("#profilePictureChange").hide();
+			$("#profilePictureDelete").hide();
+		});
+	</script>
 </head>
 
 <body>
@@ -148,6 +157,41 @@ the other templates.
 		if (p1 !== p2) {
 			alert("Passwords do not match.");
 			return false;
+		}
+	}
+</script>
+
+<!-- A script fragment that provides functions to interact with profile picture elements -->
+<!-- /* deleteProfilePictureFile: see https://stackoverflow.com/questions/20549241/how-to-reset-input-type-file */ -->
+<script th:fragment="updateProfilePicture">
+	function clickProfilePictureFile() {
+		$("#profilePictureFile").click();
+	}
+
+	function deleteProfilePictureFile() {
+		var $el = $("#profilePictureFile");
+		$el.wrap('<form>').closest('form').get(0).reset();
+		$el.unwrap();
+		$("#profilePictureLayer").html('');
+		$("#profilePictureAdd").show();
+		$("#profilePictureChange").hide();
+		$("#profilePictureDelete").hide();
+	}
+
+	function updateProfilePicture(input) {
+		if (input.files && input.files[0]) {
+			var reader = new FileReader();
+
+			reader.onload = function (e) {
+				$("#profilePictureLayer").html('<img src="' + e.target.result + '" class="profilePicturePreview" />');
+				$("#profilePictureLayer").css('opacity','0.7');
+				$(".icon--choose-image").css('opacity','0.5');
+				$("#profilePictureAdd").hide();
+				$("#profilePictureChange").show();
+				$("#profilePictureDelete").show();
+			};
+
+			reader.readAsDataURL(input.files[0]);
 		}
 	}
 </script>

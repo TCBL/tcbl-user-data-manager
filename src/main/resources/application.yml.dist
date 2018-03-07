@@ -56,6 +56,12 @@ logging:
 # Spring settings
 ##
 spring:
+  # Servlet settings
+  servlet:
+    # Limit file upload size
+    multipart:
+      max-file-size: 1MB
+      max-request-size: 1MB
 
   # Template engine settings. See http://www.thymeleaf.org/
   thymeleaf:

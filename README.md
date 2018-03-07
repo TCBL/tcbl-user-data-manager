@@ -280,7 +280,24 @@ ssh -NL 3307:localhost:3306 honegger.elis.ugent.be
 
 You then just have to change the port to `3307` in the configuration above.
 
-### 5. TCBL User Data Manager application specific settings
+### 5. Limit the size of file uploads
+
+The TCBL User Data Manager has a feature to allow profile picture uploads. Best practice is to limit the file size at the Spring level.
+
+```yaml
+spring:
+
+  # other config...
+
+  # Servlet settings
+  servlet:
+    # Limit file upload size
+    multipart:
+      max-file-size: 1MB
+      max-request-size: 1MB
+```
+
+### 6. TCBL User Data Manager application specific settings
 
 The TCBL User Data Manager application specific settings are grouped under `tudm`.
 
@@ -307,14 +324,14 @@ The TCBL privacy is declared on an external webpage, whose URL is defined in the
 When set to `true`, it causes to copy all user data found in the Gluu Server to the user database (see below) when the
 TCBL User Data Manager starts. This is intended as a one-time operation, so unless really necessary, leave this set to
 `false`!
- 
+
 #### A configuration snippet example, grouping all TCBL User Data Manager application specific settings
 
 ```yaml
 ##
 # TCBL User Data Manager application specific settings
 ##
-ttudm:
+tudm:
    tcbl-services:
      # name of the json file containing the descriptions of the TCBL services
      filename: services.json
@@ -327,7 +344,7 @@ ttudm:
    sync-userdata-at-boot: false
 ```
 
-### 6. MailChimp
+### 7. MailChimp
 
 The TCBL User Data Manager application can communicate if a user wants to be subscribed to the TCBL newsletter, or the
 other way araound: if a user unsubscribes via MailChimp, these changes will propagate to the data manager application.
@@ -351,7 +368,7 @@ in the working directory. The file is self-explanatory.
 To **disable** MailChimp communication, set the `mailchimp.filename` property to point to an non-existing file.
 
 
-### 7. Putting it all together: the complete application configuration
+### 8. Putting it all together: the complete application configuration
 
 **Putting it all together**, your client configuration file `application.yml` should look like `tcbl-user-data-manager/src/main/resources/application.yml.dist`.
 
