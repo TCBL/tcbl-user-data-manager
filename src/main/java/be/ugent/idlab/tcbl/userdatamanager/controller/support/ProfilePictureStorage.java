@@ -4,8 +4,6 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.awt.*;
-
 /**
  * A storage interface for profile picture files.
  *

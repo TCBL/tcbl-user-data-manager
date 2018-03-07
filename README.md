@@ -205,7 +205,7 @@ Here are the settings (example, adjust to correct hosts):
 For the client, this requires the following configuration snippet (example):
 
 ```yaml
-spring
+spring:
   security:
     oauth2:
       client:
@@ -253,6 +253,22 @@ scim:
 
 Follow the instructions of [MariaDB](https://git.datasciencelab.ugent.be/TCBL/internal-server-docs/wikis/mariadb) of the
 server installation to set up a database.
+
+Now we need to create a user (and password) and a table. Become root (*not* just sudo) and log into the database:
+
+```shell
+sudo su -
+mysql -u root
+```
+
+and issue the following commands (and replace 'ThePassword' with a real password):
+
+
+```sql
+create database usermanager;
+create user 'tcbluser'@'localhost' identified by 'ThePassword';
+grant all on usermanager.* to 'tcbluser'@'localhost';
+```
 
 Then we need to add this database as a data source in the `spring` section of the `application.yml` (of course with a better password):
 
