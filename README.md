@@ -249,7 +249,21 @@ scim:
   aat-client-key-id:
 ```
 
-### 4. TCBL User Data Manager application specific settings
+### 4. Limit the size of file uploads
+
+The TCBL User Data Manager has a feature to allow profile picture uploads. Best practice is to limit the file size at the Spring level.
+
+```yaml
+spring:
+  # Servlet settings
+  servlet:
+    # Limit file upload size
+    multipart:
+      max-file-size: 1MB
+      max-request-size: 1MB
+```
+
+### 5. TCBL User Data Manager application specific settings
 
 The TCBL User Data Manager application specific settings are grouped under `tudm`.
 
@@ -286,7 +300,7 @@ tudm:
 ```
  
 
-### 5. Putting it all together: the complete application configuration
+### 6. Putting it all together: the complete application configuration
 
 **Putting it all together**, your client configuration file `application.yml` should look like `tcbl-user-data-manager/src/main/resources/application.yml.dist`.
 

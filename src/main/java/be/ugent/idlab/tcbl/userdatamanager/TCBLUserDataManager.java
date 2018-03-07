@@ -1,10 +1,10 @@
 package be.ugent.idlab.tcbl.userdatamanager;
 
-// TODO import be.ugent.idlab.tcbl.userdatamanager.controller.storage.StorageService;
+import be.ugent.idlab.tcbl.userdatamanager.controller.support.ProfilePictureStorage;
+import be.ugent.idlab.tcbl.userdatamanager.controller.support.ProfilePictureStorageOnFileSystem;
 import be.ugent.idlab.tcbl.userdatamanager.model.ScimTCBLUserRepository;
 import be.ugent.idlab.tcbl.userdatamanager.model.TCBLUser;
 import be.ugent.idlab.tcbl.userdatamanager.model.TCBLUserRepository;
-// TODO import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -28,6 +28,11 @@ public class TCBLUserDataManager {
 	}
 
 	@Bean
+	public ProfilePictureStorage profilePictureStorageService(final Environment environment) throws Exception {
+		return new ProfilePictureStorageOnFileSystem(environment);
+	}
+
+	@Bean
 	public Converter<String, TCBLUser> tcblUserConverter(final Environment environment) {
 		return new Converter<String, TCBLUser>() {
 			@Nullable
@@ -41,15 +46,6 @@ public class TCBLUserDataManager {
 			}
 		};
 	}
-
-// TODO
-//	@Bean
-//	CommandLineRunner init(StorageService storageService) {
-//		return (args) -> {
-//			storageService.deleteAll();
-//			storageService.init();
-//		};
-//	}
 
 	public static void main(String[] args) {
 		SpringApplication.run(TCBLUserDataManager.class, args);

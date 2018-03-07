@@ -25,6 +25,7 @@ public class TCBLUser {
 	private String lastName;
 	private String password;
 	private boolean active;
+	private String pictureURL;
 	private boolean subscribedNL;	// is the user subscribed to the TCBL newsletter?
 	private boolean acceptedPP;		// did the user accept the TCBL privacy policy?
 	private final static String subscribedField = "gcpSubscribedToTCBLnewsletter";
@@ -42,7 +43,7 @@ public class TCBLUser {
 		user.setFirstName(scimUser.getName().getGivenName());
 		user.setLastName(scimUser.getName().getFamilyName());
 		user.setActive(scimUser.isActive() == null ? false : scimUser.isActive());
-
+		// TODO set pictureURL
 		if (scimUser.isExtensionPresent(extensionUrn)) {
 			Extension extension = scimUser.getExtension(extensionUrn);
 			try {
@@ -79,7 +80,7 @@ public class TCBLUser {
 		scimUser.setName(newName);
 		scimUser.setDisplayName(displayName);
 		scimUser.setActive(active);
-
+		// TODO set pictureURL
 		Extension extension = new Extension.Builder(extensionUrn)
 				.setField(subscribedField, Boolean.toString(subscribedNL))
 				.setField(acceptedField, Boolean.toString(acceptedPP))
@@ -114,6 +115,15 @@ public class TCBLUser {
 	public void setUserName(String userName) {
 		this.userName = userName;
 	}
+
+	public String getPictureURL() {
+		return pictureURL;
+	}
+
+	public void setPictureURL(String pictureURL) {
+		this.pictureURL = pictureURL;
+	}
+
 	public boolean isSubscribedNL() {
 		return subscribedNL;
 	}
@@ -136,6 +146,7 @@ public class TCBLUser {
 				"userName='" + userName + '\'' +
 				", firstName='" + firstName + '\'' +
 				", lastName='" + lastName + '\'' +
+				", pictureURL='" + pictureURL + '\'' +
 				", subscribedNL='" + subscribedNL + '\'' +
 				", acceptedPP='" + acceptedPP + '\'' +
 				'}';
