@@ -153,6 +153,27 @@ form input[type=file].input--choose-image {
     cursor: pointer;
 }
 
+#profilePictureOuter {
+    position: relative;
+    text-align: center;
+    background-color: #DDDDDD;
+    width: 100px;
+    height: 100px;
+}
+
+.profilePicturePreview {
+    position: absolute;
+    width: auto;
+    height: auto;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: auto;
+    max-width: 100%;
+    max-height: 100%;
+}
+
 .icon--choose-image {
     position: absolute;
     opacity: 0.1;
@@ -162,19 +183,6 @@ form input[type=file].input--choose-image {
     left: 50%;
     margin-top: -40px;
     margin-left: -40px;
-}
-
-#profilePictureOuter {
-    position: relative;
-    text-align: center;
-    background-color: #DDDDDD;
-    width: 100px;
-    height: 150px;
-}
-
-.profilePicturePreview {
-    width: 100px;
-    height: 150px;
 }
 
 .button {

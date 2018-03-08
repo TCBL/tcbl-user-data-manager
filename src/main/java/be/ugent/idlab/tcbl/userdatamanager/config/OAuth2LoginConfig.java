@@ -42,6 +42,7 @@ public class OAuth2LoginConfig {
 							"/index",
 							"/loginrequired",
 							"/services",
+							"/error",	// needed for @ExceptionHandler
 							// mappings under /user
 							"/user/register",
 							"/user/registered",
