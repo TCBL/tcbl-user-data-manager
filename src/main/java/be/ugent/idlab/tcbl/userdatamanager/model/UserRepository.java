@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
+import java.util.Date;
 import java.util.Optional;
 
 /**
@@ -29,35 +30,30 @@ public class UserRepository {
 	}
 
 	public TCBLUser find(String inum) throws  Exception {
-		if (databaseUserRepository.existsByInum(inum)) {
-			return databaseUserRepository.findByInum(inum);
-		} else {
-			TCBLUser user = scimUserRepository.find(inum);
-			databaseUserRepository.save(user);
-			return user;
-		}
+		return databaseUserRepository.findByInum(inum);
 	}
 
 	/*public Iterable<TCBLUser> findAll() throws Exception {
 		return scimUserRepository.findAll();
 	}*/
-	public TCBLUser save(TCBLUser user) throws Exception {
-		TCBLUser savedUser = scimUserRepository.save(user);
-		databaseUserRepository.save(savedUser);
-		return savedUser;
+	public void save(TCBLUser user) throws Exception {
+		TCBLUser storedUser = findByName(user.getUserName());
+		user.setActiveSince(storedUser.getActiveSince());
+		user.setInvited(storedUser.isInvited());
+		user.setPasswordReset(storedUser.getPasswordReset());
+		user.setLastModified(new Date());
+		user.setCreated(storedUser.getCreated());
+
+		scimUserRepository.save(user);
+		databaseUserRepository.save(user);
 	}
-	public TCBLUser findByName(final String userName) throws Exception {
+	public TCBLUser findByName(final String userName) {
 		Optional<TCBLUser> userOption = databaseUserRepository.findById(userName);
-		if (userOption.isPresent()) {
-			return userOption.get();
-		} else {
-			TCBLUser user = scimUserRepository.findByName(userName);
-			databaseUserRepository.save(user);
-			return user;
-		}
+		return userOption.get();
 	}
 	public TCBLUser create(TCBLUser user) throws Exception {
 		TCBLUser resultUser = scimUserRepository.create(user);
+		resultUser.setInvited(false);
 		databaseUserRepository.save(resultUser);
 		return resultUser;
 	}
@@ -68,8 +64,11 @@ public class UserRepository {
 	public Iterable<TCBLUser> findInactive() {
 		return databaseUserRepository.findByActive(false);
 	}
-	public void processTCBLUsers(final TCBLUserProcessor processor) throws Exception {
-		scimUserRepository.processTCBLUsers(processor);
+
+	public void processTCBLUsers(final TCBLUserProcessor processor) {
+		for (TCBLUser tcblUser : databaseUserRepository.findAll()) {
+			processor.process(tcblUser);
+		}
 	}
 
 	@Async
@@ -84,7 +83,7 @@ public class UserRepository {
 				});
 				log.info("Database synchronised!");
 			} catch (Exception e) {
-				log.error("Something went wrong synchronising the databases!");
+				log.error("Something went wrong synchronising the databases!", e);
 			}
 		} else {
 			log.info("Not synchronising user data (fron Gluu server to local database)");

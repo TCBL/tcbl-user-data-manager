@@ -3,10 +3,8 @@ package be.ugent.idlab.tcbl.userdatamanager.model;
 import gluu.scim.client.ScimResponse;
 import gluu.scim2.client.Scim2Client;
 import gluu.scim2.client.util.Util;
-import org.gluu.oxtrust.model.scim2.Constants;
-import org.gluu.oxtrust.model.scim2.ListResponse;
-import org.gluu.oxtrust.model.scim2.Resource;
-import org.gluu.oxtrust.model.scim2.User;
+import org.apache.commons.collections.map.SingletonMap;
+import org.gluu.oxtrust.model.scim2.*;
 import org.gluu.oxtrust.model.scim2.schema.extension.UserExtensionSchema;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,10 +14,11 @@ import org.springframework.boot.context.properties.bind.Binder;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.io.IOException;
+import java.util.*;
 
+import static be.ugent.idlab.tcbl.userdatamanager.model.Util.invitationDay;
+import static be.ugent.idlab.tcbl.userdatamanager.model.Util.toCalendarPerDay;
 import static org.gluu.oxtrust.model.scim2.Constants.MAX_COUNT;
 
 /**
@@ -57,48 +56,20 @@ public class ScimUserRepository {
 		log.debug("ScimUserRepository initialised.");
 	}
 
-	public Iterable<TCBLUser> findAll() throws Exception {
-		log.debug("Find all users.");
-		List<TCBLUser> users = new ArrayList<>();
-		processTCBLUsers(users::add);
-		return users;
-	}
 
-	public TCBLUser save(final TCBLUser tcblUser) throws Exception {
+	public void save(final TCBLUser tcblUser) throws Exception {
 		log.debug("Saving user {}", tcblUser.getUserName() );
 		User user = findUser(tcblUser.getInum());
 		user.setPassword("");
-		tcblUser.updateScimUser(user, userExtensionSchema.getId());
+		updateScimUser(user, tcblUser);
 		client.updateUser(user, tcblUser.getInum(), new String[0]);
-		return tcblUser;
-	}
-
-	public TCBLUser find(final String inum) throws Exception {
-		log.debug("Finding user with inum {}", inum);
-		User user = findUser(inum);
-		return TCBLUser.createFromScimUser(user, userExtensionSchema.getId());
-	}
-
-	public TCBLUser findByName(final String userName) throws Exception {
-		log.debug("Finding user by userName {}", userName);
-		String usernameQuery = "userName eq \"" + userName + "\"";
-		ScimResponse existsResponse = client.searchUsers(usernameQuery, 1, 1, "", "", null);
-		ListResponse userList = Util.toListResponseUser(existsResponse, userExtensionSchema);
-		if (userList.getTotalResults() == 1) {
-			User user = (User) userList.getResources().get(0);
-			return TCBLUser.createFromScimUser(user, userExtensionSchema.getId());
-		} else {
-			String message = "Did not find user " + userName;
-			log.error(message);
-			throw new Exception(message);
-		}
 	}
 
 	public TCBLUser create(final TCBLUser tcblUser) throws Exception {
 		log.debug("Creating user {}", tcblUser.getUserName());
 		try {
 			User user = new User();
-			tcblUser.updateScimUser(user, userExtensionSchema.getId());
+			updateScimUser(user, tcblUser);
 			ScimResponse response = client.createUser(user, new String[0]);
 			if (response.getStatusCode() == 201) {
 				user = Util.toUser(response, userExtensionSchema);
@@ -120,6 +91,35 @@ public class ScimUserRepository {
 		}
 	}
 
+	private void updateScimUser(final User scimUser, final TCBLUser tcblUser) {
+		if (scimUser.getUserName() == null) {
+			scimUser.setUserName(tcblUser.getUserName());
+		}
+		if (scimUser.getPassword().isEmpty()) {
+			scimUser.setPassword(tcblUser.getPassword());
+		}
+		if (scimUser.getEmails().isEmpty()) {
+			Email email = new Email();
+			email.setValue(scimUser.getUserName());
+			scimUser.setEmails(Collections.singletonList(email));
+		}
+		String displayName = tcblUser.getFirstName() + " " + tcblUser.getLastName();
+		Name newName = new Name();
+		newName.setGivenName(tcblUser.getFirstName());
+		newName.setFamilyName(tcblUser.getLastName());
+		newName.setFormatted(displayName);
+		scimUser.setName(newName);
+		scimUser.setDisplayName(displayName);
+		scimUser.setActive(tcblUser.isActive());
+		String pictureURL = tcblUser.getPictureURL() == null ? "_" : tcblUser.getPictureURL();
+		Extension extension = new Extension.Builder(ScimExtensionAttributes.urn.getValue())
+				.setField(ScimExtensionAttributes.subscribedField.getValue(), Boolean.toString(tcblUser.isSubscribedNL()))
+				.setField(ScimExtensionAttributes.acceptedField.getValue(), Boolean.toString(tcblUser.isAcceptedPP()))
+				.setField(ScimExtensionAttributes.pictureField.getValue(), pictureURL)
+				.build();
+		scimUser.setExtensions(new SingletonMap(ScimExtensionAttributes.urn.getValue(), extension));
+	}
+
 	public void deleteTCBLUser(final TCBLUser user) throws Exception {
 		log.debug("Deleting user {}", user.getUserName());
 		try {
@@ -133,42 +133,6 @@ public class ScimUserRepository {
 				String message = "Cannot create user: " + e.getMessage();
 				log.error(message, e);
 				throw new Exception(message, e);
-		}
-	}
-
-	public Iterable<TCBLUser> findInactive() throws Exception {
-		log.debug("Finding inactive users.");
-		String query = "active eq \"false\"";
-		try {
-			boolean ready = false;
-			int startIndex = 1;
-			List<TCBLUser> users = new ArrayList<>();
-			while (!ready) {
-				ScimResponse inactiveUsersResponse = client.searchUsers(query, startIndex, Constants.MAX_COUNT, "", "", null);
-				if (inactiveUsersResponse.getStatusCode() == 200) {
-					ListResponse userListResponse = Util.toListResponseUser(inactiveUsersResponse, userExtensionSchema);
-					List<Resource> userList = userListResponse.getResources();
-					if (!userList.isEmpty()) {
-						for (Resource userResource : userListResponse.getResources()) {
-							User user = (User) userResource;
-							TCBLUser tcblUser = TCBLUser.createFromScimUser(user, userExtensionSchema.getId());
-							users.add(tcblUser);
-						}
-						startIndex += Constants.MAX_COUNT;
-					} else {
-						ready = true;
-					}
-				} else {
-					String message = "Cannot search for inactive users on the OpenID Connect server: " + inactiveUsersResponse.getStatusCode() + ": " + inactiveUsersResponse.getStatus() + ". " + inactiveUsersResponse.getResponseBodyString();
-					log.error(message);
-					throw new Exception(message);
-				}
-			}
-			return users;
-		} catch (Exception e) {
-			String message = "Cannot search for inactive users: " + e.getMessage();
-			log.error(message, e);
-			throw new Exception(message, e);
 		}
 	}
 
@@ -189,7 +153,74 @@ public class ScimUserRepository {
 	}
 
 	public void processTCBLUsers(TCBLUserProcessor processor) throws Exception {
-		processScimUsers(scimUser -> processor.process(TCBLUser.createFromScimUser(scimUser, userExtensionSchema.getId())));
+		processScimUsers(scimUser -> {
+
+			// fix passwordReset date
+			Meta meta = scimUser.getMeta();
+			Date created = meta.getCreated();
+			Date modified = meta.getLastModified();
+			Calendar createdCalendar = toCalendarPerDay(created);
+
+			boolean invited = false;
+			boolean active = scimUser.isActive() == null ? false : scimUser.isActive();
+
+			Date passwordResetAt = null;
+			Date activeSince = created;
+
+			if (createdCalendar.equals(invitationDay)) {
+				invited = true;
+				if (!created.equals(modified)) {
+					passwordResetAt = modified;
+					activeSince = modified;
+				}
+			}
+
+			String pictureURL;
+			boolean subscribedNL;
+			boolean acceptedPP;
+			if (!scimUser.isExtensionPresent(ScimExtensionAttributes.urn.getValue())) {
+				pictureURL = null;
+				subscribedNL = true;
+				acceptedPP = true;
+				Extension extension = new Extension.Builder(ScimExtensionAttributes.urn.getValue())
+						.setField(ScimExtensionAttributes.subscribedField.getValue(), "true")
+						.setField(ScimExtensionAttributes.acceptedField.getValue(), "true")
+						.setField(ScimExtensionAttributes.pictureField.getValue(), "_")
+						.build();
+				scimUser.setExtensions(new SingletonMap(ScimExtensionAttributes.urn.getValue(), extension));
+
+				scimUser.setPassword("");
+				try {
+					client.updateUser(scimUser, scimUser.getId(), new String[0]);
+				} catch (IOException e) {
+					log.error("Updating SCIM user failed!", e);
+				}
+			} else {
+				Extension extension = scimUser.getExtension(ScimExtensionAttributes.urn.getValue());
+				subscribedNL = Boolean.parseBoolean(extension.getFieldAsString(ScimExtensionAttributes.subscribedField.getValue()));
+				acceptedPP = Boolean.parseBoolean(extension.getFieldAsString(ScimExtensionAttributes.acceptedField.getValue()));
+				pictureURL = extension.getFieldAsString(ScimExtensionAttributes.pictureField.getValue());
+				pictureURL = pictureURL.equals("_") ? null : pictureURL;
+			}
+
+			TCBLUser tcblUser = new TCBLUser(
+					scimUser.getId(),	// inum
+					scimUser.getUserName(),
+					scimUser.getName().getGivenName(),
+					scimUser.getName().getFamilyName(),
+					active,
+					invited,
+					pictureURL,
+					subscribedNL,
+					acceptedPP,
+					created,
+					modified,
+					passwordResetAt,
+					activeSince);
+
+			processor.process(tcblUser);
+
+		});
 	}
 
 	private static Map<String, String> resolveScimClientProperties(final Environment environment) {

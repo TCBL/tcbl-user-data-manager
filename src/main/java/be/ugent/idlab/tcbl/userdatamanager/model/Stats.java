@@ -32,13 +32,13 @@ public class Stats implements Serializable {
 		totalCount++;
 		if (user.isInvited()) {
 			invited++;
-			if (user.getActiveSince() != null) {
+			if (user.isActive()) {
 				invitedActive++;
-				insertActive(TCBLUser.toCalendarPerDay(user.getLastModified()));
+				insertActive(Util.toCalendarPerDay(user.getActiveSince()));
 			}
 		} else {
 			newUsers++;
-			Calendar createdCalendar = TCBLUser.toCalendarPerDay(user.getCreated());
+			Calendar createdCalendar = Util.toCalendarPerDay(user.getCreated());
 			insertActive(createdCalendar);
 			insertSelfRegisteredUser(createdCalendar, user.getUserName());
 		}

@@ -224,6 +224,7 @@ public class UserController {
 			TCBLUser user = userRepository.find(inum);
 			if (!user.isActive()) {
 				user.setActive(true);
+				user.setActiveSince(new Date());
 				userRepository.save(user);
 				mailChimper.addOrUpdate(user);
 			}
@@ -348,16 +349,6 @@ public class UserController {
 		return ResponseEntity.ok().contentType(loadResult.mediaType).body(loadResult.resource);
 	}
 
-
-	/*private ExchangeFilterFunction oauth2Credentials(OAuth2AuthenticationToken authentication) {
-		return ExchangeFilterFunction.ofRequestProcessor(
-				clientRequest -> {
-					ClientRequest authorizedRequest = ClientRequest.from(clientRequest)
-							.header(HttpHeaders.AUTHORIZATION, "Bearer " + authentication.getAccessToken().getTokenValue())
-							.build();
-					return Mono.just(authorizedRequest);
-				});
-	}*/
 	private ExchangeFilterFunction oauth2Credentials(OAuth2AuthorizedClient authorizedClient) {
 		return ExchangeFilterFunction.ofRequestProcessor(
 				clientRequest -> {

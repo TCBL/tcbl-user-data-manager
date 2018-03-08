@@ -1,14 +1,7 @@
 package be.ugent.idlab.tcbl.userdatamanager.model;
 
-import org.apache.commons.collections.map.SingletonMap;
-import org.gluu.oxtrust.model.scim2.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import javax.persistence.*;
-import java.util.*;
-
-;
+import java.util.Date;
 
 /**
  * <p>Copyright 2017 IDLab (Ghent University - imec)</p>
@@ -18,8 +11,6 @@ import java.util.*;
 @Entity
 @Table(indexes = @Index(columnList = "inum"))
 public class TCBLUser {
-	private static Logger log = LoggerFactory.getLogger(TCBLUser.class);
-	public transient static final Calendar invitationDay = new GregorianCalendar(2017, Calendar.AUGUST, 31);
 
 	@Column(length = 128, nullable = false)
 	private String inum;
@@ -48,93 +39,24 @@ public class TCBLUser {
 	private Date activeSince;	// only for invited users;
 
 
-	private final transient static String subscribedField = "gcpSubscribedToTCBLnewsletter";
-	private final transient static String acceptedField = "gcpAcceptedTCBLprivacyPolicy";
-	private final transient static String pictureField = "gcpPictureURL";
-
-
 	public TCBLUser() {
 		active = false;
 	}
 
-	static TCBLUser createFromScimUser(final User scimUser, String extensionUrn) {
-		TCBLUser user = new TCBLUser();
-		user.setInum(scimUser.getId());
-		user.setUserName(scimUser.getUserName());
-		user.setFirstName(scimUser.getName().getGivenName());
-		user.setLastName(scimUser.getName().getFamilyName());
-		user.setActive(scimUser.isActive() == null ? false : scimUser.isActive());
-
-		Meta meta = scimUser.getMeta();
-		user.setCreated(meta.getCreated());
-		user.setLastModified(meta.getLastModified());
-
-		// fix passwordReset date
-		Date created = meta.getCreated();
-		Date modified = meta.getLastModified();
-		Calendar createdCalendar = toCalendarPerDay(created);
-		if (createdCalendar.equals(invitationDay)) {
-			user.setInvited(true);
-			if (!created.equals(modified)) {
-				user.setPasswordReset(user.getLastModified());
-				user.setActiveSince(user.getLastModified());
-			}
-		} else {
-			user.setInvited(false);
-			user.setActiveSince(user.getCreated());
-		}
-
-		if (scimUser.isExtensionPresent(extensionUrn)) {
-			Extension extension = scimUser.getExtension(extensionUrn);
-			try {
-				user.setSubscribedNL(Boolean.parseBoolean(extension.getFieldAsString(subscribedField)));
-				user.setAcceptedPP(Boolean.parseBoolean(extension.getFieldAsString(acceptedField)));
-				if (extension.isFieldPresent(pictureField)) {
-					user.setPictureURL(extension.getFieldAsString(pictureField));
-				}
-			} catch (NoSuchElementException e) {
-				log.warn("(One of) the fields {} and {} do not exist. Setting subscribedNL and acceptedPP to 'false'",subscribedField, acceptedField);
-				user.setSubscribedNL(false);
-				user.setAcceptedPP(false);
-			}
-		} else {
-			log.warn("No extension URN '{}' found on the Gluu server", extensionUrn);
-		}
-		return user;
-	}
-
-	void updateScimUser(final User scimUser, String extensionUrn) {
-		if (scimUser.getUserName() == null) {
-			scimUser.setUserName(userName);
-		}
-		if (scimUser.getPassword().isEmpty()) {
-			scimUser.setPassword(password);
-		}
-		if (scimUser.getEmails().isEmpty()) {
-			Email email = new Email();
-			email.setValue(scimUser.getUserName());
-			scimUser.setEmails(Collections.singletonList(email));
-		}
-		String displayName = firstName + " " + lastName;
-		Name newName = new Name();
-		newName.setGivenName(firstName);
-		newName.setFamilyName(lastName);
-		newName.setFormatted(displayName);
-		scimUser.setName(newName);
-		scimUser.setDisplayName(displayName);
-		scimUser.setActive(active);
-		Extension.Builder extensionBuilder = new Extension.Builder(extensionUrn)
-				.setField(subscribedField, Boolean.toString(subscribedNL))
-				.setField(acceptedField, Boolean.toString(acceptedPP));
-		if (pictureURL != null) {
-			extensionBuilder.setField(pictureField, pictureURL);
-		}
-		Extension extension = extensionBuilder.build();
-		if (scimUser.isExtensionPresent(extensionUrn)) {
-			scimUser.setExtensions(new SingletonMap(extensionUrn, extension));
-		} else {
-			scimUser.addExtension(extension);
-		}
+	public TCBLUser(String inum, String userName, String firstName, String lastName, boolean active, boolean invited, String pictureURL, boolean subscribedNL, boolean acceptedPP, Date created, Date lastModified, Date passwordReset, Date activeSince) {
+		this.inum = inum;
+		this.userName = userName;
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.active = active;
+		this.invited = invited;
+		this.pictureURL = pictureURL;
+		this.subscribedNL = subscribedNL;
+		this.acceptedPP = acceptedPP;
+		this.created = created;
+		this.lastModified = lastModified;
+		this.passwordReset = passwordReset;
+		this.activeSince = activeSince;
 	}
 
 	public String getFirstName() {
@@ -235,16 +157,6 @@ public class TCBLUser {
 
 	public void setLastModified(Date lastModified) {
 		this.lastModified = lastModified;
-	}
-
-	public static Calendar toCalendarPerDay(final Date date) {
-		if (date == null) {
-			return new GregorianCalendar(0, 0, 1);
-		} else {
-			Calendar original = new GregorianCalendar();
-			original.setTime(date);
-			return new GregorianCalendar(original.get(Calendar.YEAR), original.get(Calendar.MONTH), original.get(Calendar.DAY_OF_MONTH));
-		}
 	}
 
 	public Date getPasswordReset() {
