@@ -42,7 +42,7 @@ import java.util.Map;
 @RequestMapping("user")
 public class UserController {
 	private final Logger log = LoggerFactory.getLogger(this.getClass());
-	private final UserRepository tcblUserRepository;
+	private final UserRepository userRepository;
 	private final Mail mail;
 	private final static Base64.Encoder encoder = Base64.getUrlEncoder();
 	private final static Base64.Decoder decoder = Base64.getUrlDecoder();
@@ -57,15 +57,15 @@ public class UserController {
 	/**
 	 * Creates a UserController; Spring injects the UserRepository.
 	 *
-	 * @param tcblUserRepository A repository where TCBLUsers are stored.
+	 * @param userRepository A repository where TCBLUsers are stored.
 	 * @param mail The background mail sender.
 	 */
-	public UserController(UserRepository tcblUserRepository,
+	public UserController(UserRepository userRepository,
 						  Mail mail,
 						  OAuth2AuthorizedClientService authorizedClientService,
 						  MailChimper mailChimper,
 						  ProfilePictureStorage profilePictureStorage) {
-		this.tcblUserRepository = tcblUserRepository;
+		this.userRepository = userRepository;
 		this.mail = mail;
 		this.authorizedClientService = authorizedClientService;
 		this.profilePictureStorage = profilePictureStorage;
@@ -102,7 +102,7 @@ public class UserController {
 					.bodyToMono(Map.class)
 					.block();
 			String id = userAttributes.get("inum").toString();
-			TCBLUser tcblUser = tcblUserRepository.find(id);
+			TCBLUser tcblUser = userRepository.find(id);
 			// note: if no user found, tcblUser is null, and this is covered nicely by the view
 			model.addAttribute("tcblUser", tcblUser);
 		} catch (Exception e) {
@@ -115,7 +115,7 @@ public class UserController {
 	@PostMapping("/update")
 	public String update (TCBLUser user, Model model) {
 		try {
-			tcblUserRepository.save(user);
+			userRepository.save(user);
 			model.addAttribute("tcblUser", user);
 			model.addAttribute("status", new Status(Status.Value.OK, "Your information is updated."));
 			mailChimper.addOrUpdate(user);
@@ -148,7 +148,7 @@ public class UserController {
 		try {
 			TCBLUser oldUser;
 			try {
-				oldUser = tcblUserRepository.findByName(user.getUserName());
+				oldUser = userRepository.findByName(user.getUserName());
 			} catch (Exception e) {
 				oldUser = null;
 			}
@@ -158,7 +158,7 @@ public class UserController {
 				} else {
 					// a previous registration attempt on this username was not completed...
 					// let's delete this old entry.
-					tcblUserRepository.deleteTCBLUser(oldUser);
+					userRepository.deleteTCBLUser(oldUser);
 				}
 			}
 
@@ -171,7 +171,7 @@ public class UserController {
 				user.setPictureURL(baseUri + "/picture/" + profilePictureKey);
 			}
 
-			TCBLUser newUser = tcblUserRepository.create(user);
+			TCBLUser newUser = userRepository.create(user);
 
 			sendRegisterMessage(newUser, baseUri);
 			ct.setUtext(getEmailInformationText(user.getUserName()));
@@ -221,10 +221,10 @@ public class UserController {
 
 		try {
 			String inum = decodeBase64(id);
-			TCBLUser user = tcblUserRepository.find(inum);
+			TCBLUser user = userRepository.find(inum);
 			if (!user.isActive()) {
 				user.setActive(true);
-				tcblUserRepository.save(user);
+				userRepository.save(user);
 				mailChimper.addOrUpdate(user);
 			}
 			ct.setUtext("<p>You're successfully signed up!</p>" +
@@ -255,7 +255,7 @@ public class UserController {
 
 		boolean userExists = false;
 		try {
-			TCBLUser user = tcblUserRepository.findByName(mail);
+			TCBLUser user = userRepository.findByName(mail);
 			userExists = true;
 			String baseUri = getUriOneLevelUp(request);
 			sendResetMessage(user, baseUri);
@@ -323,10 +323,10 @@ public class UserController {
 
 		try {
 			String inum = decodeBase64(rpc);
-			TCBLUser user = tcblUserRepository.find(inum);
+			TCBLUser user = userRepository.find(inum);
 			user.setPassword(password);
 			user.setPasswordReset(new Date());
-			tcblUserRepository.save(user);
+			userRepository.save(user);
 			ct.setUtext("<p>You've successfully updated your password!</p>");
 			ct.setStatus(new Status(Status.Value.OK, "Password updated."));
 		} catch (Exception e) {
