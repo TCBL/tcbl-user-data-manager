@@ -33,9 +33,6 @@ public class UserRepository {
 		return databaseUserRepository.findByInum(inum);
 	}
 
-	/*public Iterable<TCBLUser> findAll() throws Exception {
-		return scimUserRepository.findAll();
-	}*/
 	public void save(TCBLUser user) throws Exception {
 		TCBLUser storedUser = findByName(user.getUserName());
 		user.setActiveSince(storedUser.getActiveSince());
