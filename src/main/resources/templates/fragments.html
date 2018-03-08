@@ -180,18 +180,23 @@ the other templates.
 
 	function updateProfilePicture(input) {
 		if (input.files && input.files[0]) {
-			var reader = new FileReader();
+			if (input.files[0].size >= 1048576) {
+				alert("Picture file size should be less than 1 MB");
+				deleteProfilePictureFile();
+			} else {
+				var reader = new FileReader();
 
-			reader.onload = function (e) {
-				$("#profilePictureLayer").html('<img src="' + e.target.result + '" class="profilePicturePreview" />');
-				$("#profilePictureLayer").css('opacity','0.7');
-				$(".icon--choose-image").css('opacity','0.5');
-				$("#profilePictureAdd").hide();
-				$("#profilePictureChange").show();
-				$("#profilePictureDelete").show();
-			};
+				reader.onload = function (e) {
+					$("#profilePictureLayer").html('<img src="' + e.target.result + '" class="profilePicturePreview" />');
+					$("#profilePictureLayer").css('opacity', '0.7');
+					$(".icon--choose-image").css('opacity', '0.5');
+					$("#profilePictureAdd").hide();
+					$("#profilePictureChange").show();
+					$("#profilePictureDelete").show();
+				};
 
-			reader.readAsDataURL(input.files[0]);
+				reader.readAsDataURL(input.files[0]);
+			}
 		}
 	}
 </script>
