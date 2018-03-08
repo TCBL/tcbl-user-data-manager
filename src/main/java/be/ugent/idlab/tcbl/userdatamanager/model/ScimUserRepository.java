@@ -165,14 +165,18 @@ public class ScimUserRepository {
 			boolean active = scimUser.isActive() == null ? false : scimUser.isActive();
 
 			Date passwordResetAt = null;
-			Date activeSince = created;
+			Date activeSince;
 
 			if (createdCalendar.equals(invitationDay)) {
 				invited = true;
 				if (!created.equals(modified)) {
 					passwordResetAt = modified;
 					activeSince = modified;
+				} else {
+					activeSince = null;
 				}
+			} else {
+				activeSince = created;
 			}
 
 			String pictureURL;

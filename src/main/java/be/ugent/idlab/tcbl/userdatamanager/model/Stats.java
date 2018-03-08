@@ -32,7 +32,7 @@ public class Stats implements Serializable {
 		totalCount++;
 		if (user.isInvited()) {
 			invited++;
-			if (user.isActive()) {
+			if (user.getActiveSince() != null) {
 				invitedActive++;
 				insertActive(Util.toCalendarPerDay(user.getActiveSince()));
 			}
