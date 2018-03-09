@@ -7,11 +7,12 @@ import org.springframework.http.MediaType;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,6 +29,8 @@ import java.util.Map;
  */
 public class ProfilePictureStorageOnFileSystem implements ProfilePictureStorage {
 
+	private final static int MAX_FILENAMELENGTH = 255; // https://en.wikipedia.org/wiki/Comparison_of_file_systems#Limits
+	private final static Base64.Encoder encoder = Base64.getUrlEncoder();	// Table 2 of RFC 4648, Table 2 (URL and Filename Safe Alphabet)
 	private final Path rootLocation;
 	private final Map<String, MediaType> mediaTypeMap;
 
@@ -47,27 +50,27 @@ public class ProfilePictureStorageOnFileSystem implements ProfilePictureStorage 
 
 	@Override
 	public String store(MultipartFile profilePictureFile, String username) {
-		// make a simple yet (hopefully) unique key, suitable as filename base
-		String key = username.replaceAll("[^A-Za-z0-9]", "_");
-		if (profilePictureFile.isEmpty()) {
-			// delete all possible previous files
-			delete(key);
-			key = null;
-		}
-		else {
-			String contentType = profilePictureFile.getContentType();
-			String fileExtension = null;
-			for (Map.Entry<String, MediaType> entry : mediaTypeMap.entrySet()) {
-				if (entry.getValue().toString().equals(contentType)) {
-					fileExtension = entry.getKey();
-					break;
+		try {
+			String key = safeFilenameFromString(username);
+
+			if (profilePictureFile.isEmpty()) {
+				// delete all possible previous files
+				delete(key);
+				key = null;
+			}
+			else {
+				String contentType = profilePictureFile.getContentType();
+				String fileExtension = null;
+				for (Map.Entry<String, MediaType> entry : mediaTypeMap.entrySet()) {
+					if (entry.getValue().toString().equals(contentType)) {
+						fileExtension = entry.getKey();
+						break;
+					}
 				}
-			}
-			if (fileExtension == null) {
-				throw new BadContentTypeException(String.format("Content type '%s' is not supported", contentType));
-			}
-			String filename = key + fileExtension;
-			try {
+				if (fileExtension == null) {
+					throw new BadContentTypeException(String.format("Content type '%s' is not supported", contentType));
+				}
+				String filename = key + fileExtension;
 				// save/overwrite this file
 				Files.copy(profilePictureFile.getInputStream(), rootLocation.resolve(filename),
 						StandardCopyOption.REPLACE_EXISTING);
@@ -78,17 +81,17 @@ public class ProfilePictureStorageOnFileSystem implements ProfilePictureStorage 
 					}
 				}
 			}
-			catch (IOException e) {
-				throw new StorageException("Failed to store file: " + filename, e);
-			}
+			return key;
 		}
-		return key;
+		catch (Exception e) {
+			throw new StorageException("Failed to store file for " + username, e);
+		}
 	}
 
 	@Override
 	public LoadResult load(String key) {
-		LoadResult ret = null;
 		try {
+			LoadResult ret = null;
 			for (Map.Entry<String, MediaType> entry : mediaTypeMap.entrySet()) {
 				Path file = rootLocation.resolve(key + entry.getKey());
 				Resource resource = new UrlResource(file.toUri());
@@ -102,11 +105,11 @@ public class ProfilePictureStorageOnFileSystem implements ProfilePictureStorage 
 			if (ret == null) {
 				throw new StorageFileNotFoundException("Could not read file for: " + key);
 			}
+			return ret;
 		}
-		catch (MalformedURLException e) {
+		catch (Exception e) {
 			throw new StorageFileNotFoundException("Could not read file for: " + key, e);
 		}
-		return ret;
 	}
 
 	@Override
@@ -115,8 +118,40 @@ public class ProfilePictureStorageOnFileSystem implements ProfilePictureStorage 
 			for (String fx : mediaTypeMap.keySet()) {
 				Files.deleteIfExists(rootLocation.resolve(key + fx));
 			}
-		} catch (IOException e) {
+		} catch (Exception e) {
 			throw new StorageException("Failed to delete file for:" + key, e);
+		}
+	}
+
+	// This one gives "Data too long for column 'pictureurl'" on usernames of length >= 99
+//	private static String safeFilenameFromString(String string) {
+//		try {
+//			// encode the UTF-8 bytes as hex string
+//			byte[] utf8Bytes = string.getBytes(StandardCharsets.UTF_8);
+//			StringBuilder sb = new StringBuilder();
+//			for (int k = 0; k < utf8Bytes.length; k++) {
+//				sb.append(String.format("%02x", utf8Bytes[k]));
+//			}
+//			String ret = sb.toString();
+//			if (ret.length() > MAX_FILENAMELENGTH) {
+//				throw new Exception("Filename would be too long");
+//			}
+//			return ret;
+//		} catch (Exception e) {
+//			throw new StorageException("Could not create a valid filename for " + string, e);
+//		}
+//	}
+
+	// This one is safe for usernames of length <= 127, which is a limitation elsewhere
+	private static String safeFilenameFromString(String string) {
+		try {
+			String ret = encoder.encodeToString(string.getBytes(StandardCharsets.UTF_8));
+			if (ret.length() > MAX_FILENAMELENGTH) {
+				throw new Exception("Filename would be too long");
+			}
+			return ret;
+		} catch (Exception e) {
+			throw new StorageException("Could not create a valid filename for " + string, e);
 		}
 	}
 
