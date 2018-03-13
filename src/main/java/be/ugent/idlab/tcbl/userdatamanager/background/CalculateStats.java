@@ -27,6 +27,7 @@ public class CalculateStats implements TCBLUserProcessor {
 	@Scheduled(cron = "0 0 3 * * *")
 	//@Scheduled(cron = "0 * * * * *")
 	public void go() {
+		// TODO: sommige users zijn NIET op invitation day erin gestoken. Die van daarvoor tellen ook als "invited"
 		log.info("Calculating statistics");
 		stats = new Stats();
 		if (stats.exists()) {
