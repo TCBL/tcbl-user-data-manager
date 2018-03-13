@@ -37,10 +37,15 @@ public class Stats implements Serializable {
 				insertActive(Util.toCalendarPerDay(user.getActiveSince()));
 			}
 		} else {
-			newUsers++;
-			Calendar createdCalendar = Util.toCalendarPerDay(user.getCreated());
-			insertActive(createdCalendar);
-			insertSelfRegisteredUser(createdCalendar, user.getUserName());
+			/*Calendar created = new GregorianCalendar();
+			created.setTime(user.getCreated());
+			if (created.after(invitationDay)) {*/
+			if (user.getCreated() != null) {
+				newUsers++;
+				Calendar createdCalendar = Util.toCalendarPerDay(user.getCreated());
+				insertActive(createdCalendar);
+				insertSelfRegisteredUser(createdCalendar, user.getUserName());
+			}
 		}
 	}
 
