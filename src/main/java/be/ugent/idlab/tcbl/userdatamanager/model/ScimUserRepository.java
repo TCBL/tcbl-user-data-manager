@@ -158,6 +158,7 @@ public class ScimUserRepository {
 
 	public void processTCBLUsers(TCBLUserProcessor processor) throws Exception {
 		processScimUsers(scimUser -> {
+			log.debug("Processing user {}", scimUser.getUserName());
 
 			// fix passwordReset date
 			Meta meta = scimUser.getMeta();
