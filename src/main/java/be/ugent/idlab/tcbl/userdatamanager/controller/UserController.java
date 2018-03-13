@@ -48,27 +48,25 @@ public class UserController {
 	private final static Base64.Decoder decoder = Base64.getUrlDecoder();
 	private OAuth2AuthorizedClientService authorizedClientService;
 	private final MailChimper mailChimper;
-	private final ProfilePictureStorage profilePictureStorage;
+	private final PictureStorage pictureStorage;
+	private final static String profilePictureCategory = "pp";
 
 	@Value("${tudm.tcbl-privacy-url}")
 	private String privacyUrl;
 
 
 	/**
-	 * Creates a UserController; Spring injects the UserRepository.
-	 *
-	 * @param userRepository A repository where TCBLUsers are stored.
-	 * @param mail The background mail sender.
+	 * Creates a UserController; Spring injects the parameters.
 	 */
 	public UserController(UserRepository userRepository,
 						  Mail mail,
 						  OAuth2AuthorizedClientService authorizedClientService,
 						  MailChimper mailChimper,
-						  ProfilePictureStorage profilePictureStorage) {
+						  PictureStorage pictureStorage) {
 		this.userRepository = userRepository;
 		this.mail = mail;
 		this.authorizedClientService = authorizedClientService;
-		this.profilePictureStorage = profilePictureStorage;
+		this.pictureStorage = pictureStorage;
 		this.mailChimper = mailChimper;
 	}
 
@@ -143,8 +141,9 @@ public class UserController {
 							   TCBLUser user,
 							   @RequestParam("profilePictureFile") MultipartFile profilePictureFile) {
 		ConfirmationTemplate ct = new ConfirmationTemplate("Sign up for TCBL");
-
 		String profilePictureKey = null;
+		boolean profilePictureMustBeDeleted = true;
+
 		try {
 			TCBLUser oldUser;
 			try {
@@ -162,24 +161,29 @@ public class UserController {
 				}
 			}
 
-			String baseUri = getUriOneLevelUp(request);
 
-			profilePictureKey = profilePictureStorage.store(profilePictureFile, user.getUserName());
-			if (profilePictureKey == null) {
-				user.setPictureURL(null);
+			// The next key results in:
+			// - a valid filename (see Base64.getUrlEncoder() documentation: Table 2 of RFC 4648, Table 2 "URL and Filename Safe Alphabet")
+			// - and a pictureURL of length <= 255 characters
+			// for usernames of length <= 128 characters, which is already a limitation
+			profilePictureKey = encodeBase64(user.getUserName());
+			if (pictureStorage.store(profilePictureFile, profilePictureCategory, profilePictureKey)) {
+				String pictureBaseUri = getUriSomeLevelsUp(request, 2) + "/p" ;
+				user.setPictureURL(pictureBaseUri + "/" + profilePictureCategory + "/" + profilePictureKey);
 			} else {
-				user.setPictureURL(baseUri + "/picture/" + profilePictureKey);
+				user.setPictureURL(null);
 			}
 
 			TCBLUser newUser = userRepository.create(user);
 
+			String baseUri = getUriSomeLevelsUp(request, 1);
 			sendRegisterMessage(newUser, baseUri);
 			ct.setUtext(getEmailInformationText(user.getUserName()));
 			ct.addNavLink(new NavLink(NavLink.DisplayCondition.ALWAYS, "Try again", "/user/register"));
 			ct.setStatus(new Status(Status.Value.OK, "Please check your mailbox."));
 
 			// end well; avoid deletion here
-			profilePictureKey = null;
+			profilePictureMustBeDeleted = false;
 		} catch (UserAlreadyExistsException e) {
 			log.error("Cannot register user {}", user.getUserName(), e);
 			ct.setUtext("<p>User '" + user.getUserName() + "' was signed up earlier.</p>" +
@@ -199,6 +203,9 @@ public class UserController {
 					"<p>Please try again.</p>");
 			ct.addNavLink(new NavLink(NavLink.DisplayCondition.ALWAYS, "Try again", "/user/register"));
 			ct.setStatus(new Status(Status.Value.ERROR, "Could not save profile picture."));
+
+			// couldn't store anyway; avoid deletion here
+			profilePictureMustBeDeleted = false;
 		} catch (Exception e) {
 			log.error("Cannot register user {}", user.getUserName(), e);
 			ct.setUtext("<p>We could not complete sign up for TCBL at this moment.</p>" +
@@ -206,8 +213,12 @@ public class UserController {
 			ct.addNavLink(new NavLink(NavLink.DisplayCondition.ALWAYS, "Try again", "/user/register"));
 			ct.setStatus(new Status(Status.Value.ERROR, "Could not complete."));
 		} finally {
-			if (profilePictureKey != null) {
-				profilePictureStorage.delete(profilePictureKey);
+			if (profilePictureMustBeDeleted && profilePictureKey != null) {
+				try {
+					pictureStorage.delete(profilePictureCategory, profilePictureKey);
+				} catch (Exception e) {
+					// empty
+				}
 			}
 		}
 
@@ -258,7 +269,7 @@ public class UserController {
 		try {
 			TCBLUser user = userRepository.findByName(mail);
 			userExists = true;
-			String baseUri = getUriOneLevelUp(request);
+			String baseUri = getUriSomeLevelsUp(request, 1);
 			sendResetMessage(user, baseUri);
 			ct.setUtext(getEmailInformationText(mail) +
 					"<p>The link is only valid for <b>one hour</b>, starting now.</p>");
@@ -342,13 +353,6 @@ public class UserController {
 		return ct.getPreparedPath(model);
 	}
 
-	@GetMapping("/picture/{key:.+}")
-	@ResponseBody
-	public ResponseEntity<Resource> servePicture(@PathVariable String key) {
-		ProfilePictureStorage.LoadResult loadResult = profilePictureStorage.load(key);
-		return ResponseEntity.ok().contentType(loadResult.mediaType).body(loadResult.resource);
-	}
-
 	private ExchangeFilterFunction oauth2Credentials(OAuth2AuthorizedClient authorizedClient) {
 		return ExchangeFilterFunction.ofRequestProcessor(
 				clientRequest -> {
@@ -409,9 +413,12 @@ public class UserController {
 		mail.send(user.getUserName(), "Reset password for TCBL", text);
 	}
 
-	private String getUriOneLevelUp(final HttpServletRequest request) {
-		String reqUri = request.getRequestURL().toString();
-		return reqUri.substring(0, reqUri.lastIndexOf('/'));
+	private String getUriSomeLevelsUp(final HttpServletRequest request, int level) {
+		String ret = request.getRequestURL().toString();
+		for (int i = 0 ; i < level ; i++) {
+			ret = ret.substring(0, ret.lastIndexOf('/'));
+		}
+		return ret;
 	}
 
 	private String getEmailInformationText(String addressee) {

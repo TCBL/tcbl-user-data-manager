@@ -51,7 +51,8 @@ public class OAuth2LoginConfig {
 							"/user/resetpwform",
 							"/user/resetpwform/*",
 							"/user/passwordset",
-							"/user/picture/*",
+							// mappings under /p
+							"/p/**",
 							// mappings under /stats
 							"/stats/users"
 							// mappings under /rest

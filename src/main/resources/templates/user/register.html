@@ -13,16 +13,16 @@
 					<legend>Login details</legend>
 					<div class="row">
 						<div class="columns large-3">
-							<label for="userName">E-mail</label>
-							<input type="email" name="userName" id="userName" th:field="*{userName}" required/>
+							<label for="userName">E-mail *</label>
+							<input type="email" name="userName" id="userName" th:field="*{userName}" maxlength="128" required/>
 						</div>
 						<div class="columns large-3">
-							<label for="password">Password</label>
-							<input type="password" name="password" id="password" th:field="*{password}" autocomplete="off" required/>
+							<label for="password">Password *</label>
+							<input type="password" name="password" id="password" th:field="*{password}" autocomplete="off" maxlength="255" required/>
 						</div>
 						<div class="columns large-3">
-							<label for="cpassword">Confirm Password</label>
-							<input type="password" name="cpassword" id="cpassword" autocomplete="off" value="" required/>
+							<label for="cpassword">Confirm Password *</label>
+							<input type="password" name="cpassword" id="cpassword" autocomplete="off" value="" maxlength="255" required/>
 						</div>
 					</div>
 				</fieldset>
@@ -31,12 +31,12 @@
 					<legend>Profile information</legend>
 					<div class="row">
 						<div class="columns large-2">
-							<label for="firstName">First name</label>
-							<input type="text" name="firstName" id="firstName" th:field="*{firstName}" required/>
+							<label for="firstName">First name *</label>
+							<input type="text" name="firstName" id="firstName" th:field="*{firstName}" maxlength="255" required/>
 						</div>
 						<div class="columns large-2">
-							<label for="lastName">Last name</label>
-							<input type="text" name="lastName" id="lastName" th:field="*{lastName}" required/>
+							<label for="lastName">Last name *</label>
+							<input type="text" name="lastName" id="lastName" th:field="*{lastName}" maxlength="255" required/>
 						</div>
 					</div>
 					<div class="row">
@@ -72,7 +72,7 @@
 						<div class="columns large-1">
 							<input type="checkbox" th:field="*{acceptedPP}" required/>
 							<label class="label--checkbox" th:for="${#ids.prev('acceptedPP')}">I accept</label>
-							<label class="label--checkbox"><a target="_blank" th:href="${privacyUrl}" class="normal">the TCBL privacy policy</a>.</label>
+							<label class="label--checkbox"><a target="_blank" th:href="${privacyUrl}" class="normal">the TCBL privacy policy</a>. *</label>
 						</div>
 					</div>
 				</fieldset>
