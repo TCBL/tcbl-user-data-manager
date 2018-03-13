@@ -95,7 +95,7 @@ public class ScimUserRepository {
 		if (scimUser.getUserName() == null) {
 			scimUser.setUserName(tcblUser.getUserName());
 		}
-		if (scimUser.getPassword().isEmpty()) {
+		if (scimUser.getPassword().isEmpty() && tcblUser.getPassword() != null) {
 			scimUser.setPassword(tcblUser.getPassword());
 		}
 		if (scimUser.getEmails().isEmpty()) {
@@ -117,7 +117,11 @@ public class ScimUserRepository {
 				.setField(ScimExtensionAttributes.acceptedField.getValue(), Boolean.toString(tcblUser.isAcceptedPP()))
 				.setField(ScimExtensionAttributes.pictureField.getValue(), pictureURL)
 				.build();
-		scimUser.setExtensions(new SingletonMap(ScimExtensionAttributes.urn.getValue(), extension));
+		if (scimUser.isExtensionPresent(ScimExtensionAttributes.urn.getValue())) {
+			scimUser.setExtensions(new SingletonMap(ScimExtensionAttributes.urn.getValue(), extension));
+		} else {
+			scimUser.addExtension(extension);
+		}
 	}
 
 	public void deleteTCBLUser(final TCBLUser user) throws Exception {
