@@ -25,9 +25,17 @@ the other templates.
 	<!--*/-->
 	<script>
 		$(document).ready(function (e) {
-			$("#profilePictureAdd").show();
-			$("#profilePictureChange").hide();
-			$("#profilePictureDelete").hide();
+			if ($("#profilePictureLayer").length) {
+				if ($.trim($("#profilePictureLayer").html())) {
+					$("#profilePictureAdd").hide();
+					$("#profilePictureChange").show();
+					$("#profilePictureDelete").show();
+				} else {
+					$("#profilePictureAdd").show();
+					$("#profilePictureChange").hide();
+					$("#profilePictureDelete").hide();
+				}
+			}
 		});
 	</script>
 </head>
@@ -188,8 +196,7 @@ the other templates.
 
 				reader.onload = function (e) {
 					$("#profilePictureLayer").html('<img src="' + e.target.result + '" class="profilePicturePreview" />');
-					$("#profilePictureLayer").css('opacity', '0.7');
-					$(".icon--choose-image").css('opacity', '0.5');
+					$("#profilePictureLayer").css('opacity', '0.5');
 					$("#profilePictureAdd").hide();
 					$("#profilePictureChange").show();
 					$("#profilePictureDelete").show();

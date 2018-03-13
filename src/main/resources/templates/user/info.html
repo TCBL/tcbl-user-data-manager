@@ -7,17 +7,42 @@
 	<h1>Manage your profile</h1>
 	<main>
 		<th:block th:if="${tcblUser} != null">
-			<form action="#" th:action="@{/user/update}" th:object="${tcblUser}" method="post">
+			<form action="#" th:action="@{/user/update}" th:object="${tcblUser}" enctype="multipart/form-data" method="post">
 				<fieldset>
 					<legend>Your profile information</legend>
 					<div class="row">
 						<div class="columns large-2">
 							<label for="firstName">First name</label>
-							<input type="text" name="firstName" id="firstName" th:field="*{firstName}" required/>
+							<input type="text" name="firstName" id="firstName" th:field="*{firstName}" maxlength="255" required/>
 						</div>
 						<div class="columns large-2">
 							<label for="lastName">Last name</label>
-							<input type="text" name="lastName" id="lastName" th:field="*{lastName}" required/>
+							<input type="text" name="lastName" id="lastName" th:field="*{lastName}" maxlength="255" required/>
+						</div>
+					</div>
+					<div class="row">
+						<div class="columns large-2">
+							<fieldset class="fieldset--inner">
+								<legend>Picture</legend>
+								<div class="columns">
+									<!--/* inspired on https://phppot.com/jquery/jquery-ajax-image-upload/ */-->
+									<div id="profilePictureOuter">
+										<div id="profilePictureLayer">
+											<img th:if="${tcblUser.pictureURL != null}" th:src="*{pictureURL}" class="profilePicturePreview" />
+										</div>
+										<div class="icon--choose-image">
+											<input type="file" class="input--choose-image" name="profilePictureFile" id="profilePictureFile" accept="image/jpeg,image/png" onchange="updateProfilePicture(this);">
+										</div>
+									</div>
+								</div>
+								<div class="columns">
+									<div>
+										<input type="button" class="button button--nav" name="profilePictureAdd" id="profilePictureAdd" value="Add" onclick="clickProfilePictureFile();" />
+										<input type="button" class="button button--nav" name="profilePictureChange" id="profilePictureChange" value="Change" onclick="clickProfilePictureFile();" />
+										<input type="button" class="button button--nav" name="profilePictureDelete" id="profilePictureDelete" value="Delete" onclick="deleteProfilePictureFile();"/>
+									</div>
+								</div>
+							</fieldset>
 						</div>
 					</div>
 					<div class="row">
@@ -44,5 +69,6 @@
 		</th:block>
 	</main>
 </div>
+<script th:replace="fragments :: updateProfilePicture"></script>
 </body>
 </html>

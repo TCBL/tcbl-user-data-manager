@@ -111,8 +111,14 @@ public class UserController {
 	}
 
 	@PostMapping("/update")
-	public String update (TCBLUser user, Model model) {
+	public String update (HttpServletRequest request,
+						  Model model,
+						  TCBLUser user,
+						  @RequestParam("profilePictureFile") MultipartFile profilePictureFile) {
 		try {
+			String profilePictureKey = getProfilePictureKey(user.getUserName());
+			storeProfilePicture(request, profilePictureFile, profilePictureKey, user);
+
 			userRepository.save(user);
 			model.addAttribute("tcblUser", user);
 			model.addAttribute("status", new Status(Status.Value.OK, "Your information is updated."));
@@ -161,18 +167,8 @@ public class UserController {
 				}
 			}
 
-
-			// The next key results in:
-			// - a valid filename (see Base64.getUrlEncoder() documentation: Table 2 of RFC 4648, Table 2 "URL and Filename Safe Alphabet")
-			// - and a pictureURL of length <= 255 characters
-			// for usernames of length <= 128 characters, which is already a limitation
-			profilePictureKey = encodeBase64(user.getUserName());
-			if (pictureStorage.store(profilePictureFile, profilePictureCategory, profilePictureKey)) {
-				String pictureBaseUri = getUriSomeLevelsUp(request, 2) + "/p" ;
-				user.setPictureURL(pictureBaseUri + "/" + profilePictureCategory + "/" + profilePictureKey);
-			} else {
-				user.setPictureURL(null);
-			}
+			profilePictureKey = getProfilePictureKey(user.getUserName());
+			storeProfilePicture(request, profilePictureFile, profilePictureKey, user);
 
 			TCBLUser newUser = userRepository.create(user);
 
@@ -425,6 +421,26 @@ public class UserController {
 		return	String.format("<p>We've sent an email with further instructions to <b>%s</b>.</p>", addressee) +
 				"<p>If you don't find the email within a few minutes, check your spam folder too before retrying.</p>" +
 				"<p>When you follow the link in the email, a new browser tab will open. You can close this browser tab at that time.</p>";
+	}
+
+	private String getProfilePictureKey(String username) {
+		// The next key results in:
+		// - a valid filename (see Base64.getUrlEncoder() documentation: Table 2 of RFC 4648, Table 2 "URL and Filename Safe Alphabet")
+		// - and a pictureURL of length <= 255 characters
+		// for usernames of length <= 128 characters, which is already a limitation
+		return encodeBase64(username);
+	}
+
+	private void storeProfilePicture(HttpServletRequest request,
+									 MultipartFile profilePictureFile,
+									 String profilePictureKey,
+									 TCBLUser user /* updated */) {
+		if (pictureStorage.store(profilePictureFile, profilePictureCategory, profilePictureKey)) {
+			String pictureBaseUri = getUriSomeLevelsUp(request, 2) + "/p" ;
+			user.setPictureURL(pictureBaseUri + "/" + profilePictureCategory + "/" + profilePictureKey);
+		} else {
+			user.setPictureURL(null);
+		}
 	}
 
 }
