@@ -75,20 +75,22 @@ public class MailChimper {
 	}
 
 	private void send(final RequestBodyEntity request) {
-		send(request, 10);
+		send(request, 42);
 	}
 
 	private void send(final RequestBodyEntity request, int nrRetry) {
 		try {
 			HttpResponse<JsonNode> response = request.asJson();
 			if (response.getStatus() != 200) {
-				log.error("Error sending request to MailChimp API: {}. Trying again in 10 minutes {}", response.getStatusText());
-			} else return;
+				log.error("Error sending request to MailChimp API: {}. Trying again in 30 minutes {}", response.getStatusText());
+			} else {
+				return;
+			}
 		} catch (UnirestException e) {
-			log.error("Error sending request to MailChimp API. Trying again in 10 minutes", e);
+			log.error("Error sending request to MailChimp API. Trying again in 30 minutes", e);
 		}
 		try {
-			Thread.sleep(10 * 60 * 1000);
+			Thread.sleep(30 * 60 * 1000);
 			if (nrRetry > 0) {
 				log.warn("Retrying update user request to MailChimp. {} attempts left.", nrRetry - 1);
 				send(request, nrRetry - 1);
