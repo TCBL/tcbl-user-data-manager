@@ -176,6 +176,10 @@ the other templates.
 		$("#profilePictureFile").click();
 	}
 
+	function resetProfilePicture() {
+		$('input[name="pictureURL"]').val("");
+	}
+
 	function deleteProfilePictureFile() {
 		var $el = $("#profilePictureFile");
 		$el.wrap('<form>').closest('form').get(0).reset();
@@ -184,6 +188,7 @@ the other templates.
 		$("#profilePictureAdd").show();
 		$("#profilePictureChange").hide();
 		$("#profilePictureDelete").hide();
+		resetProfilePicture();
 	}
 
 	function updateProfilePicture(input) {
@@ -200,6 +205,7 @@ the other templates.
 					$("#profilePictureAdd").hide();
 					$("#profilePictureChange").show();
 					$("#profilePictureDelete").show();
+					resetProfilePicture();
 				};
 
 				reader.readAsDataURL(input.files[0]);

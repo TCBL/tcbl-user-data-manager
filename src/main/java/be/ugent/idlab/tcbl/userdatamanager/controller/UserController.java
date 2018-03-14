@@ -116,9 +116,15 @@ public class UserController {
 						  TCBLUser user,
 						  @RequestParam("profilePictureFile") MultipartFile profilePictureFile) {
 		try {
-			String profilePictureKey = getProfilePictureKey(user.getUserName());
-			storeProfilePicture(request, profilePictureFile, profilePictureKey, user);
-
+			// next test avoid deletion of previous picture, if available
+			// user.getPictureURL
+			// - null: no previous picture
+			// - empty: picture was modified in the frontend now (see Javascript)
+			// - not empty: previous picture not modified
+			if (user.getPictureURL() == null || user.getPictureURL().isEmpty()) {
+				String profilePictureKey = getProfilePictureKey(user.getUserName());
+				storeProfilePicture(request, profilePictureFile, profilePictureKey, user);
+			}
 			userRepository.save(user);
 			model.addAttribute("tcblUser", user);
 			model.addAttribute("status", new Status(Status.Value.OK, "Your information is updated."));
