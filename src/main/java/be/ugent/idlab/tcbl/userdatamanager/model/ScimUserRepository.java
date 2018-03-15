@@ -189,14 +189,14 @@ public class ScimUserRepository {
 			boolean acceptedPP;
 			if (!scimUser.isExtensionPresent(ScimExtensionAttributes.urn.getValue())) {
 				pictureURL = null;
-				subscribedNL = true;
-				acceptedPP = true;
+				subscribedNL = false;
+				acceptedPP = false;
 				Extension extension = new Extension.Builder(ScimExtensionAttributes.urn.getValue())
-						.setField(ScimExtensionAttributes.subscribedField.getValue(), "true")
-						.setField(ScimExtensionAttributes.acceptedField.getValue(), "true")
+						.setField(ScimExtensionAttributes.subscribedField.getValue(), Boolean.toString(subscribedNL))
+						.setField(ScimExtensionAttributes.acceptedField.getValue(), Boolean.toString(acceptedPP))
 						.setField(ScimExtensionAttributes.pictureField.getValue(), "_")
 						.build();
-				scimUser.setExtensions(new SingletonMap(ScimExtensionAttributes.urn.getValue(), extension));
+				scimUser.addExtension(extension);
 
 				scimUser.setPassword("");
 				try {
