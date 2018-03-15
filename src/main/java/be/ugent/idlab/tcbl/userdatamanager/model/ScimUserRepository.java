@@ -14,7 +14,6 @@ import org.springframework.boot.context.properties.bind.Binder;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
 import java.util.*;
 
 import static be.ugent.idlab.tcbl.userdatamanager.model.Util.invitationDay;
@@ -191,6 +190,10 @@ public class ScimUserRepository {
 				pictureURL = null;
 				subscribedNL = false;
 				acceptedPP = false;
+				/*
+				Commented out because we defined no values as "not initialised", meaning the user did not
+				(ub)subscribe or accepted any privacy policy. This affects the "invited" users.
+
 				Extension extension = new Extension.Builder(ScimExtensionAttributes.urn.getValue())
 						.setField(ScimExtensionAttributes.subscribedField.getValue(), Boolean.toString(subscribedNL))
 						.setField(ScimExtensionAttributes.acceptedField.getValue(), Boolean.toString(acceptedPP))
@@ -203,7 +206,7 @@ public class ScimUserRepository {
 					client.updateUser(scimUser, scimUser.getId(), new String[0]);
 				} catch (IOException e) {
 					log.error("Updating SCIM user failed!", e);
-				}
+				}*/
 			} else {
 				Extension extension = scimUser.getExtension(ScimExtensionAttributes.urn.getValue());
 				subscribedNL = Boolean.parseBoolean(extension.getFieldAsString(ScimExtensionAttributes.subscribedField.getValue()));
