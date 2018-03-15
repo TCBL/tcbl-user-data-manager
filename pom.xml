@@ -36,7 +36,6 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-                <!--version>1.5.4.RELEASE</version-->
             </plugin>
 
             <plugin>
@@ -99,16 +98,6 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.springframework.boot</groupId>
-                    <artifactId>spring-boot-starter-logging</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-log4j2</artifactId>
         </dependency>
 
         <!-- Spring Security offers a security framework so we don't need to write too much code -->
@@ -179,15 +168,36 @@
             <artifactId>SCIM-Client</artifactId>
             <version>${scim.client.version}</version>
             <exclusions>
+                <!--
+                Log4j is completely replaced by log4j-over-slf4j (see below), because Spring Boot (and any recent app) uses slf4j.
+                You will see "log4j:WARN No appenders could be found for logger (org.xdi.oxauth.model.util.JwtUtil)", but this can safely be ignored.
+                Logging config is translated into logback.xml.
+                -->
                 <exclusion>
                     <groupId>org.slf4j</groupId>
                     <artifactId>slf4j-log4j12</artifactId>
                 </exclusion>
                 <exclusion>
-                    <groupId>log4j</groupId>
-                    <artifactId>log4j</artifactId>
+                    <groupId>org.apache.logging.log4j</groupId>
+                    <artifactId>log4j-api</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.logging.log4j</groupId>
+                    <artifactId>log4j-1.2-api</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.logging.log4j</groupId>
+                    <artifactId>log4j-core</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+
+        <!-- A Log4j replacement, that logs to slf4j. We need this to let the SCIM client still use it's hardcoded log4j statements. -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>log4j-over-slf4j</artifactId>
+            <version>1.7.25</version>
+            <scope>runtime</scope>
         </dependency>
 
         <!-- testing -->
