@@ -9,7 +9,13 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.core.env.Environment;
 import org.springframework.lang.Nullable;
+import org.springframework.scheduling.TaskScheduler;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.concurrent.ConcurrentTaskScheduler;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+
+import java.util.concurrent.Executor;
 
 /**
  * <p>Copyright 2017 IDLab (Ghent University - imec)</p>
@@ -18,6 +24,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
  */
 @SpringBootApplication
 @EnableScheduling
+@EnableAsync
 public class TCBLUserDataManager {
 	private final UserRepository userRepository;
 
@@ -44,6 +51,21 @@ public class TCBLUserDataManager {
 				}
 			}
 		};
+	}
+
+	// see https://spring.io/guides/gs/async-method/ and
+	// https://stackoverflow.com/questions/30431776/using-scheduled-and-enablescheduling-but-gives-nosuchbeandefinitionexception#30913795 to explain
+	// the next 2 beans
+	@Bean
+	public Executor asyncExecutor() {
+		ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+		executor.initialize();
+		return executor;
+	}
+
+	@Bean
+	public TaskScheduler taskScheduler() {
+		return new ConcurrentTaskScheduler();
 	}
 
 	public static void main(String[] args) {
