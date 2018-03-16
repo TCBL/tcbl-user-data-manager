@@ -9,17 +9,27 @@
 		<main>
 			<form action="#" th:action="@{/user/resetpwform}" method="post" name="regForm"
 				  onsubmit="return validatePassword()">
-				<div class="row">
-					<div class="columns large-3">
-						<label for="password">New password</label>
-						<input type="password" name="password" id="password" autocomplete="off" required/>
+				<fieldset>
+					<legend>Reset password</legend>
+					<div class="row">
+						<div class="columns large-3">
+							<label for="password">New password</label>
+							<input type="password" name="password" id="password" autocomplete="off" required/>
+						</div>
+						<div class="columns large-3">
+							<label for="cpassword">Confirm new password</label>
+							<input type="password" name="cpassword" id="cpassword" autocomplete="off" required/>
+						</div>
+						<input type="hidden" th:value="${rpc}" name="rpc" id="rpc"/>
 					</div>
-					<div class="columns large-3">
-						<label for="cpassword">Confirm new password</label>
-						<input type="password" name="cpassword" id="cpassword" autocomplete="off" required/>
+					<div class="row" th:if="${ppwa != 'true'}">
+						<div class="columns large-2">
+							<input type="checkbox" name="acceptedPP" id="acceptedPP" required/>
+							<label class="label--checkbox" for="acceptedPP">I accept</label>
+							<label class="label--checkbox"><a target="_blank" th:href="${privacyUrl}" class="normal">the TCBL privacy policy</a>.</label>
+						</div>
 					</div>
-					<input type="hidden" th:value="${rpc}" name="rpc" id="rpc"/>
-				</div>
+				</fieldset>
 				<input type="submit" value="Set password" class="button button--red"/>
 			</form>
 		</main>
