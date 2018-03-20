@@ -191,8 +191,9 @@ public class ScimUserRepository {
 				subscribedNL = false;
 				acceptedPP = false;
 				/*
-				Commented out because we defined no values as "not initialised", meaning the user did not
-				(ub)subscribe or accepted any privacy policy. This affects the "invited" users.
+				Commented out because we defined no values as "not initialised", meaning the user did not ever
+				(un)subscribe or accept the privacy policy or added a profile picture. This affects the users in the system
+				that were already there before our first deploy including these new fields (2018-03-13).
 
 				Extension extension = new Extension.Builder(ScimExtensionAttributes.urn.getValue())
 						.setField(ScimExtensionAttributes.subscribedField.getValue(), Boolean.toString(subscribedNL))

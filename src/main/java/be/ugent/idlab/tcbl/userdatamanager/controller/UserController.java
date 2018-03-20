@@ -25,9 +25,7 @@ import reactor.core.publisher.Mono;
 
 import javax.servlet.http.HttpServletRequest;
 import java.nio.charset.StandardCharsets;
-import java.util.Base64;
-import java.util.Date;
-import java.util.Map;
+import java.util.*;
 
 /**
  * <p>Copyright 2017 IDLab (Ghent University - imec)</p>
@@ -303,13 +301,17 @@ public class UserController {
 	public String resetPasswordForm(Model model, @PathVariable String rpc) {
 		boolean expired = false;
 		try {
-			String userId = decodeIdForPassword(rpc, 3600000);
-			if (userId == null) {
+			String inum = decodeIdForPassword(rpc, 3600000);
+			if (inum == null) {
 				expired = true;
 				throw new Exception("NavLink expired.");
 			}
-			String encodedId = encodeBase64(userId);
+			String encodedId = encodeBase64(inum);
 			model.addAttribute("rpc", encodedId);
+
+			TCBLUser user = userRepository.find(inum);
+			String acceptedPP = Boolean.toString(user.isAcceptedPP());
+			model.addAttribute("ppwa", acceptedPP);
 
 			return "user/resetpwform";
 		} catch (Exception e) {
@@ -343,6 +345,8 @@ public class UserController {
 			TCBLUser user = userRepository.find(inum);
 			user.setPassword(password);
 			user.setPasswordReset(new Date());
+			// If the user hadn't accepted the PP earlier, he will have done it now in user/resetpwform
+			user.setAcceptedPP(true);
 			userRepository.save(user);
 			ct.setUtext("<p>You've successfully updated your password!</p>");
 			ct.setStatus(new Status(Status.Value.OK, "Password updated."));
