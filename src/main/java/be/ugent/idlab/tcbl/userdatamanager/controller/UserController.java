@@ -10,9 +10,7 @@ import be.ugent.idlab.tcbl.userdatamanager.model.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
@@ -86,20 +84,25 @@ public class UserController {
 	@GetMapping("/info")
 	public String userinfo(Model model, OAuth2AuthenticationToken authentication) {
 		try {
-			OAuth2AuthorizedClient authorizedClient = authorizedClientService.loadAuthorizedClient(authentication.getAuthorizedClientRegistrationId(), authentication.getName());
-			String userInfoEndpointUri = authorizedClient.getClientRegistration().getProviderDetails().getUserInfoEndpoint().getUri();
-
-
-			//WebClient webClient = WebClient.create(authentication.getClientRegistration().getProviderDetails().getUserInfoUri());
-			Map userAttributes = WebClient.builder()
-					.filter(oauth2Credentials(authorizedClient))
-					.build()
-					.get()
-					.uri(userInfoEndpointUri)
-					.retrieve()
-					.bodyToMono(Map.class)
-					.block();
-			String id = userAttributes.get("inum").toString();
+			Object idObj = authentication.getDetails();
+			String id;
+			if (idObj == null) {
+				// perform a userinfo request to get the user ID (inum)
+				OAuth2AuthorizedClient authorizedClient = authorizedClientService.loadAuthorizedClient(authentication.getAuthorizedClientRegistrationId(), authentication.getName());
+				String userInfoEndpointUri = authorizedClient.getClientRegistration().getProviderDetails().getUserInfoEndpoint().getUri();
+				Map userAttributes = WebClient.builder()
+						.filter(oauth2Credentials(authorizedClient))
+						.build()
+						.get()
+						.uri(userInfoEndpointUri)
+						.retrieve()
+						.bodyToMono(Map.class)
+						.block();
+				id = userAttributes.get("inum").toString();
+				authentication.setDetails(id);
+			} else {
+				id = idObj.toString();
+			}
 			TCBLUser tcblUser = userRepository.find(id);
 			// note: if no user found, tcblUser is null, and this is covered nicely by the view
 			model.addAttribute("tcblUser", tcblUser);
@@ -259,7 +262,7 @@ public class UserController {
 	}
 
 	@GetMapping("/resetpw")
-	public String getResetPassword(Model model) {
+	public String getResetPassword() {
 		return "user/resetpw";
 	}
 
