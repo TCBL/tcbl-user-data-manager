@@ -1,12 +1,11 @@
 package be.ugent.idlab.tcbl.userdatamanager.model;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-
-import java.io.*;
+import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
+
+import static be.ugent.idlab.tcbl.userdatamanager.model.Util.invitationDay;
 
 /**
  * <p>Copyright 2017 IDLab (Ghent University - imec)</p>
@@ -18,13 +17,10 @@ public class Stats implements Serializable {
 	public int invited = 0;	// number of invited (pre-registered) users
 	public int invitedActive = 0;	// number of invited users that never signed in
 	public int newUsers = 0;	// number of users that registered themselves
+	public int testUsers = 0;
 	private Map<Long, Integer> activeAtTime = new TreeMap<>();
-
 	private Map<Long, List<String>> selfRegisteredUsers = new TreeMap<>();
 
-	
-	private final long now = new Date().getTime();
-	private transient static Gson gson = new GsonBuilder().setDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz").create();
 	private transient static DateFormat dateFormat = new SimpleDateFormat("YYYY-LL-dd");
 
 
@@ -37,14 +33,15 @@ public class Stats implements Serializable {
 				insertActive(Util.toCalendarPerDay(user.getActiveSince()));
 			}
 		} else {
-			/*Calendar created = new GregorianCalendar();
-			created.setTime(user.getCreated());
-			if (created.after(invitationDay)) {*/
 			if (user.getCreated() != null) {
-				newUsers++;
 				Calendar createdCalendar = Util.toCalendarPerDay(user.getCreated());
-				insertActive(createdCalendar);
-				insertSelfRegisteredUser(createdCalendar, user.getUserName());
+				if (createdCalendar.after(invitationDay)) {
+					newUsers++;
+					insertActive(createdCalendar);
+					insertSelfRegisteredUser(createdCalendar, user.getUserName());
+				} else {
+					testUsers++;
+				}
 			}
 		}
 	}
@@ -65,33 +62,6 @@ public class Stats implements Serializable {
 		userList.add(user);
 	}
 
-	public void toFile() throws IOException {
-		File file = new File("/tmp", "usermanager_stats_" + dateFormat.format(new Date(now)) + ".json");
-		try (Writer out = new FileWriter(file)) {
-			gson.toJson(this, out);
-		}
-	}
-
-	public boolean exists() {
-		File file = new File("/tmp", "usermanager_stats_" + dateFormat.format(new Date(now))+ ".json");
-		return file.exists();
-	}
-
-	public static Stats fromLatestFile() throws FileNotFoundException {
-		File tmp = new File("/tmp");
-		File[] possibleFiles = tmp.listFiles((dir, fileName) -> fileName.startsWith("usermanager_stats_"));
-		if (possibleFiles != null && possibleFiles.length > 0) {
-			Arrays.sort(possibleFiles);
-			File file = possibleFiles[possibleFiles.length - 1];
-			if (file.exists()) {
-				return gson.fromJson(new FileReader(file), Stats.class);
-			} else {
-				return null;
-			}
-		}
-		return null;
-	}
-
 	public Map<Long, List<String>> getSelfRegisteredUsers() {
 		return selfRegisteredUsers;
 	}
@@ -108,8 +78,7 @@ public class Stats implements Serializable {
 	}
 
 	public Integer[] getActiveValues() {
-		List<Integer> values = new ArrayList<>();
-		values.addAll(activeAtTime.values());
+		List<Integer> values = new ArrayList<>(activeAtTime.values());
 		return values.toArray(new Integer[values.size()]);
 	}
 

@@ -26,21 +26,10 @@ public class StatController {
 
 	@GetMapping("/users")
 	public String activeUsers(Model model) {
-
-			// TODO: sommige users zijn NIET op invitation day erin gestoken. Die van daarvoor tellen ook als "invited"
 		final Stats stats = new Stats();
-		log.info("Calculating statistics");
-		if (stats.exists()) {
-			log.info("Stats already calculated. Skipping");
-		} else {
-			try {
-				userRepository.processTCBLUsers(stats::add);
-				stats.toFile();
-			} catch (Exception e) {
-				log.warn("Calculating statistics went wrong. ", e);
-			}
-		}
-		log.info("calculating statistics done.");
+		log.debug("Calculating statistics");
+		userRepository.processTCBLUsers(stats::add);
+		log.debug("calculating statistics done.");
 		model.addAttribute("totalCount", stats.totalCount);
 		model.addAttribute("invited", stats.invited);
 		model.addAttribute("invitedActive", stats.invitedActive);
@@ -48,9 +37,7 @@ public class StatController {
 		model.addAttribute("dates", stats.getLabels());
 		model.addAttribute("active", stats.getActiveValues());
 		model.addAttribute("totalActive", stats.getTotalActiveValues());
-		//model.addAttribute("invitedActive", stats.getInvitedActive());
-
+		model.addAttribute("testUsers", stats.testUsers);
 		return "stats/users";
 	}
-
 }

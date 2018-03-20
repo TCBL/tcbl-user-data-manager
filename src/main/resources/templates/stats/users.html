@@ -12,6 +12,8 @@
                 <tr><td>Invited:</td><td th:text="${invited}"></td> </tr>
                 <tr><td>Active (invited):</td><td th:text="${invitedActive}"></td> </tr>
                 <tr><td>Active (self-registered):</td><td th:text="${newUsers}"></td> </tr>
+                <tr><td>test or legacy users:</td><td th:text="${testUsers}"></td> </tr>
+
             </table>
         </div>
         <div th:unless="${totalCount} != null">
