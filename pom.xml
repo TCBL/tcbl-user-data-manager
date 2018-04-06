@@ -12,12 +12,12 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.0.0.RELEASE</version>
+        <version>2.0.1.RELEASE</version>
     </parent>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <spring.security.version>5.0.3.RELEASE</spring.security.version>
+        <spring.security.version>5.0.4.RELEASE</spring.security.version>
         <scim.client.version>3.0.2</scim.client.version>             <!-- Must be the same as the Gluu server version -->
         <java.version>1.8</java.version>
     </properties>
@@ -47,16 +47,6 @@
     </build>
 
     <repositories>
-        <!-- Needed to use Spring Milestone releases -->
-        <repository>
-            <id>spring-milestones</id>
-            <name>Spring Milestones</name>
-            <url>https://repo.spring.io/libs-milestone</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-
         <!-- Gluu software repo -->
         <repository>
             <id>gluu</id>
@@ -64,14 +54,6 @@
             <url>http://ox.gluu.org/maven</url>
         </repository>
     </repositories>
-
-    <pluginRepositories>
-        <pluginRepository>
-            <id>spring-milestones</id>
-            <url>http://repo.spring.io/milestone</url>
-        </pluginRepository>
-    </pluginRepositories>
-
     <dependencies>
 
         <!-- Spring Boot, to minimalise and ease configuration -->
