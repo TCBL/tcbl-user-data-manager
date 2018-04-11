@@ -407,19 +407,28 @@ public class UserController {
 	 */
 	private void sendRegisterMessage(final TCBLUser user, final String baseUri) {
 		String encodedId = encodeBase64(user.getInum());
-		String text = "<p>Thank you for becoming a TCBL member. Click <a href=\""
-				+ baseUri + "/confirm/" + encodedId
-				+ "\">here</a> to activate your account.</p>";
-		mail.send(user.getUserName(), "Registration TCBL", text);
+		String text = String.format("<p>Dear %s %s,</p>\n" +
+				"<p>Thank you for your interest in joining the TCBL Community.</p>\n" +
+				"<p>There is just <b>one more step required</b> before you can access the numerous advantages of being part of TCBL.</p>\n" +
+				"<p>This is it: please simply <b><a href=\"%s/confirm/%s\">click here to activate your account</a></b>.\n" +
+				"<p>Once you've confirmed your registration, you'll open up a growing world of features such as:</p>\n" +
+				"<p><ul>\n" +
+				"<li>Participating in the discussion on the <a href=\"https://tcbl.eu\">tcbl.eu</a> website forum and comments features</li>\n" +
+				"<li>Access to a range of free <b>on-line Business Services that can help T&amp;C companies</b> effectively deploy new business model concepts</li>\n" +
+				"<li>Full and safe management of your data</li>\n" +
+				"</ul></p>\n" +
+				"<p>For any questions about TCBL, let us know at <a href=\"mailto:tcbl@comune.prato.it\">tcbl@comune.prato.it</a>.</p>",
+				user.getFirstName(), user.getLastName(), baseUri, encodedId);
+		mail.send(user.getUserName(), "TCBL single sign on registration confirmation - action required to activate your account", text);
 	}
 
 	private void sendResetMessage(final TCBLUser user, final String baseUri) {
 		String passwordResetCode = generateResetPasswordCode(user.getInum());
-		String text = "<p>You receive this mail because you want to reset your TCBL password. Click <a href=\""
+		String text = "<p>You receive this mail because you requested to reset your TCBL password. Click <a href=\""
 				+ baseUri + "/resetpwform/" + passwordResetCode
 				+ "\">here</a> to do so.</p>" +
-				"<p>If you didn't request to reset your password, you can just ignore this e-mail.</p>";
-		mail.send(user.getUserName(), "Reset password for TCBL", text);
+				"<p>If you didn't request to reset your TCBL password, simply ignore this mail and your password will remain as is.</p>";
+		mail.send(user.getUserName(), "TCBL single sign on reset password - action required to obtain a new password", text);
 	}
 
 	private String getUriSomeLevelsUp(final HttpServletRequest request, int level) {
