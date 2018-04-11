@@ -38,6 +38,11 @@ server:
     # e.g. https://myserver.example.com/usermanager/...
     context-path: /usermanager
 
+	# This prevents servlet sessions to time-out after 30 minutes (which can give annoying and unclear error messages).
+	session:
+	  # One day should be enough
+      timeout: 86400
+
 ##
 # Logging settings
 # See https://www.slf4j.org/
