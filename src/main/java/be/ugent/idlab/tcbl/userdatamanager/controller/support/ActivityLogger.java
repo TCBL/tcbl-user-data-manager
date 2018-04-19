@@ -1,14 +1,16 @@
 package be.ugent.idlab.tcbl.userdatamanager.controller.support;
 
 import com.google.gson.Gson;
+import com.google.gson.annotations.SerializedName;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
-import com.mashape.unirest.request.body.RequestBodyEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.env.Environment;
+import org.springframework.http.HttpStatus;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 /**
@@ -41,32 +43,41 @@ public class ActivityLogger {
 		this.enabled = enabled;
 	}
 
+	@Async
 	public void log(String userName, ActivityLoggingType logType) {
 		String body = gson.toJson(new ActivityLoggingRecord(userName, logType.getValue()));
+		send(body);
+	}
+
+	private void send(String body) {
 		if (enabled) {
-			log.debug("Activity logging - sending: " + body);
-			RequestBodyEntity request = Unirest.post(endpoint)
-					.body(body);
-			send(request);
+			log.debug("Activity logging - start sending: " + body);
+			try {
+				HttpResponse<JsonNode> response = Unirest.post(endpoint)
+						.header("authorization", "Bearer " + jwtKey)
+						.header("content-type", "application/json")
+						.body(body)
+						.asJson();
+				int statusCode = response.getStatus();
+				String statusText = response.getStatusText();
+				if (statusCode == HttpStatus.OK.value()) {
+					log.debug("Activity logging - sending done.");
+				} else {
+					log.error("Activity logging - sending ended with: %d, %s.", statusCode, statusText);
+				}
+			} catch (UnirestException e) {
+				log.error("Activity logging - sending failed.", e);
+			}
 		} else {
 			log.debug("Activity logging - not sending: " + body);
 		}
 	}
 
-	private void send(final RequestBodyEntity request) {
-		try {
-			HttpResponse<JsonNode> response = request.asJson();
-			if (response.getStatus() != 200) {
-				log.error("Error sending activity logging record: {}.", response.getStatusText());
-			}
-		} catch (UnirestException e) {
-			log.error("Error sending activity logging record: ", e);
-		}
-	}
-
 
 	private class ActivityLoggingRecord {
+		@SerializedName("userID")
 		private String userName;
+		@SerializedName("type")
 		private String logType;
 
 		public ActivityLoggingRecord() {
