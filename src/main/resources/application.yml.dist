@@ -149,10 +149,13 @@ tudm:
   # this is necessary for some reason.
   sync-userdata-at-boot: false
 
+  mailchimp:
+    # name of the properties file containing the mailchimp settings
+    filename: mailchimp.properties
 
-##
-# MailChimp settings.
-##
-mailchimp:
-  # name of the properties file containing the API key and the list id
-  filename: mailchimp.properties
+  activity-logging:
+    # activity logging will be disabled if any of the entries below is missing
+    # where to post our activity logging
+    endpoint: <something like this, see Jan: https://api.behaviourkit.tocker.iminds.be/logs>
+    # JWT key of our platform
+    jwtkey: <obtain it at a place like this, see also Jan: http://admin.behaviourkit.tocker.iminds.be/platforms>

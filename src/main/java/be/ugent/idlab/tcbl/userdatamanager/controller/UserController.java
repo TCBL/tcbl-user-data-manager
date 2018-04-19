@@ -46,6 +46,7 @@ public class UserController {
 	private final MailChimper mailChimper;
 	private final PictureStorage pictureStorage;
 	private final static String profilePictureCategory = "pp";
+	private final ActivityLogger activityLogger;
 
 	@Value("${tudm.tcbl-privacy-url}")
 	private String privacyUrl;
@@ -58,12 +59,14 @@ public class UserController {
 						  Mail mail,
 						  OAuth2AuthorizedClientService authorizedClientService,
 						  MailChimper mailChimper,
-						  PictureStorage pictureStorage) {
+						  PictureStorage pictureStorage,
+						  ActivityLogger activityLogger) {
 		this.userRepository = userRepository;
 		this.mail = mail;
 		this.authorizedClientService = authorizedClientService;
 		this.pictureStorage = pictureStorage;
 		this.mailChimper = mailChimper;
+		this.activityLogger = activityLogger;
 	}
 
 	@ModelAttribute("privacyUrl")
@@ -82,9 +85,11 @@ public class UserController {
 	@GetMapping("/info")
 	public String userinfo(Model model, OAuth2AuthenticationToken authentication) {
 		try {
-			Object idObj = authentication.getDetails();
+			MyAuthenticationDetails myAuthenticationDetails = (MyAuthenticationDetails) authentication.getDetails();
 			String id;
-			if (idObj == null) {
+			TCBLUser tcblUser;
+			String userName;
+			if (myAuthenticationDetails == null) {
 				// perform a userinfo request to get the user ID (inum)
 				OAuth2AuthorizedClient authorizedClient = authorizedClientService.loadAuthorizedClient(authentication.getAuthorizedClientRegistrationId(), authentication.getName());
 				String userInfoEndpointUri = authorizedClient.getClientRegistration().getProviderDetails().getUserInfoEndpoint().getUri();
@@ -97,11 +102,25 @@ public class UserController {
 						.bodyToMono(Map.class)
 						.block();
 				id = userAttributes.get("inum").toString();
-				authentication.setDetails(id);
+				tcblUser = userRepository.find(id);
+				if (tcblUser == null) {
+					log.error("Cannot find tcblUser for %s. The user repository may be broken.".format(id));
+					userName = "unknown";
+				} else {
+					userName = tcblUser.getUserName();
+				}
+				// This is a HACK: we add what we need elsewhere as details to the OAuth2AuthenticationToken object.
+				// When changing, also check all uses of the corresponding .getDetails() method!
+				authentication.setDetails(new MyAuthenticationDetails(id, userName));
+				// Getting here means a user logged in now.
+				// This is a workable HACK for activity logging,
+				// as long as this is the only endpoint that requires login!
+				// Otherwise we'll need to intercept the OAuth2 login success handler...
+				activityLogger.log(userName, ActivityLoggingType.login);
 			} else {
-				id = idObj.toString();
+				id = myAuthenticationDetails.getId();
+				tcblUser = userRepository.find(id);
 			}
-			TCBLUser tcblUser = userRepository.find(id);
 			// note: if no user found, tcblUser is null, and this is covered nicely by the view
 			model.addAttribute("tcblUser", tcblUser);
 		} catch (Exception e) {
@@ -130,6 +149,7 @@ public class UserController {
 			model.addAttribute("tcblUser", user);
 			model.addAttribute("status", new Status(Status.Value.OK, "Your information is updated."));
 			mailChimper.addOrUpdate(user);
+			activityLogger.log(user.getUserName(), ActivityLoggingType.profile_updated);
 		} catch (Exception e) {
 			log.error("Cannot update user info", e);
 			model.addAttribute("status", new Status(Status.Value.ERROR, "Your information could not be updated."));
@@ -183,6 +203,7 @@ public class UserController {
 			ct.setUtext(getEmailInformationText(user.getUserName()));
 			ct.addNavLink(new NavLink(NavLink.DisplayCondition.ALWAYS, "Try again", "/user/register"));
 			ct.setStatus(new Status(Status.Value.OK, "Please check your mailbox."));
+			activityLogger.log(newUser.getUserName(), ActivityLoggingType.registration_mailsent);
 
 			// end well; avoid deletion here
 			profilePictureMustBeDeleted = false;
@@ -240,6 +261,7 @@ public class UserController {
 				user.setActiveSince(new Date());
 				userRepository.save(user);
 				mailChimper.addOrUpdate(user);
+				activityLogger.log(user.getUserName(), ActivityLoggingType.registration_completed);
 			}
 			ct.setUtext("<p>You're successfully signed up!</p>" +
 					"<p>You can now use your new account to login.</p>" +
@@ -273,6 +295,7 @@ public class UserController {
 			userExists = true;
 			String baseUri = getUriSomeLevelsUp(request, 1);
 			sendResetMessage(user, baseUri);
+			activityLogger.log(user.getUserName(), ActivityLoggingType.resetpassword_mailsent);
 			ct.setUtext(getEmailInformationText(mail) +
 					"<p>The link is only valid for <b>one hour</b>, starting now.</p>");
 			ct.addNavLink(new NavLink(NavLink.DisplayCondition.ALWAYS, "Try again", "/user/resetpw"));
@@ -347,6 +370,7 @@ public class UserController {
 			// If the user hadn't accepted the PP earlier, he will have done it now in user/resetpwform
 			user.setAcceptedPP(true);
 			userRepository.save(user);
+			activityLogger.log(user.getUserName(), ActivityLoggingType.resetpassword_completed);
 			ct.setUtext("<p>You've successfully updated your password!</p>");
 			ct.setStatus(new Status(Status.Value.OK, "Password updated."));
 		} catch (Exception e) {

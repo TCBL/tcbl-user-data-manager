@@ -32,7 +32,7 @@ public class MailChimper {
 
 	private final UserRepository userRepository;
 
-	@Value("${mailchimp.filename}")
+	@Value("${tudm.mailchimp.filename}")
 	private String filename;
 
 	private String key;

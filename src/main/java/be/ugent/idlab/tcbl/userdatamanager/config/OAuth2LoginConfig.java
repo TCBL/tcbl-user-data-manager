@@ -1,5 +1,6 @@
 package be.ugent.idlab.tcbl.userdatamanager.config;
 
+import be.ugent.idlab.tcbl.userdatamanager.controller.support.MyAuthenticationDetails;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -74,7 +75,15 @@ public class OAuth2LoginConfig {
 									String redirecturl = request.getRequestURL().toString().replace("/logout", "");
 									// compose end session uri
 									String op = ((DefaultOidcUser) authentication.getPrincipal()).getAttributes().get("iss").toString();
-									endSessionUri = "/gluulogout?op=" + op +"&id_token_hint=" + idTokenStr + "&post_logout_redirect_uri=" + redirecturl;
+									String userName;
+									try {
+										// See UserController.userinfo() to see how the authentication details were set
+										MyAuthenticationDetails myAuthenticationDetails = (MyAuthenticationDetails) authentication.getDetails();
+										userName = myAuthenticationDetails.getUserName();
+									} catch (Exception e) {
+										userName = "";
+									}
+									endSessionUri = "/gluulogout?op=" + op +"&id_token_hint=" + idTokenStr + "&post_logout_redirect_uri=" + redirecturl + "&un=" + userName;
 								}
 							}
 							String targetUrl = endSessionUri != null ? endSessionUri : "/index";

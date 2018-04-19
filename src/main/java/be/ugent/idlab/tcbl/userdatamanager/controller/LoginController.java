@@ -1,5 +1,7 @@
 package be.ugent.idlab.tcbl.userdatamanager.controller;
 
+import be.ugent.idlab.tcbl.userdatamanager.controller.support.ActivityLogger;
+import be.ugent.idlab.tcbl.userdatamanager.controller.support.ActivityLoggingType;
 import be.ugent.idlab.tcbl.userdatamanager.model.NavLink;
 import be.ugent.idlab.tcbl.userdatamanager.model.Status;
 import org.springframework.boot.context.properties.bind.BindResult;
@@ -24,8 +26,9 @@ import java.util.Set;
 @Controller
 public class LoginController {
 	private final String redirectDirective;
+	private final ActivityLogger activityLogger;
 
-	public LoginController(final Environment environment) throws Exception {
+	public LoginController(final Environment environment, ActivityLogger activityLogger) throws Exception {
 		// find the redirect path; we need this to do a correct forwarding. The path is composed
 		Set<String> clientPropertyKeys = resolveClientPropertyKeys(environment);
 		if (!clientPropertyKeys.isEmpty()) {
@@ -34,10 +37,15 @@ public class LoginController {
 		} else {
 			throw new Exception("No client defined.");
 		}
+		this.activityLogger = activityLogger;
 	}
 
 	@RequestMapping("/gluulogout")
-	public String gluuLogout(@RequestParam String op, @RequestParam String id_token_hint, @RequestParam String post_logout_redirect_uri) {
+	public String gluuLogout(@RequestParam String op,
+							 @RequestParam String id_token_hint,
+							 @RequestParam String post_logout_redirect_uri,
+							 @RequestParam String un) {
+		activityLogger.log(un, ActivityLoggingType.logout);
 		return "redirect:" + op + "/oxauth/seam/resource/restv1/oxauth/end_session?id_token_hint=" + id_token_hint + "&post_logout_redirect_uri=" + post_logout_redirect_uri;
 	}
 
