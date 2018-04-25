@@ -32,6 +32,7 @@ public class TCBLUser {
 	private String pictureURL;
 	private boolean subscribedNL;	// is the user subscribed to the TCBL newsletter?
 	private boolean acceptedPP;		// did the user accept the TCBL privacy policy?
+	private boolean allowedMon;		// did the user allow TCBL activity monitoring?
 
 	private Date created;
 	private Date lastModified;
@@ -43,7 +44,20 @@ public class TCBLUser {
 		active = false;
 	}
 
-	public TCBLUser(String inum, String userName, String firstName, String lastName, boolean active, boolean invited, String pictureURL, boolean subscribedNL, boolean acceptedPP, Date created, Date lastModified, Date passwordReset, Date activeSince) {
+	public TCBLUser(String inum,
+					String userName,
+					String firstName,
+					String lastName,
+					boolean active,
+					boolean invited,
+					String pictureURL,
+					boolean subscribedNL,
+					boolean acceptedPP,
+					boolean allowedMon,
+					Date created,
+					Date lastModified,
+					Date passwordReset,
+					Date activeSince) {
 		this.inum = inum;
 		this.userName = userName;
 		this.firstName = firstName;
@@ -53,6 +67,7 @@ public class TCBLUser {
 		this.pictureURL = pictureURL;
 		this.subscribedNL = subscribedNL;
 		this.acceptedPP = acceptedPP;
+		this.allowedMon = allowedMon;
 		this.created = created;
 		this.lastModified = lastModified;
 		this.passwordReset = passwordReset;
@@ -107,6 +122,14 @@ public class TCBLUser {
 		this.acceptedPP = acceptedPP;
 	}
 
+	public boolean isAllowedMon() {
+		return allowedMon;
+	}
+
+	public void setAllowedMon(boolean allowedMon) {
+		this.allowedMon = allowedMon;
+	}
+
 	@Override
 	public String toString() {
 		return "TCBLUser{" +
@@ -116,6 +139,7 @@ public class TCBLUser {
 				", pictureURL='" + pictureURL + '\'' +
 				", subscribedNL='" + subscribedNL + '\'' +
 				", acceptedPP='" + acceptedPP + '\'' +
+				", allowedMon='" + allowedMon + '\'' +
 				'}';
 	}
 

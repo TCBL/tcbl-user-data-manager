@@ -117,7 +117,7 @@ public class UserController {
 						  TCBLUser user,
 						  @RequestParam("profilePictureFile") MultipartFile profilePictureFile) {
 		try {
-			// next test avoid deletion of previous picture, if available
+			// next test avoids deletion of previous picture, if available
 			// user.getPictureURL
 			// - null: no previous picture
 			// - empty: picture was modified in the frontend now (see Javascript)
@@ -141,8 +141,7 @@ public class UserController {
 	public String getRegister(Model model) {
 		TCBLUser user = new TCBLUser();
 
-		// set defaults for new user:
-		user.setSubscribedNL(true);
+		// set defaults for new user here if they are non-empty, non-zero, non-false (user.set...)
 
 		model.addAttribute("tcblUser", user);
 		return "user/register";
@@ -441,7 +440,7 @@ public class UserController {
 
 	private String getEmailInformationText(String addressee) {
 		return	String.format("<p>We've sent an email with further instructions to <b>%s</b>.</p>", addressee) +
-				"<p>If you don't find the email within a few minutes, check your spam folder too before retrying.</p>" +
+				"<p>If you don't find the email within a few minutes, <b>check your spam folder too before retrying</b>.</p>" +
 				"<p>When you follow the link in the email, a new browser tab will open. You can close this browser tab at that time.</p>";
 	}
 

@@ -115,6 +115,7 @@ public class ScimUserRepository {
 				.setField(ScimExtensionAttributes.subscribedField.getValue(), Boolean.toString(tcblUser.isSubscribedNL()))
 				.setField(ScimExtensionAttributes.acceptedField.getValue(), Boolean.toString(tcblUser.isAcceptedPP()))
 				.setField(ScimExtensionAttributes.pictureField.getValue(), pictureURL)
+				.setField(ScimExtensionAttributes.allowedMonField.getValue(), Boolean.toString(tcblUser.isAllowedMon()))
 				.build();
 		if (scimUser.isExtensionPresent(ScimExtensionAttributes.urn.getValue())) {
 			scimUser.setExtensions(new SingletonMap(ScimExtensionAttributes.urn.getValue(), extension));
@@ -166,6 +167,15 @@ public class ScimUserRepository {
 			Calendar createdCalendar = toCalendarPerDay(created);
 
 			boolean invited = false;
+
+			// Very important note about behaviour of the SCIM client (observed in version 3.0.2),
+			// concerning User.active (SCIM client class property) vs.
+			// gluuPerson.gluuStatus (display name 'User Status' as seen in the Gluu GUI):
+			// - Changes to User.active are reflected in gluuPerson.gluuStatus after calling client.updateUser() [as expected],
+			// - Changes to gluuPerson.gluuStatus through the Gluu GUI are not reflected in User.active after calling
+			//   client.searchUsers() and other client methods that read back users [not as expected].
+			// Conclusion:
+			//   NEVER modify the 'User Status' in the Gluu GUI!!!!!!!!!!!!!!!!!!
 			boolean active = scimUser.isActive() == null ? false : scimUser.isActive();
 
 			Date passwordResetAt = null;
@@ -183,37 +193,21 @@ public class ScimUserRepository {
 				activeSince = created;
 			}
 
-			String pictureURL;
-			boolean subscribedNL;
-			boolean acceptedPP;
-			if (!scimUser.isExtensionPresent(ScimExtensionAttributes.urn.getValue())) {
-				pictureURL = null;
-				subscribedNL = false;
-				acceptedPP = false;
-				/*
-				Commented out because we defined no values as "not initialised", meaning the user did not ever
-				(un)subscribe or accept the privacy policy or added a profile picture. This affects the users in the system
-				that were already there before our first deploy including these new fields (2018-03-13).
-
-				Extension extension = new Extension.Builder(ScimExtensionAttributes.urn.getValue())
-						.setField(ScimExtensionAttributes.subscribedField.getValue(), Boolean.toString(subscribedNL))
-						.setField(ScimExtensionAttributes.acceptedField.getValue(), Boolean.toString(acceptedPP))
-						.setField(ScimExtensionAttributes.pictureField.getValue(), "_")
-						.build();
-				scimUser.addExtension(extension);
-
-				scimUser.setPassword("");
-				try {
-					client.updateUser(scimUser, scimUser.getId(), new String[0]);
-				} catch (IOException e) {
-					log.error("Updating SCIM user failed!", e);
-				}*/
-			} else {
+			// Default values for the TCBLUser properties that 'can' be available in the SCIM extension attributes
+			// Note that there is no need to write back missing SCIM extension attributes to the Gluu server...
+			String pictureURL = null;
+			boolean subscribedNL = false;
+			boolean acceptedPP = false;
+			boolean allowedMon = false;
+			if (scimUser.isExtensionPresent(ScimExtensionAttributes.urn.getValue())) {
 				Extension extension = scimUser.getExtension(ScimExtensionAttributes.urn.getValue());
-				subscribedNL = Boolean.parseBoolean(extension.getFieldAsString(ScimExtensionAttributes.subscribedField.getValue()));
-				acceptedPP = Boolean.parseBoolean(extension.getFieldAsString(ScimExtensionAttributes.acceptedField.getValue()));
-				pictureURL = extension.getFieldAsString(ScimExtensionAttributes.pictureField.getValue());
-				pictureURL = pictureURL.equals("_") ? null : pictureURL;
+				pictureURL = getScimExtensionFieldStringWithDefault(extension, ScimExtensionAttributes.pictureField.getValue(), pictureURL);
+				if ("_".equals(pictureURL)) {
+					pictureURL = null;
+				}
+				subscribedNL = getScimExtensionFieldBooleanWithDefault(extension, ScimExtensionAttributes.subscribedField.getValue(), subscribedNL);
+				acceptedPP = getScimExtensionFieldBooleanWithDefault(extension, ScimExtensionAttributes.acceptedField.getValue(), acceptedPP);
+				allowedMon = getScimExtensionFieldBooleanWithDefault(extension, ScimExtensionAttributes.allowedMonField.getValue(), allowedMon);
 			}
 
 			TCBLUser tcblUser = new TCBLUser(
@@ -226,6 +220,7 @@ public class ScimUserRepository {
 					pictureURL,
 					subscribedNL,
 					acceptedPP,
+					allowedMon,
 					created,
 					modified,
 					passwordResetAt,
@@ -234,6 +229,15 @@ public class ScimUserRepository {
 			processor.process(tcblUser);
 
 		});
+	}
+
+	private static String getScimExtensionFieldStringWithDefault(Extension extension, String field, String defaultValue) {
+		return extension.isFieldPresent(field) ? extension.getFieldAsString(field) : defaultValue;
+	}
+
+	private static boolean getScimExtensionFieldBooleanWithDefault(Extension extension, String field, boolean defaultValue) {
+		String s = getScimExtensionFieldStringWithDefault(extension, field, Boolean.toString(defaultValue));
+		return Boolean.parseBoolean(s);
 	}
 
 	private static Map<String, String> resolveScimClientProperties(final Environment environment) {

@@ -140,6 +140,7 @@ form input[type=checkbox] {
     width: 1rem;
     height: 1rem;
     display: inline-block;
+    margin: 3px 16px 0px 0px;
 }
 
 form input[type=file].input--choose-image {
