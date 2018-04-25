@@ -33,6 +33,7 @@ public class OAuth2LoginConfig {
 							"/favicon.ico",
 							"/css/*",
 							"/assets/*",
+							"/webjars/**",
 							"/oiclogin",
 							"/login",
 							"/login/*",
