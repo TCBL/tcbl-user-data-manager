@@ -154,8 +154,10 @@ tudm:
     filename: mailchimp.properties
 
   activity-logging:
-    # activity logging will be disabled if any of the entries below is missing
+    # activity logging will be disabled if endpoint and/or jwtkey below is missing
     # where to post our activity logging
     endpoint: <something like this, see Jan: https://api.behaviourkit.tocker.iminds.be/logs>
     # JWT key of our platform
     jwtkey: <obtain it at a place like this, see also Jan: http://admin.behaviourkit.tocker.iminds.be/platforms>
+    # optional timeout in milliseconds; avoids unnecessary waiting after posts
+    timeout: 500

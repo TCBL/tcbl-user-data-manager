@@ -1,9 +1,13 @@
 package be.ugent.idlab.tcbl.userdatamanager.controller.support;
 
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.env.Environment;
 import org.springframework.http.*;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
@@ -22,6 +26,8 @@ public class ActivityLogger {
 	private final String endpoint;
 	private final String jwtKey;
 	private final boolean enabled;
+	// see https://spring.io/guides/gs/consuming-rest/
+	// and http://www.baeldung.com/rest-template
 	private final RestTemplate restTemplate;
 
 	public ActivityLogger(Environment environment) {
@@ -39,7 +45,20 @@ public class ActivityLogger {
 		this.endpoint = endpoint;
 		this.jwtKey = jwtKey;
 		this.enabled = enabled;
-		this.restTemplate = new RestTemplate();
+
+		// Create our restTemplate based on a custom configured Apache HttpComponents HttpClient:
+		// HttpComponentsClientHttpRequestFactory is a ClientHttpRequestFactory implementation that uses Apache HttpComponents HttpClient to create requests.
+		int timeout = environment.getProperty("tudm.activity-logging.timeout", Integer.class, 0); // ms
+		RequestConfig config = RequestConfig.custom()
+				.setConnectTimeout(timeout)
+				.setConnectionRequestTimeout(timeout)
+				.setSocketTimeout(timeout)
+				.build();
+		CloseableHttpClient client = HttpClientBuilder
+				.create()
+				.setDefaultRequestConfig(config)
+				.build();
+		this.restTemplate = new RestTemplate(new HttpComponentsClientHttpRequestFactory(client));
 	}
 
 	@Async
@@ -57,9 +76,12 @@ public class ActivityLogger {
 				HttpEntity<ActivityLoggingDataToSend> request = new HttpEntity<>(record, headers);
 
 				ResponseEntity<ActivityLoggingDataReturned> response = restTemplate.postForEntity(endpoint, request, ActivityLoggingDataReturned.class);
-				HttpStatus status = response.getStatusCode();
-				ActivityLoggingDataReturned result = response.getBody();
-				log.debug(String.format("Activity logging - sent %s: status %d (%s); uuid '%s'.", record.toString(), status.value(), status.getReasonPhrase(), result.getUuid()));
+				if (log.isDebugEnabled()) {
+					// We're not using the data returned unless for debugging...
+					HttpStatus status = response.getStatusCode();
+					ActivityLoggingDataReturned result = response.getBody();
+					log.debug(String.format("Activity logging - sent %s: status %d (%s); uuid '%s'.", record.toString(), status.value(), status.getReasonPhrase(), result.getUuid()));
+				}
 			} catch (Exception e) {
 				log.error(String.format("Activity logging - failed sending %s: %s.", record.toString(), e.getMessage()));
 			}
