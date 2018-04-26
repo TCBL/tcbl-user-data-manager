@@ -1,7 +1,5 @@
 package be.ugent.idlab.tcbl.userdatamanager.controller.support;
 
-import com.google.gson.Gson;
-import com.google.gson.annotations.SerializedName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.env.Environment;
@@ -25,7 +23,6 @@ public class ActivityLogger {
 	private final String jwtKey;
 	private final boolean enabled;
 	private final RestTemplate restTemplate;
-	private final Gson gson = new Gson();
 
 	public ActivityLogger(Environment environment) {
 		String endpoint = null;
@@ -34,7 +31,7 @@ public class ActivityLogger {
 		try {
 			endpoint = environment.getRequiredProperty("tudm.activity-logging.endpoint");
 			jwtKey = environment.getRequiredProperty("tudm.activity-logging.jwtkey");
-			log.info(String.format("Activity logging is enabled; endpoint: %s, jwtKey: %s", endpoint, jwtKey));
+			log.info(String.format("Activity logging is enabled; endpoint: '%s', jwtKey: '%s'", endpoint, jwtKey));
 			enabled = true;
 		} catch (Exception e) {
 			log.info("Activity logging is not enabled.");
@@ -47,60 +44,27 @@ public class ActivityLogger {
 
 	@Async
 	public void log(String userName, ActivityLoggingType logType) {
-		String body = gson.toJson(new ActivityLoggingRecord(userName, logType.getValue()));
-		send(body);
+		send(new ActivityLoggingDataToSend(userName, logType.getValue()));
 	}
 
-	private void send(String body) {
+	private void send(ActivityLoggingDataToSend record) {
 		if (enabled) {
-			log.debug("Activity logging - start sending: " + body);
+			log.debug(String.format("Activity logging - sending %s.", record.toString()));
 			try {
 				HttpHeaders headers = new HttpHeaders();
 				headers.add("authorization", "Bearer " + jwtKey);
 				headers.setContentType(MediaType.APPLICATION_JSON);
-				HttpEntity<String> request = new HttpEntity<>(body, headers);
+				HttpEntity<ActivityLoggingDataToSend> request = new HttpEntity<>(record, headers);
 
-				ResponseEntity<String> response = restTemplate.postForEntity(endpoint, request, String.class);
+				ResponseEntity<ActivityLoggingDataReturned> response = restTemplate.postForEntity(endpoint, request, ActivityLoggingDataReturned.class);
 				HttpStatus status = response.getStatusCode();
-				log.debug(String.format("Activity logging - sending ended with: %d, %s.", status.value(), status.getReasonPhrase()));
+				ActivityLoggingDataReturned result = response.getBody();
+				log.debug(String.format("Activity logging - sent %s: status %d (%s); uuid '%s'.", record.toString(), status.value(), status.getReasonPhrase(), result.getUuid()));
 			} catch (Exception e) {
-				log.error("Activity logging - sending failed: " + e.getMessage());
+				log.error(String.format("Activity logging - failed sending %s: %s.", record.toString(), e.getMessage()));
 			}
 		} else {
-			log.debug("Activity logging - not sending: " + body);
+			log.debug(String.format("Activity logging - not sending %s.", record.toString()));
 		}
 	}
-
-
-	private class ActivityLoggingRecord {
-		@SerializedName("userID")
-		private String userName;
-		@SerializedName("type")
-		private String logType;
-
-		public ActivityLoggingRecord() {
-		}
-
-		public String getUserName() {
-			return userName;
-		}
-
-		public ActivityLoggingRecord(String userName, String logType) {
-			this.userName = userName;
-			this.logType = logType;
-		}
-
-		public void setUserName(String userName) {
-			this.userName = userName;
-		}
-
-		public String getLogType() {
-			return logType;
-		}
-
-		public void setLogType(String logType) {
-			this.logType = logType;
-		}
-	}
-
 }
