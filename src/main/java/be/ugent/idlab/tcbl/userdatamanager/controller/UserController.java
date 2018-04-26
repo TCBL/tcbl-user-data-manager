@@ -104,7 +104,7 @@ public class UserController {
 				id = userAttributes.get("inum").toString();
 				tcblUser = userRepository.find(id);
 				if (tcblUser == null) {
-					log.error("Cannot find tcblUser for %s. The user repository may be broken.".format(id));
+					log.error(String.format("Cannot find tcblUser for %s. The user repository may be broken.", id));
 					userName = "unknown";
 				} else {
 					userName = tcblUser.getUserName();
