@@ -2,16 +2,13 @@ package be.ugent.idlab.tcbl.userdatamanager.controller.support;
 
 import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
-import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.JsonNode;
-import com.mashape.unirest.http.Unirest;
-import com.mashape.unirest.http.exceptions.UnirestException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.env.Environment;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.*;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
 
 /**
  * <p>Activity logging support.</p>
@@ -24,23 +21,28 @@ import org.springframework.stereotype.Component;
 public class ActivityLogger {
 	private final Logger log = LoggerFactory.getLogger(this.getClass());
 
-	private String endpoint;
-	private String jwtKey;
+	private final String endpoint;
+	private final String jwtKey;
 	private final boolean enabled;
-
+	private final RestTemplate restTemplate;
 	private final Gson gson = new Gson();
 
 	public ActivityLogger(Environment environment) {
+		String endpoint = null;
+		String jwtKey = null;
 		boolean enabled = false;
 		try {
-			this.endpoint = environment.getRequiredProperty("tudm.activity-logging.endpoint");
-			this.jwtKey = environment.getRequiredProperty("tudm.activity-logging.jwtkey");
-			log.info("Activity logging is enabled; endpoint: %s, jwtKey: %s".format(endpoint, jwtKey));
+			endpoint = environment.getRequiredProperty("tudm.activity-logging.endpoint");
+			jwtKey = environment.getRequiredProperty("tudm.activity-logging.jwtkey");
+			log.info(String.format("Activity logging is enabled; endpoint: %s, jwtKey: %s", endpoint, jwtKey));
 			enabled = true;
 		} catch (Exception e) {
 			log.info("Activity logging is not enabled.");
 		}
+		this.endpoint = endpoint;
+		this.jwtKey = jwtKey;
 		this.enabled = enabled;
+		this.restTemplate = new RestTemplate();
 	}
 
 	@Async
@@ -53,20 +55,16 @@ public class ActivityLogger {
 		if (enabled) {
 			log.debug("Activity logging - start sending: " + body);
 			try {
-				HttpResponse<JsonNode> response = Unirest.post(endpoint)
-						.header("authorization", "Bearer " + jwtKey)
-						.header("content-type", "application/json")
-						.body(body)
-						.asJson();
-				int statusCode = response.getStatus();
-				String statusText = response.getStatusText();
-				if (statusCode == HttpStatus.OK.value()) {
-					log.debug("Activity logging - sending done.");
-				} else {
-					log.error("Activity logging - sending ended with: %d, %s.", statusCode, statusText);
-				}
-			} catch (UnirestException e) {
-				log.error("Activity logging - sending failed.", e);
+				HttpHeaders headers = new HttpHeaders();
+				headers.add("authorization", "Bearer " + jwtKey);
+				headers.setContentType(MediaType.APPLICATION_JSON);
+				HttpEntity<String> request = new HttpEntity<>(body, headers);
+
+				ResponseEntity<String> response = restTemplate.postForEntity(endpoint, request, String.class);
+				HttpStatus status = response.getStatusCode();
+				log.debug(String.format("Activity logging - sending ended with: %d, %s.", status.value(), status.getReasonPhrase()));
+			} catch (Exception e) {
+				log.error("Activity logging - sending failed: " + e.getMessage());
 			}
 		} else {
 			log.debug("Activity logging - not sending: " + body);
