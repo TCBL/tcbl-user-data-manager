@@ -156,8 +156,8 @@ tudm:
   activity-logging:
     # activity logging will be disabled if endpoint and/or jwtkey below is missing
     # where to post our activity logging
-    endpoint: <something like this, see Jan: https://api.behaviourkit.tocker.iminds.be/logs>
+    endpoint: "https://hostname-of-api-behaviourkit/logs"
     # JWT key of our platform
-    jwtkey: <obtain it at a place like this, see also Jan: http://admin.behaviourkit.tocker.iminds.be/platforms>
+    jwtkey: "JWT key value obtained for the user manager platform in the admin pages of the behaviourkit"
     # optional timeout in milliseconds; avoids unnecessary waiting after posts
     timeout: 500

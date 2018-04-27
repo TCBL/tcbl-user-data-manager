@@ -341,6 +341,36 @@ When set to `true`, it causes to copy all user data found in the Gluu Server to 
 TCBL User Data Manager starts. This is intended as a one-time operation, so unless really necessary, leave this set to
 `false`!
 
+#### MailChimp
+
+The TCBL User Data Manager application can communicate if a user wants to be subscribed to the TCBL newsletter, or the
+other way around: if a user unsubscribes via MailChimp, these changes will propagate to the data manager application.
+
+The main configuration file defines the name of a properties file that contains the actual settings for MailChimp.
+
+That properties file **will be read every time** a request to the MailChimp API is made.
+This way you can re-configure the settings without having to restart the application.
+Use the file `tcbl-user-data-manager/src/main/resources/mailchimp.properties.dist` as a template and store it as `mailchimp.properties`
+in the working directory. The file is self-explanatory.
+
+To **disable** MailChimp communication, set the `mailchimp.filename` property to point to an non-existing file.
+
+#### Activity logging
+
+Application events can be sent to an activity logging **endpoint**.
+At time of writing this is 'http://api.behaviourkit.tocker.iminds.be/logs'.
+Will become https as soon as possible.
+
+Access to that endpoint requires a **JWT key**, defined per platform.
+At time of writing this key can be obtained at 'http://admin.behaviourkit.tocker.iminds.be/platforms'.
+Our platform is named 'USERMANAGER' (during testing: 'USERMANAGER_TEST').
+
+Activity logging is disabled if either of the above settings is not defined.
+
+To avoid unwanted application delay in case of a slow responding logging endpoint, a **timeout** can be set.
+
+All these parameters can be set in de main configuration file.
+ 
 #### A configuration snippet example, grouping all TCBL User Data Manager application specific settings
 
 ```yaml
@@ -348,40 +378,30 @@ TCBL User Data Manager starts. This is intended as a one-time operation, so unle
 # TCBL User Data Manager application specific settings
 ##
 tudm:
-   tcbl-services:
-     # name of the json file containing the descriptions of the TCBL services
-     filename: services.json
+  tcbl-services:
+    # name of the json file containing the descriptions of the TCBL services
+    filename: services.json
 
-   # url of the webpage containing the TCBL privacy declaration
-   tcbl-privacy-url: "https://tcbl.eu/privacy"
+  # url of the webpage containing the TCBL privacy declaration
+  tcbl-privacy-url: "https://tcbl.eu/privacy"
 
-   # should we copy the user data from the Gluu server to the local database at boot-time? Set this to false unless
-   # this is necessary for some reason.
-   sync-userdata-at-boot: false
+  # should we copy the user data from the Gluu server to the local database at boot-time? Set this to false unless
+  # this is necessary for some reason.
+  sync-userdata-at-boot: false
+
+  mailchimp:
+    # name of the properties file containing the mailchimp settings
+    filename: mailchimp.properties
+
+  activity-logging:
+    # activity logging will be disabled if endpoint and/or jwtkey below is missing
+    # where to post our activity logging
+    endpoint: "https://hostname-of-api-behaviourkit/logs"
+    # JWT key of our platform
+    jwtkey: "JWT key value obtained for the user manager platform in the admin pages of the behaviourkit"
+    # optional timeout in milliseconds; avoids unnecessary waiting after posts
+    timeout: 500
 ```
-
-### 7. MailChimp
-
-The TCBL User Data Manager application can communicate if a user wants to be subscribed to the TCBL newsletter, or the
-other way araound: if a user unsubscribes via MailChimp, these changes will propagate to the data manager application.
-
-The application.yml requires the following settings:
-
-```yaml
-##
-# MailChimp settings.
-##
-mailchimp:
-  # name of the properties file containing the API key and the list id
-  filename: mailchimp.properties
-```
-
-The mailchimp.properties file contains the actual settings and **will be read every time** a request to the MailChimp API
-is made. This way you can re-congifure the settings without having to restart the application. Use the file
-`tcbl-user-data-manager/src/main/resources/mailchimp.properties.dist` as a template and store it as `mailchimp.properties`
-in the working directory. The file is self-explanatory.
-
-To **disable** MailChimp communication, set the `mailchimp.filename` property to point to an non-existing file.
 
 
 ### 8. Putting it all together: the complete application configuration
