@@ -2,7 +2,7 @@ package be.ugent.idlab.tcbl.userdatamanager.model;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
@@ -16,17 +16,18 @@ import java.util.Optional;
  */
 @Component
 public class UserRepository {
-	private final ScimUserRepository scimUserRepository;
-	private final DatabaseUserRepository databaseUserRepository;
-
-	@Value("${tudm.sync-userdata-at-boot}")
-	private boolean syncUserDataAtBoot;
-
 	private final Logger log = LoggerFactory.getLogger(TCBLUser.class);
 
-	public UserRepository(ScimUserRepository scimUserRepository, DatabaseUserRepository databaseUserRepository) {
+	private final ScimUserRepository scimUserRepository;
+	private final DatabaseUserRepository databaseUserRepository;
+	private final boolean syncUserDataAtBoot;
+
+	public UserRepository(Environment environment,
+						  ScimUserRepository scimUserRepository,
+						  DatabaseUserRepository databaseUserRepository) {
 		this.scimUserRepository = scimUserRepository;
 		this.databaseUserRepository = databaseUserRepository;
+		this.syncUserDataAtBoot = environment.getProperty("tudm.sync-userdata-at-boot", Boolean.class, false);
 	}
 
 	public TCBLUser find(String inum) throws  Exception {

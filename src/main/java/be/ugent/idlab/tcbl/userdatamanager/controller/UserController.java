@@ -9,7 +9,7 @@ import be.ugent.idlab.tcbl.userdatamanager.model.TCBLUser;
 import be.ugent.idlab.tcbl.userdatamanager.model.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
@@ -38,6 +38,7 @@ import java.util.*;
 @RequestMapping("user")
 public class UserController {
 	private final Logger log = LoggerFactory.getLogger(this.getClass());
+	private final String privacyUrl;
 	private final UserRepository userRepository;
 	private final Mail mail;
 	private final static Base64.Encoder encoder = Base64.getUrlEncoder();
@@ -48,19 +49,18 @@ public class UserController {
 	private final static String profilePictureCategory = "pp";
 	private final ActivityLogger activityLogger;
 
-	@Value("${tudm.tcbl-privacy-url}")
-	private String privacyUrl;
-
 
 	/**
 	 * Creates a UserController; Spring injects the parameters.
 	 */
-	public UserController(UserRepository userRepository,
+	public UserController(Environment environment,
+						  UserRepository userRepository,
 						  Mail mail,
 						  OAuth2AuthorizedClientService authorizedClientService,
 						  MailChimper mailChimper,
 						  PictureStorage pictureStorage,
 						  ActivityLogger activityLogger) {
+		this.privacyUrl = environment.getRequiredProperty("tudm.tcbl-privacy-url");
 		this.userRepository = userRepository;
 		this.mail = mail;
 		this.authorizedClientService = authorizedClientService;

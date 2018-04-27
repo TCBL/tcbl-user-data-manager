@@ -10,7 +10,7 @@ import com.mashape.unirest.http.exceptions.UnirestException;
 import com.mashape.unirest.request.body.RequestBodyEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -32,7 +32,6 @@ public class MailChimper {
 
 	private final UserRepository userRepository;
 
-	@Value("${tudm.mailchimp.filename}")
 	private String filename;
 
 	private String key;
@@ -41,7 +40,8 @@ public class MailChimper {
 
 	private final Gson gson = new Gson();
 
-	public MailChimper(UserRepository userRepository) {
+	public MailChimper(Environment environment, UserRepository userRepository) {
+		this.filename = environment.getProperty("tudm.mailchimp.filename");
 		this.userRepository = userRepository;
 	}
 
