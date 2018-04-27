@@ -46,8 +46,11 @@ public class ActivityLogger {
 		this.jwtKey = jwtKey;
 		this.enabled = enabled;
 
-		// Create our restTemplate based on a custom configured Apache HttpComponents HttpClient:
-		// HttpComponentsClientHttpRequestFactory is a ClientHttpRequestFactory implementation that uses Apache HttpComponents HttpClient to create requests.
+		// With default HttpClient: this.restTemplate = new RestTemplate();
+		// Below: create our restTemplate based on a custom configured Apache HttpComponents HttpClient:
+		//   HttpComponentsClientHttpRequestFactory is a ClientHttpRequestFactory implementation
+		//   that uses Apache HttpComponents HttpClient to create requests.
+		//   Found at http://www.baeldung.com/rest-template.
 		int timeout = environment.getProperty("tudm.activity-logging.timeout", Integer.class, 0); // ms
 		RequestConfig config = RequestConfig.custom()
 				.setConnectTimeout(timeout)
@@ -72,12 +75,14 @@ public class ActivityLogger {
 			try {
 				HttpHeaders headers = new HttpHeaders();
 				headers.add("authorization", "Bearer " + jwtKey);
-				headers.setContentType(MediaType.APPLICATION_JSON);
+				// All other needed headers (such as Accept and Content-Type) are added nicely by RestTemplate.
+				// To check the finally constructed request right before it is sent, set a breakpoint
+				// in RestTemplate.java, method "protected <T> T doExecute(...)", statement "response = request.execute();"
 				HttpEntity<ActivityLoggingDataToSend> request = new HttpEntity<>(record, headers);
 
 				ResponseEntity<ActivityLoggingDataReturned> response = restTemplate.postForEntity(endpoint, request, ActivityLoggingDataReturned.class);
 				if (log.isDebugEnabled()) {
-					// We're not using the data returned unless for debugging...
+					// We're not using the data returned here unless for debugging...
 					HttpStatus status = response.getStatusCode();
 					ActivityLoggingDataReturned result = response.getBody();
 					log.debug(String.format("Activity logging - sent %s: status %d (%s); uuid '%s'.", record.toString(), status.value(), status.getReasonPhrase(), result.getUuid()));
