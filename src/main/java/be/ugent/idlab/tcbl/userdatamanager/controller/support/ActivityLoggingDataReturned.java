@@ -1,5 +1,7 @@
 package be.ugent.idlab.tcbl.userdatamanager.controller.support;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import java.io.Serializable;
 
 /**
@@ -9,6 +11,7 @@ import java.io.Serializable;
  *
  * @author Martin Vanbrabant
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class ActivityLoggingDataReturned {
 	private String uuid;
 

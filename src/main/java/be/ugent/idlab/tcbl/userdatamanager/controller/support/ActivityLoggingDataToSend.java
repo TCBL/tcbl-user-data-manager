@@ -1,5 +1,6 @@
 package be.ugent.idlab.tcbl.userdatamanager.controller.support;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
@@ -9,6 +10,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  *
  * @author Martin Vanbrabant
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class ActivityLoggingDataToSend {
 	@JsonProperty("userID")
 	private String userName;

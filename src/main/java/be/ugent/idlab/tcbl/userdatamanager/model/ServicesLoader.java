@@ -1,14 +1,13 @@
 package be.ugent.idlab.tcbl.userdatamanager.model;
 
-import com.google.gson.Gson;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import java.io.FileReader;
-import java.io.Reader;
+import java.io.File;
 import java.util.List;
 
 /**
@@ -35,8 +34,8 @@ public class ServicesLoader {
 
 	@PostConstruct
 	public void refresh() {
-		try (Reader in = new FileReader(filename)) {
-			services = new Gson().fromJson(in, Services.class);
+		try {
+			services = new ObjectMapper().readValue(new File(filename), Services.class);
 			log.info("ServiceLoader's services refreshed.");
 		} catch (Exception e) {
 			log.error("ServiceLoader's services no refreshed:", e);
