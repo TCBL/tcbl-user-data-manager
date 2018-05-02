@@ -74,7 +74,7 @@ public class ActivityLogger {
 			log.debug(String.format("Activity logging - sending %s.", record.toString()));
 			try {
 				HttpHeaders headers = new HttpHeaders();
-				headers.add("authorization", "Bearer " + jwtKey);
+				headers.add("Authorization", "Bearer " + jwtKey);
 				// All other needed headers (such as Accept and Content-Type) are added nicely by RestTemplate.
 				// To check the finally constructed request right before it is sent, set a breakpoint
 				// in RestTemplate.java, method "protected <T> T doExecute(...)", statement "response = request.execute();"
