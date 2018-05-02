@@ -15,7 +15,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.io.FileReader;
 import java.io.Reader;
 import java.net.URI;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Properties;
@@ -55,7 +54,7 @@ public class MailChimper {
 
 			// see http://www.baeldung.com/how-to-use-resttemplate-with-basic-authentication-in-spring
 			String auth = "anystring:" + key;
-			byte[] encodedAuth = Base64.getEncoder().encode(auth.getBytes(Charset.forName("UTF-8")));
+			byte[] encodedAuth = Base64.getEncoder().encode(auth.getBytes(StandardCharsets.UTF_8));
 			authorizationHeaderValue = "Basic " + new String(encodedAuth);
 
 			log.info("MailChimpLoader's properties (re)loaded");
