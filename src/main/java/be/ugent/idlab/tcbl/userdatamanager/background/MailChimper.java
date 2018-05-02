@@ -71,7 +71,7 @@ public class MailChimper {
 			String url = baseUrl + "/lists/" + listId + "/members/" + getSubscriberHash(user.getUserName());
 			MailChimperUpdateUserData updateUserData = new MailChimperUpdateUserData(user);
 			HttpHeaders headers = new HttpHeaders();
-			headers.add("Authorization", authorizationHeaderValue);
+			headers.add(HttpHeaders.AUTHORIZATION, authorizationHeaderValue);
 			HttpEntity<MailChimperUpdateUserData> request = new HttpEntity<>(updateUserData, headers);
 			put(url, request);
 		}
@@ -130,7 +130,7 @@ public class MailChimper {
 							.queryParam("count", 100)
 							.build().toUri();
 					HttpHeaders headers = new HttpHeaders();
-					headers.add("Authorization", authorizationHeaderValue);
+					headers.add(HttpHeaders.AUTHORIZATION, authorizationHeaderValue);
 					HttpEntity<Object> request = new HttpEntity<>(headers);
 					ResponseEntity<MailChimperReturnCase1> response = restTemplate.exchange(url,  HttpMethod.GET, request, MailChimperReturnCase1.class);
 					HttpStatus status = response.getStatusCode();
