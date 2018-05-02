@@ -2,23 +2,22 @@ package be.ugent.idlab.tcbl.userdatamanager.background;
 
 import be.ugent.idlab.tcbl.userdatamanager.model.TCBLUser;
 import be.ugent.idlab.tcbl.userdatamanager.model.UserRepository;
-import com.google.gson.Gson;
-import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.JsonNode;
-import com.mashape.unirest.http.Unirest;
-import com.mashape.unirest.http.exceptions.UnirestException;
-import com.mashape.unirest.request.body.RequestBodyEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.env.Environment;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.*;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.FileReader;
 import java.io.Reader;
+import java.net.URI;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.Properties;
 
 /**
@@ -30,30 +29,35 @@ import java.util.Properties;
 public class MailChimper {
 	private final Logger log = LoggerFactory.getLogger(this.getClass());
 
+	private final String filename;
 	private final UserRepository userRepository;
+	private final RestTemplate restTemplate;
 
-	private String filename;
-
-	private String key;
 	private String listId;
 	private String baseUrl;
-
-	private final Gson gson = new Gson();
+	private String authorizationHeaderValue;
 
 	public MailChimper(Environment environment, UserRepository userRepository) {
 		this.filename = environment.getProperty("tudm.mailchimp.filename");
 		this.userRepository = userRepository;
+		this.restTemplate = new RestTemplate();
 	}
 
 	private boolean load() {
 		try (Reader in = new FileReader(filename)) {
 			Properties properties = new Properties();
 			properties.load(in);
-			key = properties.getProperty("key");
+			String key = properties.getProperty("key");
 			listId = properties.getProperty("list");
 			String apiVersion = properties.getProperty("api");
 			String dcPart = key.substring(key.lastIndexOf('-') + 1);
 			baseUrl = "https://" + dcPart + ".api.mailchimp.com/" + apiVersion;
+
+			// see http://www.baeldung.com/how-to-use-resttemplate-with-basic-authentication-in-spring
+			String auth = "anystring:" + key;
+			byte[] encodedAuth = Base64.getEncoder().encode(auth.getBytes(Charset.forName("UTF-8")));
+			authorizationHeaderValue = "Basic " + new String(encodedAuth);
+
 			log.info("MailChimpLoader's properties (re)loaded");
 			return true;
 		} catch (Exception e) {
@@ -65,35 +69,36 @@ public class MailChimper {
 	@Async
 	public void addOrUpdate(final TCBLUser user) {
 		if (load()) {
-			String subscriberHash = getSubscriberHash(user.getUserName());
-			String body = new UpdateUserData(user).toJSON();
-			RequestBodyEntity request = Unirest.put(baseUrl + "/lists/" + listId + "/members/" + subscriberHash)
-					.basicAuth("anystring", key)
-					.body(body);
-			send(request);
+			String url = baseUrl + "/lists/" + listId + "/members/" + getSubscriberHash(user.getUserName());
+			MailChimperUpdateUserData updateUserData = new MailChimperUpdateUserData(user);
+			HttpHeaders headers = new HttpHeaders();
+			headers.add("Authorization", authorizationHeaderValue);
+			HttpEntity<MailChimperUpdateUserData> request = new HttpEntity<>(updateUserData, headers);
+			put(url, request);
 		}
 	}
 
-	private void send(final RequestBodyEntity request) {
-		send(request, 42);
+	private void put(final String url, final HttpEntity<?> request) {
+		put(url, request, 42);
 	}
 
-	private void send(final RequestBodyEntity request, int nrRetry) {
+	private void put(final String url, final HttpEntity<?> request, int nrRetry) {
 		try {
-			HttpResponse<JsonNode> response = request.asJson();
-			if (response.getStatus() != 200) {
-				log.error("Error sending request to MailChimp API: {}. Trying again in 30 minutes {}", response.getStatusText());
+			ResponseEntity<Void> response = restTemplate.exchange(url, HttpMethod.PUT, request, Void.class);
+			HttpStatus status = response.getStatusCode();
+			if (status.value() != HttpStatus.OK.value()) {
+				log.error("Error sending request to MailChimp API: {}. Trying again in 30 minutes {}", status.getReasonPhrase());
 			} else {
 				return;
 			}
-		} catch (UnirestException e) {
+		} catch (Exception e) {
 			log.error("Error sending request to MailChimp API. Trying again in 30 minutes", e);
 		}
 		try {
 			Thread.sleep(30 * 60 * 1000);
 			if (nrRetry > 0) {
 				log.warn("Retrying update user request to MailChimp. {} attempts left.", nrRetry - 1);
-				send(request, nrRetry - 1);
+				put(url, request, nrRetry - 1);
 			}
 		} catch (InterruptedException e) {
 			log.error("Error sending request to MailChimp, giving up! {}", e);
@@ -119,26 +124,29 @@ public class MailChimper {
 			int totalCount = 100000000;
 			try {
 				while (totalCount > 0) {
-					HttpResponse<JsonNode> response = Unirest.get(baseUrl + "/lists/" + listId + "/members")
-							.queryString("fields", "members.email_address,total_items")
-							.queryString("status", "unsubscribed")
-							.queryString("offset", offset)
-							.queryString("count", 100)
-							.basicAuth("anystring", key)
-							.asJson();
-					if (response.getStatus() != HttpStatus.OK.value()) {
-						log.error("Could not retrieve list of members from MailChimp! Response: {}", response.getStatusText());
+					URI url = UriComponentsBuilder.fromHttpUrl(baseUrl + "/lists/" + listId + "/members")
+							.queryParam("fields", "members.email_address,total_items")
+							.queryParam("status", "unsubscribed")
+							.queryParam("offset", offset)
+							.queryParam("count", 100)
+							.build().toUri();
+					HttpHeaders headers = new HttpHeaders();
+					headers.add("Authorization", authorizationHeaderValue);
+					HttpEntity<Object> request = new HttpEntity<>(headers);
+					ResponseEntity<MailChimperReturnCase1> response = restTemplate.exchange(url,  HttpMethod.GET, request, MailChimperReturnCase1.class);
+					HttpStatus status = response.getStatusCode();
+					if (status.value() != HttpStatus.OK.value()) {
+						log.error("Could not retrieve list of members from MailChimp! Response: {}", status.getReasonPhrase());
 						return;
 					}
+					MailChimperReturnCase1 members = response.getBody();
 					if (totalCount == 100000000) {
-						totalCount = response.getBody().getObject().getInt("total_items");
+						totalCount = members.getTotalItems();
 					}
 					totalCount -= 100;
 					offset += 100;
-					String responseStr = response.getBody().getObject().toString();
-					MailChimpMembers members = gson.fromJson(responseStr, MailChimpMembers.class);
-					for (MailChimpMember mailChimpMember : members.getMembers()) {
-						String userName = mailChimpMember.getEmail_address();
+					for (MailChimperMember mailChimperMember : members.getMembers()) {
+						String userName = mailChimperMember.getEmailAddress();
 						try {
 							TCBLUser user = userRepository.findByName(userName);
 							if (user.isSubscribedNL()) {
@@ -151,36 +159,8 @@ public class MailChimper {
 					}
 
 				}
-			} catch (UnirestException e) {
+			} catch (Exception e) {
 				log.error("Could not retrieve list of members from MailChimp!", e);
-			}
-		}
-	}
-
-	private class UpdateUserData {
-		private final String email_address;
-		private final String status_if_new;
-		private final String status;
-		private final MergeFields merge_fields;
-
-		public UpdateUserData(TCBLUser user) {
-			this.email_address = user.getUserName();
-			this.status_if_new = user.isSubscribedNL() ? "subscribed" : "unsubscribed";
-			this.status = status_if_new;
-			this.merge_fields = new MergeFields(user.getFirstName(), user.getLastName());
-		}
-
-		public String toJSON() {
-			return gson.toJson(this);
-		}
-
-		private class MergeFields {
-			private final String FNAME;
-			private final String LNAME;
-
-			public MergeFields(String FNAME, String LNAME) {
-				this.FNAME = FNAME;
-				this.LNAME = LNAME;
 			}
 		}
 	}
