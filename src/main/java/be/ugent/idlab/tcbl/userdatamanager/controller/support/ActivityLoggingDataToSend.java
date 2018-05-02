@@ -43,7 +43,10 @@ public class ActivityLoggingDataToSend {
 
 	@Override
 	public String toString() {
-		return String.format("ActivityLoggingDataToSend{userName='%s', logType='%s}'", userName, logType);
+		return String.format("%s{userName='%s', logType='%s'}",
+				this.getClass().getSimpleName(),
+				userName,
+				logType);
 	}
 }
 

@@ -32,7 +32,9 @@ public class ActivityLoggingDataReturned {
 
 	@Override
 	public String toString() {
-		return String.format("ActivityLoggingDataReturned{uuid='%s'}", uuid);
+		return String.format("%s{uuid='%s'}",
+				this.getClass().getSimpleName(),
+				uuid);
 	}
 }
 
