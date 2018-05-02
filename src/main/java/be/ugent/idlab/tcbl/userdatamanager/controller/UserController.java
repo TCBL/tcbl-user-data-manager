@@ -10,22 +10,20 @@ import be.ugent.idlab.tcbl.userdatamanager.model.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.env.Environment;
-import org.springframework.http.HttpHeaders;
+import org.springframework.http.*;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.reactive.function.client.ClientRequest;
-import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
-import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
 
 import javax.servlet.http.HttpServletRequest;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.Base64;
+import java.util.Date;
 
 /**
  * <p>Copyright 2017 IDLab (Ghent University - imec)</p>
@@ -48,6 +46,7 @@ public class UserController {
 	private final PictureStorage pictureStorage;
 	private final static String profilePictureCategory = "pp";
 	private final ActivityLogger activityLogger;
+	private final RestTemplate restTemplate;
 
 
 	/**
@@ -67,6 +66,7 @@ public class UserController {
 		this.pictureStorage = pictureStorage;
 		this.mailChimper = mailChimper;
 		this.activityLogger = activityLogger;
+		restTemplate = new RestTemplate();
 	}
 
 	@ModelAttribute("privacyUrl")
@@ -93,19 +93,23 @@ public class UserController {
 				// perform a userinfo request to get the user ID (inum)
 				OAuth2AuthorizedClient authorizedClient = authorizedClientService.loadAuthorizedClient(authentication.getAuthorizedClientRegistrationId(), authentication.getName());
 				String userInfoEndpointUri = authorizedClient.getClientRegistration().getProviderDetails().getUserInfoEndpoint().getUri();
-				Map userAttributes = WebClient.builder()
-						.filter(oauth2Credentials(authorizedClient))
-						.build()
-						.get()
-						.uri(userInfoEndpointUri)
-						.retrieve()
-						.bodyToMono(Map.class)
-						.block();
-				id = userAttributes.get("inum").toString();
+
+				HttpHeaders headers = new HttpHeaders();
+				headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + authorizedClient.getAccessToken().getTokenValue());
+				headers.add(HttpHeaders.ACCEPT, "*/*");
+				ResponseEntity<UserInfoReturned> response = restTemplate.exchange(userInfoEndpointUri, HttpMethod.GET, new HttpEntity<>(headers), UserInfoReturned.class);
+				if (!response.getStatusCode().equals(HttpStatus.OK)) {
+					log.error("Cannot get user info. Possible causes: wrong OP configured; scope 'inum' is not defined or assigned to the user manager client. Server error: {}", response.toString());
+					model.addAttribute("status", new Status(Status.Value.ERROR, "Your information could not be found."));
+					return "user/info";
+				}
+
+				id = response.getBody().getInum();
 				tcblUser = userRepository.find(id);
 				if (tcblUser == null) {
 					log.error(String.format("Cannot find tcblUser for %s. The user repository may be broken.", id));
 					userName = "unknown";
+					// TODO: return wirh error in stead of just logging this?
 				} else {
 					userName = tcblUser.getUserName();
 				}
@@ -383,16 +387,6 @@ public class UserController {
 		}
 
 		return ct.getPreparedPath(model);
-	}
-
-	private ExchangeFilterFunction oauth2Credentials(OAuth2AuthorizedClient authorizedClient) {
-		return ExchangeFilterFunction.ofRequestProcessor(
-				clientRequest -> {
-					ClientRequest authorizedRequest = ClientRequest.from(clientRequest)
-							.header(HttpHeaders.AUTHORIZATION, "Bearer " + authorizedClient.getAccessToken().getTokenValue())
-							.build();
-					return Mono.just(authorizedRequest);
-				});
 	}
 
 	static String encodeBase64(final String input) {
