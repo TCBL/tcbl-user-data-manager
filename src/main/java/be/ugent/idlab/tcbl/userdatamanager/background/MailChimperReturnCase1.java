@@ -16,14 +16,6 @@ public class MailChimperReturnCase1 {
 	private int totalItems;
 	private List<MailChimperMember> members;
 
-	public MailChimperReturnCase1() {
-	}
-
-	public MailChimperReturnCase1(int totalItems, List<MailChimperMember> members) {
-		this.totalItems = totalItems;
-		this.members = members;
-	}
-
 	public int getTotalItems() {
 		return totalItems;
 	}

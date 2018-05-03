@@ -18,4 +18,12 @@ public class UserInfoReturned {
 	public void setInum(String inum) {
 		this.inum = inum;
 	}
+
+	@Override
+	public String toString() {
+		return String.format("%s{inum='%s'}",
+				this.getClass().getSimpleName(),
+				inum);
+	}
+
 }

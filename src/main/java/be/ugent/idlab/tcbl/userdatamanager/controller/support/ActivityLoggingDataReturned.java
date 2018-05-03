@@ -15,13 +15,6 @@ import java.io.Serializable;
 public class ActivityLoggingDataReturned {
 	private String uuid;
 
-	public ActivityLoggingDataReturned() {
-	}
-
-	public ActivityLoggingDataReturned(String uuid) {
-		this.uuid = uuid;
-	}
-
 	public String getUuid() {
 		return uuid;
 	}

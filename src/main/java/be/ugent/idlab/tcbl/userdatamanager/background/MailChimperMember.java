@@ -13,13 +13,6 @@ public class MailChimperMember {
 	@JsonProperty("email_address")
 	private String emailAddress;
 
-	public MailChimperMember() {
-	}
-
-	public MailChimperMember(String emailAddress) {
-		this.emailAddress = emailAddress;
-	}
-
 	public String getEmailAddress() {
 		return emailAddress;
 	}
