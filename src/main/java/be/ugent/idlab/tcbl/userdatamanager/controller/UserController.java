@@ -99,20 +99,23 @@ public class UserController {
 				headers.add(HttpHeaders.ACCEPT, "*/*");
 				ResponseEntity<UserInfoReturned> response = restTemplate.exchange(userInfoEndpointUri, HttpMethod.GET, new HttpEntity<>(headers), UserInfoReturned.class);
 				if (!response.getStatusCode().equals(HttpStatus.OK)) {
-					log.error("Cannot get user info. Possible causes: wrong OP configured; scope 'inum' is not defined or assigned to the user manager client. Server error: {}", response.toString());
-					model.addAttribute("status", new Status(Status.Value.ERROR, "Your information could not be found."));
-					return "user/info";
+					String msg = String.format("User info request returned status code '%s'). Possible cause: wrong OP configured.", response.getStatusCode().getReasonPhrase());
+					log.error(msg);
+					throw new Exception(msg);
 				}
-
 				id = response.getBody().getInum();
+				if (id == null) {
+					String msg = "User info request returned inum null. Possible cause: scope 'inum' is not visible to the user manager client.";
+					log.error(msg);
+					throw new Exception(msg);
+				}
 				tcblUser = userRepository.find(id);
 				if (tcblUser == null) {
-					log.error(String.format("Cannot find tcblUser for %s. The user repository may be broken.", id));
-					userName = "unknown";
-					// TODO: return wirh error in stead of just logging this?
-				} else {
-					userName = tcblUser.getUserName();
+					String msg = String.format("Cannot find tcblUser for inum '%s'. Possible cause: user repository not up to date.", id);
+					log.error(msg);
+					throw new Exception(msg);
 				}
+				userName = tcblUser.getUserName();
 				// This is a HACK: we add what we need elsewhere as details to the OAuth2AuthenticationToken object.
 				// When changing, also check all uses of the corresponding .getDetails() method!
 				authentication.setDetails(new MyAuthenticationDetails(id, userName));
@@ -120,15 +123,19 @@ public class UserController {
 				// This is a workable HACK for activity logging,
 				// as long as this is the only endpoint that requires login!
 				// Otherwise we'll need to intercept the OAuth2 login success handler...
-				activityLogger.log(userName, ActivityLoggingType.login);
+				activityLogger.log(tcblUser, ActivityLoggingType.login);
 			} else {
 				id = myAuthenticationDetails.getId();
 				tcblUser = userRepository.find(id);
+				if (tcblUser == null) {
+					String msg = String.format("Cannot find tcblUser for inum '%s'. The user repository may be broken.", id);
+					log.error(msg);
+					throw new Exception(msg);
+				}
 			}
-			// note: if no user found, tcblUser is null, and this is covered nicely by the view
 			model.addAttribute("tcblUser", tcblUser);
 		} catch (Exception e) {
-			log.error("Cannot get user info. Possible causes: wrong OP configured; scope 'inum' is not defined or assigned to the user manager client.", e);
+			log.error("User info request aborted because of exception.", e);
 			model.addAttribute("status", new Status(Status.Value.ERROR, "Your information could not be found."));
 		}
 		return "user/info";
@@ -153,7 +160,7 @@ public class UserController {
 			model.addAttribute("tcblUser", user);
 			model.addAttribute("status", new Status(Status.Value.OK, "Your information is updated."));
 			mailChimper.addOrUpdate(user);
-			activityLogger.log(user.getUserName(), ActivityLoggingType.profile_updated);
+			activityLogger.log(user, ActivityLoggingType.profile_updated);
 		} catch (Exception e) {
 			log.error("Cannot update user info", e);
 			model.addAttribute("status", new Status(Status.Value.ERROR, "Your information could not be updated."));
@@ -207,7 +214,7 @@ public class UserController {
 			ct.setUtext(getEmailInformationText(user.getUserName()));
 			ct.addNavLink(new NavLink(NavLink.DisplayCondition.ALWAYS, "Try again", "/user/register"));
 			ct.setStatus(new Status(Status.Value.OK, "Please check your mailbox."));
-			activityLogger.log(newUser.getUserName(), ActivityLoggingType.registration_mailsent);
+			activityLogger.log(newUser, ActivityLoggingType.registration_mailsent);
 
 			// end well; avoid deletion here
 			profilePictureMustBeDeleted = false;
@@ -265,7 +272,7 @@ public class UserController {
 				user.setActiveSince(new Date());
 				userRepository.save(user);
 				mailChimper.addOrUpdate(user);
-				activityLogger.log(user.getUserName(), ActivityLoggingType.registration_completed);
+				activityLogger.log(user, ActivityLoggingType.registration_completed);
 			}
 			ct.setUtext("<p>You're successfully signed up!</p>" +
 					"<p>You can now use your new account to login.</p>" +
@@ -299,7 +306,7 @@ public class UserController {
 			userExists = true;
 			String baseUri = getUriSomeLevelsUp(request, 1);
 			sendResetMessage(user, baseUri);
-			activityLogger.log(user.getUserName(), ActivityLoggingType.resetpassword_mailsent);
+			activityLogger.log(user, ActivityLoggingType.resetpassword_mailsent);
 			ct.setUtext(getEmailInformationText(mail) +
 					"<p>The link is only valid for <b>one hour</b>, starting now.</p>");
 			ct.addNavLink(new NavLink(NavLink.DisplayCondition.ALWAYS, "Try again", "/user/resetpw"));
@@ -374,7 +381,7 @@ public class UserController {
 			// If the user hadn't accepted the PP earlier, he will have done it now in user/resetpwform
 			user.setAcceptedPP(true);
 			userRepository.save(user);
-			activityLogger.log(user.getUserName(), ActivityLoggingType.resetpassword_completed);
+			activityLogger.log(user, ActivityLoggingType.resetpassword_completed);
 			ct.setUtext("<p>You've successfully updated your password!</p>");
 			ct.setStatus(new Status(Status.Value.OK, "Password updated."));
 		} catch (Exception e) {

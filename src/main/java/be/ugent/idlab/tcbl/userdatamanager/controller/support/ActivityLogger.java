@@ -1,5 +1,6 @@
 package be.ugent.idlab.tcbl.userdatamanager.controller.support;
 
+import be.ugent.idlab.tcbl.userdatamanager.model.TCBLUser;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
@@ -65,8 +66,18 @@ public class ActivityLogger {
 	}
 
 	@Async
-	public void log(String userName, ActivityLoggingType logType) {
-		send(new ActivityLoggingDataToSend(userName, logType.getValue()));
+	public void log(TCBLUser tcblUser, ActivityLoggingType logType) {
+		if (tcblUser == null) {
+			log.error(String.format("Activity logging - not logging event %s for null user", logType.getValue()));
+		} else {
+			String userName = tcblUser.getUserName();
+			if (tcblUser.isAllowedMon()) {
+				send(new ActivityLoggingDataToSend(userName, logType.getValue()));
+			} else {
+				log.debug(String.format("Activity logging not allowed for user %s.", userName));
+			}
+
+		}
 	}
 
 	private void send(ActivityLoggingDataToSend record) {
@@ -91,7 +102,7 @@ public class ActivityLogger {
 				log.error(String.format("Activity logging - failed sending %s: %s.", record.toString(), e.getMessage()));
 			}
 		} else {
-			log.debug(String.format("Activity logging - not sending %s.", record.toString()));
+			log.debug(String.format("Activity logging - cannot send %s.", record.toString()));
 		}
 	}
 }
