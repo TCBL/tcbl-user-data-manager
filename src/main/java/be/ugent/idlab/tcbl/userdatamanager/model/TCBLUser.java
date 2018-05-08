@@ -132,15 +132,15 @@ public class TCBLUser {
 
 	@Override
 	public String toString() {
-		return "TCBLUser{" +
-				"userName='" + userName + '\'' +
-				", firstName='" + firstName + '\'' +
-				", lastName='" + lastName + '\'' +
-				", pictureURL='" + pictureURL + '\'' +
-				", subscribedNL='" + subscribedNL + '\'' +
-				", acceptedPP='" + acceptedPP + '\'' +
-				", allowedMon='" + allowedMon + '\'' +
-				'}';
+		return String.format("%s{userName='%s', firstName='%s', lastName='%s', pictureURL=%s, subscribedNL=%b, acceptedPP=%b, allowedMon=%b}",
+				this.getClass().getSimpleName(),
+				userName,
+				firstName,
+				lastName,
+				pictureURL == null ? "null" : pictureURL,
+				subscribedNL,
+				acceptedPP,
+				allowedMon);
 	}
 
 	public String getInum() {

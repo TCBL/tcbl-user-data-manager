@@ -147,20 +147,26 @@ public class UserController {
 						  TCBLUser user,
 						  @RequestParam("profilePictureFile") MultipartFile profilePictureFile) {
 		try {
-			// next test avoids deletion of previous picture, if available
+			TCBLUser oldUser = userRepository.find(user.getInum());
+			boolean samePicture;
+			// next test avoids deletion of unmodified previously available picture
 			// user.getPictureURL
-			// - null: no previous picture
-			// - empty: picture was modified in the frontend now (see Javascript)
-			// - not empty: previous picture not modified
-			if (user.getPictureURL() == null || user.getPictureURL().isEmpty()) {
+			// - not null and not empty: previous picture was available and it was not modified now
+			// - otherwise: previous picture was not available or picture was modified in the frontend now (see Javascript)
+			if (user.getPictureURL() != null && !user.getPictureURL().isEmpty()) {
+				samePicture = true;
+			} else {
 				String profilePictureKey = getProfilePictureKey(user.getUserName());
 				storeProfilePicture(request, profilePictureFile, profilePictureKey, user);
+				samePicture = false;
 			}
+			// calculate update before saving, because saving modifies oldUser in place!
+			UserProfileUpdateData userProfileUpdateData = new UserProfileUpdateData(oldUser, user, samePicture);
 			userRepository.save(user);
 			model.addAttribute("tcblUser", user);
 			model.addAttribute("status", new Status(Status.Value.OK, "Your information is updated."));
 			mailChimper.addOrUpdate(user);
-			activityLogger.log(user, ActivityLoggingType.profile_updated);
+			activityLogger.log(user, ActivityLoggingType.profile_updated, userProfileUpdateData);
 		} catch (Exception e) {
 			log.error("Cannot update user info", e);
 			model.addAttribute("status", new Status(Status.Value.ERROR, "Your information could not be updated."));

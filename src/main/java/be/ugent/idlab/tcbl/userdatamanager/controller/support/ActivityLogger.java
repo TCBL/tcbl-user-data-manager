@@ -65,14 +65,18 @@ public class ActivityLogger {
 		this.restTemplate = new RestTemplate(new HttpComponentsClientHttpRequestFactory(client));
 	}
 
-	@Async
 	public void log(TCBLUser tcblUser, ActivityLoggingType logType) {
+		log(tcblUser, logType, null);
+	}
+
+	@Async
+	public void log(TCBLUser tcblUser, ActivityLoggingType logType, Object extraData) {
 		if (tcblUser == null) {
 			log.error(String.format("Activity logging - not logging event %s for null user", logType.getValue()));
 		} else {
 			String userName = tcblUser.getUserName();
 			if (tcblUser.isAllowedMon()) {
-				send(new ActivityLoggingDataToSend(userName, logType.getValue()));
+				send(new ActivityLoggingDataToSend(userName, logType.getValue(), extraData));
 			} else {
 				log.debug(String.format("Activity logging not allowed for user %s.", userName));
 			}
