@@ -80,7 +80,6 @@ public class ActivityLogger {
 			} else {
 				log.debug(String.format("Activity logging not allowed for user %s.", userName));
 			}
-
 		}
 	}
 
@@ -92,7 +91,8 @@ public class ActivityLogger {
 				headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + jwtKey);
 				// All other needed headers (such as Accept and Content-Type) are added nicely by RestTemplate.
 				// To check the finally constructed request right before it is sent, set a breakpoint
-				// in RestTemplate.java, method "protected <T> T doExecute(...)", statement "response = request.execute();"
+				// in RestTemplate.java, method "protected <T> T doExecute(...)", statement "response = request.execute();".
+				// To see the physical payload, set in application.yml: logging.level.org.apache.http.wire debug.
 				HttpEntity<ActivityLoggingDataToSend> request = new HttpEntity<>(record, headers);
 
 				ResponseEntity<ActivityLoggingDataReturned> response = restTemplate.postForEntity(endpoint, request, ActivityLoggingDataReturned.class);
@@ -106,7 +106,7 @@ public class ActivityLogger {
 				log.error(String.format("Activity logging - failed sending %s: %s.", record.toString(), e.getMessage()));
 			}
 		} else {
-			log.debug(String.format("Activity logging - cannot send %s.", record.toString()));
+			log.debug(String.format("Activity logging - disabled; cannot send %s.", record.toString()));
 		}
 	}
 }
