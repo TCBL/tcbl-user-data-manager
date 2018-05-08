@@ -278,7 +278,7 @@ public class UserController {
 				user.setActiveSince(new Date());
 				userRepository.save(user);
 				mailChimper.addOrUpdate(user);
-				activityLogger.log(user, ActivityLoggingType.registration_completed);
+				activityLogger.log(user, ActivityLoggingType.registration_completed, new NewUserData(user));
 			}
 			ct.setUtext("<p>You're successfully signed up!</p>" +
 					"<p>You can now use your new account to login.</p>" +

@@ -8,13 +8,13 @@ package be.ugent.idlab.tcbl.userdatamanager.controller.support;
  * @author Martin Vanbrabant
  */
 public enum ActivityLoggingType {
-	login                  ("usermanager.user/login"),
-	logout                 ("usermanager.user/logout"),
 	registration_mailsent  ("usermanager.user/registration.mailsent"),
 	registration_completed ("usermanager.user/registration.completed"),
+	login                  ("usermanager.user/login"),
+	profile_updated        ("usermanager.user/profile.updated"),
+	logout                 ("usermanager.user/logout"),
 	resetpassword_mailsent ("usermanager.user/resetpassword.mailsent"),
-	resetpassword_completed("usermanager.user/resetpassword.completed"),
-	profile_updated        ("usermanager.user/profile.updated");
+	resetpassword_completed("usermanager.user/resetpassword.completed");
 
 	private final String value;
 
