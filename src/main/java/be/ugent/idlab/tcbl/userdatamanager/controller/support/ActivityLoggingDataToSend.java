@@ -1,6 +1,6 @@
 package be.ugent.idlab.tcbl.userdatamanager.controller.support;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
@@ -10,43 +10,28 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  *
  * @author Martin Vanbrabant
  */
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class ActivityLoggingDataToSend {
 	@JsonProperty("userID")
 	private String userName;
 	@JsonProperty("type")
 	private String logType;
+	@JsonInclude(JsonInclude.Include.NON_NULL)
+	@JsonProperty("data")
+	private Object extraData;
 
-	public ActivityLoggingDataToSend() {
-	}
-
-	public String getUserName() {
-		return userName;
-	}
-
-	public ActivityLoggingDataToSend(String userName, String logType) {
+	public ActivityLoggingDataToSend(String userName, String logType, Object extraData) {
 		this.userName = userName;
 		this.logType = logType;
-	}
-
-	public void setUserName(String userName) {
-		this.userName = userName;
-	}
-
-	public String getLogType() {
-		return logType;
-	}
-
-	public void setLogType(String logType) {
-		this.logType = logType;
+		this.extraData = extraData;
 	}
 
 	@Override
 	public String toString() {
-		return String.format("%s{userName='%s', logType='%s'}",
+		return String.format("%s{userName='%s', logType='%s', extraData=%s}",
 				this.getClass().getSimpleName(),
 				userName,
-				logType);
+				logType,
+				extraData == null ? "null" : "'" + extraData.toString() + "'");
 	}
 }
 

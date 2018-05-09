@@ -456,3 +456,7 @@ Put your specific `application.yml` in the root directory of the project.
 Ready to run!
 
 Same remark as for running using maven.
+
+## Detailed documentation
+
+* [Activity logging](activity-logging.md)

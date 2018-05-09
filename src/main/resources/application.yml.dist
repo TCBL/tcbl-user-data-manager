@@ -54,6 +54,8 @@ logging:
     be.ugent.idlab: debug
     org.thymeleaf: info
     org.apache: info
+    #org.apache.http.wire: debug
+    #org.springframework: debug
     org.springframework.web: warn
     org.springframework.security: warn
 

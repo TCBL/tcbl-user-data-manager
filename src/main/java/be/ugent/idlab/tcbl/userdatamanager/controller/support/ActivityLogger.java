@@ -1,5 +1,6 @@
 package be.ugent.idlab.tcbl.userdatamanager.controller.support;
 
+import be.ugent.idlab.tcbl.userdatamanager.model.TCBLUser;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
@@ -64,9 +65,22 @@ public class ActivityLogger {
 		this.restTemplate = new RestTemplate(new HttpComponentsClientHttpRequestFactory(client));
 	}
 
+	public void log(TCBLUser tcblUser, ActivityLoggingType logType) {
+		log(tcblUser, logType, null);
+	}
+
 	@Async
-	public void log(String userName, ActivityLoggingType logType) {
-		send(new ActivityLoggingDataToSend(userName, logType.getValue()));
+	public void log(TCBLUser tcblUser, ActivityLoggingType logType, Object extraData) {
+		if (tcblUser == null) {
+			log.error(String.format("Activity logging - not logging event %s for null user", logType.getValue()));
+		} else {
+			String userName = tcblUser.getUserName();
+			if (tcblUser.isAllowedMon()) {
+				send(new ActivityLoggingDataToSend(userName, logType.getValue(), extraData));
+			} else {
+				log.debug(String.format("Activity logging not allowed for user %s.", userName));
+			}
+		}
 	}
 
 	private void send(ActivityLoggingDataToSend record) {
@@ -77,7 +91,8 @@ public class ActivityLogger {
 				headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + jwtKey);
 				// All other needed headers (such as Accept and Content-Type) are added nicely by RestTemplate.
 				// To check the finally constructed request right before it is sent, set a breakpoint
-				// in RestTemplate.java, method "protected <T> T doExecute(...)", statement "response = request.execute();"
+				// in RestTemplate.java, method "protected <T> T doExecute(...)", statement "response = request.execute();".
+				// To see the physical payload, set in application.yml: logging.level.org.apache.http.wire debug.
 				HttpEntity<ActivityLoggingDataToSend> request = new HttpEntity<>(record, headers);
 
 				ResponseEntity<ActivityLoggingDataReturned> response = restTemplate.postForEntity(endpoint, request, ActivityLoggingDataReturned.class);
@@ -91,7 +106,7 @@ public class ActivityLogger {
 				log.error(String.format("Activity logging - failed sending %s: %s.", record.toString(), e.getMessage()));
 			}
 		} else {
-			log.debug(String.format("Activity logging - not sending %s.", record.toString()));
+			log.debug(String.format("Activity logging - disabled; cannot send %s.", record.toString()));
 		}
 	}
 }

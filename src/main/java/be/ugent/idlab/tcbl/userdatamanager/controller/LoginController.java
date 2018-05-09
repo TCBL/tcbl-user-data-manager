@@ -4,6 +4,8 @@ import be.ugent.idlab.tcbl.userdatamanager.controller.support.ActivityLogger;
 import be.ugent.idlab.tcbl.userdatamanager.controller.support.ActivityLoggingType;
 import be.ugent.idlab.tcbl.userdatamanager.model.NavLink;
 import be.ugent.idlab.tcbl.userdatamanager.model.Status;
+import be.ugent.idlab.tcbl.userdatamanager.model.TCBLUser;
+import be.ugent.idlab.tcbl.userdatamanager.model.UserRepository;
 import org.springframework.boot.context.properties.bind.BindResult;
 import org.springframework.boot.context.properties.bind.Bindable;
 import org.springframework.boot.context.properties.bind.Binder;
@@ -26,9 +28,12 @@ import java.util.Set;
 @Controller
 public class LoginController {
 	private final String redirectDirective;
+	private final UserRepository userRepository;
 	private final ActivityLogger activityLogger;
 
-	public LoginController(final Environment environment, ActivityLogger activityLogger) throws Exception {
+	public LoginController(final Environment environment,
+						   UserRepository userRepository,
+						   ActivityLogger activityLogger) throws Exception {
 		// find the redirect path; we need this to do a correct forwarding. The path is composed
 		Set<String> clientPropertyKeys = resolveClientPropertyKeys(environment);
 		if (!clientPropertyKeys.isEmpty()) {
@@ -37,6 +42,7 @@ public class LoginController {
 		} else {
 			throw new Exception("No client defined.");
 		}
+		this.userRepository = userRepository;
 		this.activityLogger = activityLogger;
 	}
 
@@ -45,7 +51,8 @@ public class LoginController {
 							 @RequestParam String id_token_hint,
 							 @RequestParam String post_logout_redirect_uri,
 							 @RequestParam String un) {
-		activityLogger.log(un, ActivityLoggingType.logout);
+		TCBLUser tcblUser = userRepository.findByName(un);
+		activityLogger.log(tcblUser, ActivityLoggingType.logout);
 		return "redirect:" + op + "/oxauth/seam/resource/restv1/oxauth/end_session?id_token_hint=" + id_token_hint + "&post_logout_redirect_uri=" + post_logout_redirect_uri;
 	}
 
