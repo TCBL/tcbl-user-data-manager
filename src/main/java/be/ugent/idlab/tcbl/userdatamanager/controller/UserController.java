@@ -148,20 +148,20 @@ public class UserController {
 						  @RequestParam("profilePictureFile") MultipartFile profilePictureFile) {
 		try {
 			TCBLUser oldUser = userRepository.find(user.getInum());
-			boolean samePicture;
+			boolean pictureUpdated;
 			// next test avoids deletion of unmodified previously available picture
 			// user.getPictureURL
-			// - not null and not empty: previous picture was available and it was not modified now
+			// - not null and not empty: previous picture was available and it was not updated now
 			// - otherwise: previous picture was not available or picture was modified in the frontend now (see Javascript)
 			if (user.getPictureURL() != null && !user.getPictureURL().isEmpty()) {
-				samePicture = true;
+				pictureUpdated = false;
 			} else {
 				String profilePictureKey = getProfilePictureKey(user.getUserName());
 				storeProfilePicture(request, profilePictureFile, profilePictureKey, user);
-				samePicture = false;
+				pictureUpdated = oldUser.getPictureURL() != null && user.getPictureURL() != null;
 			}
 			// calculate update before saving, because saving modifies oldUser in place!
-			UserProfileUpdateData userProfileUpdateData = new UserProfileUpdateData(oldUser, user, samePicture);
+			UserProfileUpdateData userProfileUpdateData = new UserProfileUpdateData(oldUser, user, pictureUpdated);
 			userRepository.save(user);
 			model.addAttribute("tcblUser", user);
 			model.addAttribute("status", new Status(Status.Value.OK, "Your information is updated."));
@@ -278,7 +278,7 @@ public class UserController {
 				user.setActiveSince(new Date());
 				userRepository.save(user);
 				mailChimper.addOrUpdate(user);
-				activityLogger.log(user, ActivityLoggingType.registration_completed, new NewUserData(user));
+				activityLogger.log(user, ActivityLoggingType.registration_completed, new UserProfileData(user));
 			}
 			ct.setUtext("<p>You're successfully signed up!</p>" +
 					"<p>You can now use your new account to login.</p>" +

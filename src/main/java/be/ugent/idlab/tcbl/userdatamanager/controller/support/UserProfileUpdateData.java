@@ -8,66 +8,49 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * <p>Extra data to send in ActivityLogger, in case of a user profile update.</p>
+ * <p>Extra data to send in ActivityLogger, in case of a user profile was updated.</p>
  * <p>
  * <p>Copyright 2018 IDLab (Ghent University - imec)</p>
  *
  * @author Martin Vanbrabant
  */
-public class UserProfileUpdateData {
-
+public class UserProfileUpdateData extends UserProfileData {
 
 	@JsonProperty
 	private final List<String> updates;
 
-	public UserProfileUpdateData(TCBLUser oldUser, TCBLUser newUser, boolean samePicture) {
-		this.updates = new ArrayList<>();
-		addUpdatedString(oldUser.getFirstName(), newUser.getFirstName(), "firstName", false);
-		addUpdatedString(oldUser.getLastName(), newUser.getLastName(), "lastName", false);
-		addUpdatedPicture(oldUser.getPictureURL(), newUser.getPictureURL(), "picture", samePicture);
-		addUpdatedBoolean(oldUser.isSubscribedNL(), newUser.isSubscribedNL(), "subscribedNL");
-		addUpdatedBoolean(oldUser.isAcceptedPP(), newUser.isAcceptedPP(), "acceptedPP");
-		addUpdatedBoolean(oldUser.isAllowedMon(), newUser.isAllowedMon(), "allowedMon");
-	}
-
-	private void addUpdatedString(String oldValue, String newValue, String label, boolean showNewValue) {
-		if (!Objects.equals(oldValue, newValue)) {
-			if (showNewValue) {
-				updates.add(String.format(label + " (%s)", newValue));
-			} else {
-				updates.add(label);
-			}
+	public UserProfileUpdateData(TCBLUser oldUser, TCBLUser newUser, boolean pictureUpdated) {
+		super(newUser);
+		List<String> updates = new ArrayList<>();
+		if (!Objects.equals(oldUser.getFirstName(), newUser.getFirstName())) {
+			updates.add("firstName");
 		}
-	}
-
-	private void addUpdatedBoolean(boolean oldValue, boolean newValue, String label) {
-		if (!Objects.equals(oldValue, newValue)) {
-			updates.add(String.format(label + " (%b)", newValue));
+		if (!Objects.equals(oldUser.getLastName(), newUser.getLastName())) {
+			updates.add("lastName");
 		}
-	}
-
-	private void addUpdatedPicture(String oldPictureURL, String newPictureURL, String label, boolean samePicture) {
-		// for a given user, the pictureURL will allways be null or one userName-dependent fixed value
-		// if neither the old nor the new pictureURL is null, we need the hint from samePicture to detect actual updates to the picture
-		if (oldPictureURL == null) {
-			if (newPictureURL != null) {
-				updates.add(label + " (added)");
-			}
-		} else {
-			if (newPictureURL == null) {
-				updates.add(label + " (deleted)");
-			} else {
-				if (!samePicture) {
-					updates.add(label + " (updated)");
-				}
-			}
+		if (!Objects.equals(oldUser.getPictureURL(), newUser.getPictureURL())) {
+			updates.add("hasPicture");
 		}
+		// picture updates cannot be deducted from the pictureURL. Get this info from the user interface...
+		if (pictureUpdated) {
+			updates.add("picture");
+		}
+		if (!Objects.equals(oldUser.isAcceptedPP(), newUser.isAcceptedPP())) {
+			updates.add("acceptedPP");
+		}
+		if (!Objects.equals(oldUser.isAllowedMon(), newUser.isAllowedMon())) {
+			updates.add("allowedMon");
+		}
+		if (!Objects.equals(oldUser.isSubscribedNL(), newUser.isSubscribedNL())) {
+			updates.add("subscribedNL");
+		}
+		this.updates = updates;
 	}
 
 	@Override
 	public String toString() {
-		return String.format("%s{updates=%s}",
+		return String.format("%s{hasPicture=%b, acceptedPP=%b, allowedMon=%b, subscribedNL=%b, updates=%s}",
 				this.getClass().getSimpleName(),
-				updates.toString());
+				hasPicture,	subscribedNL, acceptedPP, allowedMon, updates.toString());
 	}
 }
