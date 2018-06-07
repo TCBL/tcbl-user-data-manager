@@ -1,6 +1,8 @@
 // Logging to the behaviourkit logging endpoint javascript example
 // More readable version, but basically the same as logit_golden.js
 
+// NOTE: not updated for https and new host - use logit.sh to test!
+
 // Host name of the behaviourkit API
 var HOST_NAME = "api.behaviourkit.tocker.iminds.be";
 // Path of the logging endpoint

@@ -2,12 +2,8 @@
 # Logging to the behaviourkit logging endpoint curl example
 # More readable version, but basically the same as logit_golden.sh
 
-# Host name of the behaviourkit API
-HOST_NAME=api.behaviourkit.tocker.iminds.be
-# Path of the logging endpoint
-LOGGING_PATH=/logs
-
-LOGGING_ENDPOINT=http://${HOST_NAME}${LOGGING_PATH}
+#LOGGING_ENDPOINT=http://api.behaviourkit.tocker.iminds.be/logs
+LOGGING_ENDPOINT=https://api.behaviourkit.duxis.io/logs
 
 # JWT keys of platforms: copy from http://admin.behaviourkit.tocker.iminds.be/platforms
 
