@@ -91,5 +91,15 @@ public class Stats implements Serializable {
 		}
 		return values.toArray(new Integer[values.size()]);
 	}
+
+	public String getDataString() {
+		StringBuilder str = new StringBuilder("Date,Active users\n");
+		for (Map.Entry<Long, Integer> datelongToActive : activeAtTime.entrySet()) {
+			Date date = new Date(datelongToActive.getKey());
+			String dateStr =  dateFormat.format(date);
+			str.append(dateStr).append(',').append(datelongToActive.getValue()).append('\n');
+		}
+		return str.toString();
+	}
 }
 

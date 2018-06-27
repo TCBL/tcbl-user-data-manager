@@ -19,7 +19,24 @@
         <div th:unless="${totalCount} != null">
             <p>No stats found!</p>
         </div>
-        <canvas id="myChart" width="600" height="400"></canvas>
+
+        <div id="graphdiv" style="width:800px; height:400px;"></div>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/dygraph/2.1.0/dygraph.min.js"></script>
+        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/dygraph/2.1.0/dygraph.min.css" />
+        <!--script th:src="@{/webjars/github-com-danvk-dygraphs/2.0.0/dygraph.js}"></script-->
+        <script th:inline="javascript">
+            var dataStr = [[${dataStr}]];
+            g = new Dygraph(
+
+                // containing div
+                document.getElementById("graphdiv"),
+
+                // the data
+                dataStr
+            );
+        </script>
+
+        <!--canvas id="myChart" width="600" height="400"></canvas>
         <script th:src="@{/webjars/chartjs/2.7.0/Chart.min.js}"></script>
         <script th:inline="javascript">
             var ctx = document.getElementById("myChart").getContext('2d');
@@ -91,7 +108,7 @@
                     }
                 }
             );
-        </script>
+        </script-->
     </main>
 </div>
 </body>

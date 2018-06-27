@@ -38,6 +38,7 @@ public class StatController {
 		model.addAttribute("active", stats.getActiveValues());
 		model.addAttribute("totalActive", stats.getTotalActiveValues());
 		model.addAttribute("testUsers", stats.testUsers);
+		model.addAttribute("dataStr", stats.getDataString());
 		return "stats/users";
 	}
 }
