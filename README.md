@@ -7,6 +7,8 @@ This README describes how to build and configure it.
 The code and documentation are based on [this sample](https://github.com/spring-projects/spring-security/tree/master/samples/boot/oauth2login)
 and [this how-to](https://www.drissamri.be/blog/java/enable-https-in-spring-boot/).
 
+**NOTE** At this moment, the Usermanager is only fully tested in Java 8.
+
 ## Building
 
 Building the code is trivial using maven. Or open the `pom.xml` as a project in your IDE.
