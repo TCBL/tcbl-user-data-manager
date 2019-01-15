@@ -462,3 +462,19 @@ Same remark as for running using maven.
 ## Detailed documentation
 
 * [Activity logging](activity-logging.md)
+
+## License information
+
+This component is licensed under the Apache 2.0 License . See license.txt.
+
+Component | License
+----------|--------
+Spring Boot 2.0.1 | Apache License 2.0
+Spring Security 5.0.4 | Apache License 2.0
+Thymeleaf 3.0.2 | Apache License 2.0
+Gluu SCIM Client 3.0.2 | MIT License
+SLF4J 1.7.25 | MIT License
+Webjars | MIT License
+jQuery 1.12.4 | MIT License
+Chart.js 2.7.0 | MIT License
+
