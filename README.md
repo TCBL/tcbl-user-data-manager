@@ -231,7 +231,7 @@ spring:
 
 ### 3. SCIM configuration
 
-Follow the instructions of [1. Preparations](https://gitlab.ilabt.imec.be/TCBL/internal-server-docs/wikis/scim-2-0-setup#1-preparations) of
+Follow the instructions of [1. Preparations](https://github.com/TCBL/internal-server-docs/wiki/scim-2-0-setup#1-preparations) of
 chapter **Setting up a SCIM 2.0 client** from the Scim 2.0 wiki page. In this page, the client is this application.
 
 Skip **2 Setting up the client application**.
@@ -253,7 +253,7 @@ scim:
 
 ### 4. Datasource configuration
 
-Follow the instructions of [MariaDB](https://gitlab.ilabt.imec.be/TCBL/internal-server-docs/wikis/mariadb) of the
+Follow the instructions of [MariaDB](https://github.com/TCBL/internal-server-docs/wiki/mariadb) of the
 server installation to set up a database.
 
 Now we need to create a user (and password) and a table. Become root (*not* just sudo) and log into the database:
