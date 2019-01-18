@@ -465,7 +465,7 @@ Same remark as for running using maven.
 
 ## License information
 
-This component is licensed under the Apache 2.0 License . See license.txt.
+This component is licensed under the Apache 2.0 License. See also file LICENSE in the repository root.
 
 Component | License
 ----------|--------
