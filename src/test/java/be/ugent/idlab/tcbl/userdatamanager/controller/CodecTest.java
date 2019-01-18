@@ -6,8 +6,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
 /**
- * <p>Copyright 2017 IDLab (Ghent University - imec)</p>
- *
  * @author Gerald Haesendonck
  */
 

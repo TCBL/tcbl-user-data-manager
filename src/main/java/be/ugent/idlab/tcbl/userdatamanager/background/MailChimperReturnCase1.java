@@ -6,8 +6,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 
 /**
- * <p>Copyright 2018 IDLab (Ghent University - imec)</p>
- *
  * @author Gerald Haesendonck
  */
 @JsonIgnoreProperties(ignoreUnknown = true)

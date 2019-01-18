@@ -18,8 +18,6 @@ import java.util.ArrayList;
 import java.util.Date;
 
 /**
- * <p>Copyright 2017 IDLab (Ghent University - imec)</p>
- *
  * @author Gerald Haesendonck
  */
 @RestController

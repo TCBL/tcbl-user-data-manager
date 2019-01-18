@@ -1,8 +1,6 @@
 package be.ugent.idlab.tcbl.userdatamanager.model;
 
 /**
- * <p>Copyright 2017 IDLab (Ghent University - imec)</p>
- *
  * @author Martin Vanbrabant
  */
 public class NavLink {

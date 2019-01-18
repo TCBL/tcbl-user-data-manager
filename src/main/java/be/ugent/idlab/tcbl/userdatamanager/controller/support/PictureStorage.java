@@ -21,8 +21,6 @@ import java.util.Map;
  *
  * Inspired on https://spring.io/guides/gs/uploading-files/
  *
- * <p>Copyright 2018 IDLab (Ghent University - imec)</p>
- *
  * @author Martin Vanbrabant
  */
 public class PictureStorage {

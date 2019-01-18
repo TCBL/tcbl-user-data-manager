@@ -8,8 +8,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 /**
- * <p>Copyright 2017 IDLab (Ghent University - imec)</p>
- *
  * @author Gerald Haesendonck
  */
 

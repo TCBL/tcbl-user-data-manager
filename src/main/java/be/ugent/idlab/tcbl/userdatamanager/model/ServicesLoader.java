@@ -12,8 +12,6 @@ import java.util.List;
 
 /**
  * <p>A class to load the TCBL services from file.</p>
- * <p>
- * <p>Copyright 2017 IDLab (Ghent University - imec)</p>
  *
  * @author Martin Vanbrabant
  */

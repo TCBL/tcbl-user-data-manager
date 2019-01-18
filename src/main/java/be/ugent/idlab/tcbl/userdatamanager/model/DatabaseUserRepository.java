@@ -6,8 +6,6 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 /**
- * <p>Copyright 2018 IDLab (Ghent University - imec)</p>
- *
  * @author Gerald Haesendonck
  */
 @Component

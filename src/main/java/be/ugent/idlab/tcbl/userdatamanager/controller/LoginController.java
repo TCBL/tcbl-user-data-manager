@@ -21,8 +21,6 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * <p>Copyright 2017 IDLab (Ghent University - imec)</p>
- *
  * @author Gerald Haesendonck
  */
 @Controller

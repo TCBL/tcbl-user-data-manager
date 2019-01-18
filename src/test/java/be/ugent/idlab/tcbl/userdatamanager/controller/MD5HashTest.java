@@ -8,8 +8,6 @@ import java.security.NoSuchAlgorithmException;
 import static junit.framework.TestCase.assertEquals;
 
 /**
- * <p>Copyright 2018 IDLab (Ghent University - imec)</p>
- *
  * @author Gerald Haesendonck
  */
 public class MD5HashTest {

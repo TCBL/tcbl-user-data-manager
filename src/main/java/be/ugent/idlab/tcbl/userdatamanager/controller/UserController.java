@@ -26,8 +26,6 @@ import java.util.Base64;
 import java.util.Date;
 
 /**
- * <p>Copyright 2017 IDLab (Ghent University - imec)</p>
- *
  * Controller for actions where (TCBL) users are involved.
  *
  * @author Gerald Haesendonck

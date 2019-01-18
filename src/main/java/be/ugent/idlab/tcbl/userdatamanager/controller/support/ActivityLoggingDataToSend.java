@@ -5,8 +5,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * <p>Data to send in ActivityLogger.</p>
- * <p>
- * <p>Copyright 2018 IDLab (Ghent University - imec)</p>
  *
  * @author Martin Vanbrabant
  */

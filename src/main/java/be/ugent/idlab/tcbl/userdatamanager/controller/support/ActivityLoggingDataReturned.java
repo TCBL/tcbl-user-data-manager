@@ -6,8 +6,6 @@ import java.io.Serializable;
 
 /**
  * <p>Data returned in ActivityLogger.</p>
- * <p>
- * <p>Copyright 2018 IDLab (Ghent University - imec)</p>
  *
  * @author Martin Vanbrabant
  */

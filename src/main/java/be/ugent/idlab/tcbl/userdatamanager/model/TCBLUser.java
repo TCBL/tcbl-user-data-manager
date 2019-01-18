@@ -4,8 +4,6 @@ import javax.persistence.*;
 import java.util.Date;
 
 /**
- * <p>Copyright 2017 IDLab (Ghent University - imec)</p>
- *
  * @author Gerald Haesendonck
  */
 @Entity

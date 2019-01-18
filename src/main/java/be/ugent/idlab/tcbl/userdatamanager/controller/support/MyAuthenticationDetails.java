@@ -2,8 +2,6 @@ package be.ugent.idlab.tcbl.userdatamanager.controller.support;
 
 /**
  * <p>Authentication details we set in the OAuth2AuthenticationToken object.</p>
- * <p>
- * <p>Copyright 2018 IDLab (Ghent University - imec)</p>
  *
  * @author Martin Vanbrabant
  */

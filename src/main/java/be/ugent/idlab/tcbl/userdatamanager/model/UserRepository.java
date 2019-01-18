@@ -10,8 +10,6 @@ import java.util.Date;
 import java.util.Optional;
 
 /**
- * <p>Copyright 2017 IDLab (Ghent University - imec)</p>
- *
  * @author Gerald Haesendonck
  */
 @Component

@@ -9,8 +9,6 @@ import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 /**
  * <p>Defines handlers for exceptions.</p>
- * <p>
- * <p>Copyright 2018 IDLab (Ghent University - imec)</p>
  *
  * @author Martin Vanbrabant
  */

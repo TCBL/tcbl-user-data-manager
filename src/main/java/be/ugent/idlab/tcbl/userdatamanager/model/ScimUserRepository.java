@@ -21,8 +21,6 @@ import static be.ugent.idlab.tcbl.userdatamanager.model.Util.toCalendarPerDay;
 import static org.gluu.oxtrust.model.scim2.Constants.MAX_COUNT;
 
 /**
- * <p>Copyright 2017 IDLab (Ghent University - imec)</p>
- *
  * @author Gerald Haesendonck
  */
 @Component

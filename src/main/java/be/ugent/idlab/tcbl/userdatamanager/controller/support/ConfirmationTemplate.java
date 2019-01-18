@@ -9,8 +9,6 @@ import java.util.List;
 
 /**
  * <p>Controller support for the configuration template.</p>
- * <p>
- * <p>Copyright 2017 IDLab (Ghent University - imec)</p>
  *
  * @author Martin Vanbrabant
  */

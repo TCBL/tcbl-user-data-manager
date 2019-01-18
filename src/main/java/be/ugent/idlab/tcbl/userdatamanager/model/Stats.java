@@ -8,8 +8,6 @@ import java.util.*;
 import static be.ugent.idlab.tcbl.userdatamanager.model.Util.invitationDay;
 
 /**
- * <p>Copyright 2017 IDLab (Ghent University - imec)</p>
- *
  * @author Gerald Haesendonck
  */
 public class Stats implements Serializable {

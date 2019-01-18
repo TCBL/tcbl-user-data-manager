@@ -5,8 +5,6 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 
 /**
- * <p>Copyright 2018 IDLab (Ghent University - imec)</p>
- *
  * @author Gerald Haesendonck
  */
 public class Util {

@@ -9,8 +9,6 @@ import java.util.Objects;
 
 /**
  * <p>Extra data to send in ActivityLogger, in case of a user profile was updated.</p>
- * <p>
- * <p>Copyright 2018 IDLab (Ghent University - imec)</p>
  *
  * @author Martin Vanbrabant
  */

@@ -20,8 +20,6 @@ import java.util.Base64;
 import java.util.Properties;
 
 /**
- * <p>Copyright 2018 IDLab (Ghent University - imec)</p>
- *
  * @author Gerald Haesendonck
  */
 @Component

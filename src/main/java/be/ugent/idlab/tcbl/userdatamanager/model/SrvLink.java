@@ -3,8 +3,6 @@ package be.ugent.idlab.tcbl.userdatamanager.model;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 /**
- * <p>Copyright 2017 IDLab (Ghent University - imec)</p>
- *
  * @author Martin Vanbrabant
  */
 @JsonIgnoreProperties(ignoreUnknown = true)

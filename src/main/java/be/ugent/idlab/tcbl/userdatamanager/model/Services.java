@@ -8,8 +8,6 @@ import java.util.List;
  * <p>A class to contain the TCBL services.</p>
  * <p>
  * <p>Fixed structure for json file compatibility.</p>
- * <p>
- * <p>Copyright 2017 IDLab (Ghent University - imec)</p>
  *
  * @author Martin Vanbrabant
  */

@@ -19,9 +19,6 @@ import org.springframework.core.env.Environment;
  * Adds an AJP connector (and thus endpoint) to the embedded Tomcat servlet container.
  * This enables efficient cooperation with the Apache HTTP server configured as reverse proxy.
  *
- * 
- * <p>Copyright 2017 IDLab (Ghent University - imec)</p>
- *
  * @author Gerald Haesendonck
  */
 @Configuration

@@ -15,8 +15,6 @@ import org.springframework.web.client.RestTemplate;
 
 /**
  * <p>Activity logging support.</p>
- * <p>
- * <p>Copyright 2018 IDLab (Ghent University - imec)</p>
  *
  * @author Martin Vanbrabant
  */

@@ -14,8 +14,6 @@ import org.springframework.security.web.authentication.LoginUrlAuthenticationEnt
 import java.util.Collection;
 
 /**
- * <p>Copyright 2017 IDLab (Ghent University - imec)</p>
- *
  * @author Gerald Haesendonck
  */
 @Configuration

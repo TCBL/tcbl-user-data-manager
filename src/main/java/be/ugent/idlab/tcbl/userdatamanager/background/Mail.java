@@ -12,8 +12,6 @@ import javax.mail.internet.MimeMessage;
 import java.util.Arrays;
 
 /**
- * <p>Copyright 2017 IDLab (Ghent University - imec)</p>
- *
  * @author Gerald Haesendonck
  */
 @Component
